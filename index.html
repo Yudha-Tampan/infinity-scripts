@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Infinity Scripts — WhatsApp Bot Center</title>
+  <meta name="description" content="Platform terbaik untuk script bot WhatsApp premium dan gratis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <canvas id="splash-particles"></canvas>
+  <div class="splash-content">
+    <div class="splash-logo">
+      <div class="logo-ring"></div>
+      <div class="logo-ring ring2"></div>
+      <div class="logo-icon"><i class="fa-brands fa-whatsapp"></i></div>
+    </div>
+    <h1 class="splash-title">INFINITY<span>SCRIPTS</span></h1>
+    <p class="splash-sub">WhatsApp Bot Center</p>
+    <div class="splash-bar"><div class="splash-fill"></div></div>
+    <p class="splash-loading">Initializing system...</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+
+  <!-- PARTICLE BG -->
+  <canvas id="bg-particles"></canvas>
+
+  <!-- NAVBAR TOP -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <i class="fa-brands fa-whatsapp"></i>
+        <span>Infinity<b>Scripts</b></span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge"><span class="live-dot"></span><span id="visitor-count">0</span> online</div>
+      <button class="icon-btn" id="theme-toggle" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+      <button class="icon-btn" id="fav-btn" title="Favorites"><i class="fa-solid fa-heart"></i><span id="fav-count" class="badge hidden">0</span></button>
+    </div>
+  </header>
+
+  <!-- PAGES -->
+  <main id="pages">
+
+    <!-- HOME PAGE -->
+    <section id="page-home" class="page active">
+
+      <!-- BANNER SLIDER -->
+      <div class="banner-slider">
+        <div class="banner-track" id="banner-track">
+          <div class="banner-slide slide1">
+            <div class="banner-content">
+              <span class="banner-tag">🔥 Trending</span>
+              <h2>Script Bot<br><span>WhatsApp</span> Terbaik</h2>
+              <p>Ratusan script premium tersedia gratis dan berbayar</p>
+              <button class="btn-glow" onclick="scrollToScripts()">Jelajahi Sekarang</button>
+            </div>
+          </div>
+          <div class="banner-slide slide2">
+            <div class="banner-content">
+              <span class="banner-tag">⚡ New Update</span>
+              <h2>AI Bot<br><span>Terbaru</span> 2026</h2>
+              <p>Integrasikan kecerdasan buatan ke WhatsApp kamu</p>
+              <button class="btn-glow" onclick="filterCategory('AI')">Lihat AI Bot</button>
+            </div>
+          </div>
+          <div class="banner-slide slide3">
+            <div class="banner-content">
+              <span class="banner-tag">💎 Premium</span>
+              <h2>Panel<br><span>Control</span> Modern</h2>
+              <p>Kelola semua bot dengan dashboard canggih</p>
+              <button class="btn-glow" onclick="filterCategory('Panel')">Lihat Panel</button>
+            </div>
+          </div>
+        </div>
+        <div class="banner-dots" id="banner-dots"></div>
+      </div>
+
+      <!-- STATS BAR -->
+      <div class="stats-bar">
+        <div class="stat-item"><i class="fa-solid fa-box-archive"></i><div><span id="stat-total">0</span><small>Total Script</small></div></div>
+        <div class="stat-item"><i class="fa-solid fa-fire"></i><div><span>150K+</span><small>Downloads</small></div></div>
+        <div class="stat-item"><i class="fa-solid fa-users"></i><div><span>50K+</span><small>Pengguna</small></div></div>
+        <div class="stat-item"><i class="fa-solid fa-star"></i><div><span>4.9</span><small>Rating</small></div></div>
+      </div>
+
+      <!-- LIVE UPDATE -->
+      <div class="live-update">
+        <span class="live-dot"></span>
+        <span id="live-text">Loading...</span>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="search-wrap">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="search-input" placeholder="Cari script bot..." autocomplete="off" />
+          <button class="clear-btn hidden" id="clear-search"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="section-header">
+        <h3>Kategori</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="categories" id="categories">
+        <button class="cat-btn active" data-cat="all"><i class="fa-solid fa-border-all"></i><span>Semua</span></button>
+        <button class="cat-btn" data-cat="MD"><i class="fa-solid fa-mobile-screen"></i><span>MD</span></button>
+        <button class="cat-btn" data-cat="Bug"><i class="fa-solid fa-bug"></i><span>Bug</span></button>
+        <button class="cat-btn" data-cat="Store"><i class="fa-solid fa-store"></i><span>Store</span></button>
+        <button class="cat-btn" data-cat="Pushkontak"><i class="fa-solid fa-address-book"></i><span>Pushkontak</span></button>
+        <button class="cat-btn" data-cat="JPM"><i class="fa-solid fa-bolt"></i><span>JPM</span></button>
+        <button class="cat-btn" data-cat="Pairing"><i class="fa-solid fa-link"></i><span>Pairing</span></button>
+        <button class="cat-btn" data-cat="Panel"><i class="fa-solid fa-desktop"></i><span>Panel</span></button>
+        <button class="cat-btn" data-cat="Downloader"><i class="fa-solid fa-download"></i><span>Downloader</span></button>
+        <button class="cat-btn" data-cat="AI"><i class="fa-solid fa-robot"></i><span>AI</span></button>
+        <button class="cat-btn" data-cat="Game"><i class="fa-solid fa-gamepad"></i><span>Game</span></button>
+        <button class="cat-btn" data-cat="Tools"><i class="fa-solid fa-wrench"></i><span>Tools</span></button>
+      </div>
+
+      <!-- TRENDING SECTION -->
+      <div class="section-header" id="trending-header">
+        <h3><i class="fa-solid fa-fire" style="color:#ff6b35"></i> Trending</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="cards-grid" id="trending-grid"></div>
+
+      <!-- ALL SCRIPTS -->
+      <div class="section-header" id="scripts-anchor">
+        <h3>Semua Script</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="cards-grid" id="scripts-grid"></div>
+      <div class="empty-state hidden" id="empty-state">
+        <i class="fa-solid fa-ghost"></i>
+        <p>Script tidak ditemukan</p>
+        <small>Coba kata kunci lain</small>
+      </div>
+
+    </section>
+
+    <!-- PROFILE PAGE -->
+    <section id="page-profile" class="page">
+      <div class="profile-bg-effect"></div>
+      <div class="profile-wrap">
+        <!-- Cover -->
+        <div class="profile-cover">
+          <div class="profile-cover-glow"></div>
+        </div>
+        <!-- Avatar -->
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar">
+            <img src="owner.jpg" alt="Owner" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect fill=\'%230d0d1a\' width=\'100\' height=\'100\'/><text y=\'55\' x=\'50\' text-anchor=\'middle\' font-size=\'40\'>👤</text></svg>'" />
+          </div>
+          <div class="profile-status-badge"><i class="fa-solid fa-check"></i></div>
+        </div>
+        <!-- Info -->
+        <div class="profile-info">
+          <h2 class="profile-name">Infinity Owner</h2>
+          <p class="profile-role"><i class="fa-solid fa-crown"></i> Script Developer</p>
+          <p class="profile-bio">Developer script WhatsApp bot sejak 2026. Spesialis dalam pembuatan bot otomatis, AI integration, dan sistem store digital. Melayani dengan profesional dan cepat.</p>
+          <!-- Stats -->
+          <div class="profile-stats">
+            <div class="p-stat"><span>150+</span><small>Script</small></div>
+            <div class="p-stat"><span>50K+</span><small>Users</small></div>
+            <div class="p-stat"><span>5★</span><small>Rating</small></div>
+            <div class="p-stat"><span>3yr</span><small>Experience</small></div>
+          </div>
+          <!-- Buttons -->
+          <div class="profile-btns">
+            <a href="https://wa.me/6288973461209" target="_blank" class="prof-btn wa-btn"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+            <a href="https://t.me/infinityscripts" target="_blank" class="prof-btn tg-btn"><i class="fa-brands fa-telegram"></i> Telegram</a>
+          </div>
+          <div class="profile-btns" style="margin-top:10px">
+            <a href="https://youtube.com/@infinityscripts" target="_blank" class="prof-btn yt-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>
+            <a href="https://github.com/infinityscripts" target="_blank" class="prof-btn gh-btn"><i class="fa-brands fa-github"></i> GitHub</a>
+          </div>
+          <!-- Contact card -->
+          <div class="contact-card">
+            <div class="contact-row"><i class="fa-solid fa-phone"></i><span>+6288973461209</span></div>
+            <div class="contact-row"><i class="fa-solid fa-envelope"></i><span>infinity@scripts.id</span></div>
+            <div class="contact-row"><i class="fa-solid fa-location-dot"></i><span>Indonesia 🇮🇩</span></div>
+            <div class="contact-row"><i class="fa-solid fa-clock"></i><span>Respon dalam 1x24 jam</span></div>
+          </div>
+          <!-- Skills -->
+          <div class="skills-section">
+            <h4>Keahlian</h4>
+            <div class="skill-bar-wrap"><span>JavaScript</span><div class="skill-bar"><div class="skill-fill" data-w="95"></div></div><span>95%</span></div>
+            <div class="skill-bar-wrap"><span>Node.js</span><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div><span>90%</span></div>
+            <div class="skill-bar-wrap"><span>WhatsApp API</span><div class="skill-bar"><div class="skill-fill" data-w="98"></div></div><span>98%</span></div>
+            <div class="skill-bar-wrap"><span>AI Integration</span><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div><span>85%</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MUSIC PLAYER -->
+  <div class="music-player" id="music-player">
+    <div class="music-info">
+      <div class="music-disc" id="music-disc"><i class="fa-solid fa-music"></i></div>
+      <div class="music-text">
+        <span id="music-title">Infinity Vibes</span>
+        <small id="music-artist">Ambient BGM</small>
+      </div>
+    </div>
+    <div class="music-controls">
+      <button class="music-btn" id="music-toggle"><i class="fa-solid fa-play"></i></button>
+    </div>
+    <div class="music-wave" id="music-wave">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" title="Scroll to top"><i class="fa-solid fa-chevron-up"></i></button>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="home">
+      <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" data-page="profile">
+      <div class="nav-icon-wrap"><i class="fa-solid fa-user"></i></div>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- POPUP MODAL -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-img-wrap">
+      <img id="modal-img" src="" alt="" />
+      <div class="modal-badges">
+        <span id="modal-status-badge" class="status-badge"></span>
+        <span id="modal-new-badge" class="new-badge hidden">NEW</span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modal-cat"></div>
+      <h2 id="modal-name"></h2>
+      <p id="modal-desc"></p>
+      <div class="modal-meta">
+        <div class="meta-item"><i class="fa-solid fa-star"></i><span id="modal-rating"></span></div>
+        <div class="meta-item"><i class="fa-solid fa-eye"></i><span id="modal-views"></span></div>
+        <div class="meta-item"><i class="fa-solid fa-fire" id="modal-trend-icon"></i><span id="modal-trend"></span></div>
+      </div>
+      <div class="modal-actions">
+        <a id="modal-link" href="#" target="_blank" class="btn-download"><i class="fa-solid fa-download"></i> Download / Open</a>
+        <button class="btn-fav-modal" id="modal-fav-btn"><i class="fa-solid fa-heart"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
