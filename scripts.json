@@ -193,5 +193,44 @@
     "trending": false,
     "baru": true,
     "link": "https://www.mediafire.com/file/68pkalb5aoux231/FURINA_V13.zip/file?dkey=68pkalb5aoux231"
+  },
+  {
+    "id": 16,
+    "nama": "Cantarella.",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa Cantarella.",
+    "thumbnail": "cantarella",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": true,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/cczr5he8kf2zt8d/Cantarella_Reactch_%252B_SWGRUP_No_ENC.zip/file"
+  },
+  {
+    "id": 17,
+    "nama": "ShirokoFork (V3).",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa ShirokoFork (V3).",
+    "thumbnail": "shiroko.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": true,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/csxa82k6gfce201/ShirokoFork_%2528v3%2529_.zip/file?dkey=csxa82k6gfce201"
+  },
+   {
+    "id": 18,
+    "nama": "Lyrra MD V7.",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa Lyrra V7.",
+    "thumbnail": "axonic.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": true,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/49l5nqr1rxdl735/Script_Lyrra_MD_V7.zip/file"
   }
 ]
