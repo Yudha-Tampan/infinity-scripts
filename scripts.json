@@ -232,5 +232,57 @@
     "trending": true,
     "baru": true,
     "link": "https://www.mediafire.com/file/49l5nqr1rxdl735/Script_Lyrra_MD_V7.zip/file"
+  },
+  {
+    "id": 19,
+    "nama": "HydroMD.",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa HydroMD.",
+    "thumbnail": "hydro.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": true,
+    "baru": false,
+    "link": "https://www.mediafire.com/file/quqa54t987vv7ho/HydroMD.zip/file"
+  },
+  {
+    "id": 20,
+    "nama": "AkaneMD.",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Tele AkaneMD.",
+    "thumbnail": "axonic.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": false,
+    "baru": false,
+    "link": "https://www.mediafire.com/file/7u6fqljidyz9ydo/akaneMD.zip/file"
+  },
+  {
+    "id": 21,
+    "nama": "Zeno V16.",
+    "kategori": "Bug",
+    "deskripsi": "Script Bot Wa Bug Zeno V16.",
+    "thumbnail": "zeno.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": true,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/6cc6wd3re7ds6hy/Zeno-V16.zip/file"
+  },
+  {
+    "id": 22,
+    "nama": "NAHIDA-MD.",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa NAHIDA-MD.",
+    "thumbnail": "nahida.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": true,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/wfn8pesg7flklmp/%25F0%259D%2597%25A1%25F0%259D%2597%2594%25F0%259D%2597%259B%25F0%259D%2597%259C%25F0%259D%2597%2597%25F0%259D%2597%2594-%25F0%259D%2597%25A0%25F0%259D%2597%2597.zip/file"
   }
 ]
