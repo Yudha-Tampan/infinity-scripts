@@ -386,14 +386,14 @@ function initMusicPlayer() {
 
   // Kalau file tidak ada / error
   audioPlayer.addEventListener('error', () => {
-    if (title)  title.textContent  = 'Infinity Vibes';
+    if (title)  title.textContent  = 'Everything u are';
     if (artist) artist.textContent = 'Taruh lagu.mp3 di folder';
   });
 
   // Kalau berhasil load
   audioPlayer.addEventListener('canplay', () => {
-    if (title)  title.textContent  = 'Infinity Vibes';
-    if (artist) artist.textContent = 'BGM • lagu.mp3';
+    if (title)  title.textContent  = 'Everything u are';
+    if (artist) artist.textContent = 'Hindia';
   });
 
   // Update progress bar (opsional visual)
