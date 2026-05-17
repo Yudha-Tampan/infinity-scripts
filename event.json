@@ -68,5 +68,19 @@
     "featured": false,
     "aktif": true,
     "baru": true
-  }
+  },
+   {
+    "id": 6,
+    "nama": "Tutorial cara masang bot",
+    "tipe": "Lainnya",
+    "deskripsi": "Tutorial Cara Masang Bot.",
+    "thumbnail": "tutor.jpg",
+    "penyelenggara": "haidarmahiruofficial",
+    "anggota": "2000+ Subscriber",
+    "link": "https://youtu.be/LHuShHC0T0U?si=7QQjkUFolwm487u1",
+    "label_btn": "Tonton Sekarang",
+    "featured": false,
+    "aktif": true,
+    "baru": false
+  } 
 ]
