@@ -83,4 +83,32 @@
     "aktif": true,
     "baru": false
   } 
+  {
+    "id": 7,
+    "nama": "Tutorial Cara Install Module Script Bot Di Panel Pterodactyl",
+    "tipe": "Lainnya",
+    "deskripsi": "Tutorial Cara Install Module Script Bot Di Panel Pterodactyl.",
+    "thumbnail": "tutorial.jpg",
+    "penyelenggara": "mts_store_real",
+    "anggota": "7000+ Subscriber",
+    "link": "https://youtu.be/LHuShHC0T0U?si=7QQjkUFolwm487u1",
+    "label_btn": "Tonton Sekarang",
+    "featured": false,
+    "aktif": true,
+    "baru": false
+  },
+  {
+    "id": 6,
+    "nama": "Cara Mengatasi Panel Eror",
+    "tipe": "Lainnya",
+    "deskripsi": "Cara Mengatasi Panel Eror.",
+    "thumbnail": "cara.jpg",
+    "penyelenggara": "MimiXdSolo",
+    "anggota": "3000+ Subscriber",
+    "link": "https://youtu.be/T_U-ItqM3aA?si=o09NhwYHqtEU2b94",
+    "label_btn": "Tonton Sekarang",
+    "featured": false,
+    "aktif": true,
+    "baru": false
+  }     
 ]
