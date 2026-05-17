@@ -337,6 +337,7 @@ function initNavigation() {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + page).classList.add('active');
       if (page === 'profile') animateSkillBars();
+      if (page === 'anime') { initAnimeDayTabs(); loadAnimeSchedule(); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   });
@@ -843,3 +844,446 @@ function initBgParticles() {
   }
   draw();
 }
+
+// ===================================================
+// ANIME SYSTEM — AniList GraphQL API
+// ===================================================
+
+let animeScheduleData = {};   // { 0:[...], 1:[...], ..., 6:[...] }
+let currentAnimeDay = new Date().getDay();
+let currentAnimeGenre = 'all';
+let animeSearchQuery = '';
+let animeLoaded = false;
+
+const ANILIST_API = 'https://graphql.anilist.co';
+
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const HARI_SHORT = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+const SEASON_MAP = { 0:'WINTER', 1:'WINTER', 2:'SPRING', 3:'SPRING', 4:'SPRING',
+                     5:'SUMMER', 6:'SUMMER', 7:'SUMMER', 8:'FALL', 9:'FALL',
+                     10:'FALL', 11:'WINTER' };
+const SEASON_LABEL = { WINTER:'❄️ Winter', SPRING:'🌸 Spring', SUMMER:'☀️ Summer', FALL:'🍂 Fall' };
+
+// -- Query AniList --
+const AIRING_QUERY = `
+query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { hasNextPage }
+    airingSchedules: media(
+      season: $season
+      seasonYear: $seasonYear
+      type: ANIME
+      status: RELEASING
+      sort: POPULARITY_DESC
+    ) {
+      id
+      title { romaji english native }
+      description(asHtml: false)
+      coverImage { large extraLarge }
+      bannerImage
+      genres
+      averageScore
+      popularity
+      favourites
+      episodes
+      nextAiringEpisode { episode airingAt timeUntilAiring }
+      airingSchedule(notYetAired: false, perPage: 1) {
+        nodes { episode airingAt }
+      }
+      studios(isMain: true) { nodes { name } }
+      format
+      siteUrl
+    }
+  }
+}`;
+
+async function loadAnimeSchedule(forceReload = false) {
+  if (animeLoaded && !forceReload) { renderAnimeDay(); return; }
+
+  showAnimeLoading(true);
+  showAnimeError(false);
+
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+  const season = SEASON_MAP[month];
+  const seasonYear = (month === 11) ? year : year;
+
+  // Update season label
+  const label = document.getElementById('anime-season-label');
+  if (label) label.innerHTML = `<i class="fa-solid fa-sun"></i> ${SEASON_LABEL[season]} ${seasonYear}`;
+
+  try {
+    const res = await fetch(ANILIST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        query: AIRING_QUERY,
+        variables: { page: 1, perPage: 50, season, seasonYear }
+      })
+    });
+    const json = await res.json();
+    const list = json?.data?.Page?.airingSchedules || [];
+
+    // Distribusi ke hari berdasarkan nextAiringEpisode.airingAt atau popular
+    animeScheduleData = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
+
+    list.forEach(anime => {
+      const airingAt = anime?.nextAiringEpisode?.airingAt
+        || anime?.airingSchedule?.nodes?.[0]?.airingAt;
+      let day;
+      if (airingAt) {
+        day = new Date(airingAt * 1000).getDay();
+      } else {
+        // fallback: distribusi merata pakai id
+        day = anime.id % 7;
+      }
+      animeScheduleData[day].push(anime);
+    });
+
+    // Sort tiap hari by popularity
+    for (let d = 0; d < 7; d++) {
+      animeScheduleData[d].sort((a,b) => (b.popularity||0) - (a.popularity||0));
+    }
+
+    animeLoaded = true;
+
+    // Update stats
+    const totalWeek = list.length;
+    const todayCount = animeScheduleData[currentAnimeDay]?.length || 0;
+    const el = document.getElementById('anime-count-week');
+    const el2 = document.getElementById('anime-count-day');
+    if (el) el.textContent = totalWeek;
+    if (el2) el2.textContent = todayCount;
+
+    // Last update time
+    const lu = document.getElementById('anime-last-update');
+    if (lu) {
+      const t = new Date();
+      lu.textContent = t.getHours().toString().padStart(2,'0') + ':' + t.getMinutes().toString().padStart(2,'0');
+    }
+
+    // Next airing time
+    updateNextAiringTime();
+
+    showAnimeLoading(false);
+    renderAnimeDay();
+
+  } catch(e) {
+    showAnimeLoading(false);
+    showAnimeError(true);
+    showToast('Gagal memuat jadwal anime', 'error');
+  }
+}
+
+function updateNextAiringTime() {
+  const todayList = animeScheduleData[currentAnimeDay] || [];
+  const now = Math.floor(Date.now() / 1000);
+  let soonest = null;
+  todayList.forEach(a => {
+    const t = a?.nextAiringEpisode?.airingAt;
+    if (t && t > now) {
+      if (!soonest || t < soonest) soonest = t;
+    }
+  });
+  const el = document.getElementById('anime-next-time');
+  if (el && soonest) {
+    const d = new Date(soonest * 1000);
+    el.textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+}
+
+// -- Render per hari --
+function renderAnimeDay() {
+  const grid = document.getElementById('anime-grid');
+  const empty = document.getElementById('anime-empty');
+  if (!grid) return;
+
+  let list = animeScheduleData[currentAnimeDay] || [];
+
+  // Genre filter
+  if (currentAnimeGenre !== 'all') {
+    list = list.filter(a => a.genres && a.genres.includes(currentAnimeGenre));
+  }
+
+  // Search
+  if (animeSearchQuery) {
+    const q = animeSearchQuery.toLowerCase();
+    list = list.filter(a => {
+      const t = a.title;
+      return (t.romaji||'').toLowerCase().includes(q) ||
+             (t.english||'').toLowerCase().includes(q) ||
+             (t.native||'').toLowerCase().includes(q);
+    });
+  }
+
+  // Update stat
+  document.getElementById('anime-count-day').textContent = list.length;
+
+  // Schedule title
+  const titleEl = document.getElementById('anime-schedule-title');
+  if (titleEl) {
+    titleEl.innerHTML = `<i class="fa-solid fa-calendar-day" style="color:#ff5c93"></i> ${HARI[currentAnimeDay]}`;
+  }
+
+  // Upcoming banner — ambil yg paling cepat tayang hari ini
+  renderUpcomingBanner(animeScheduleData[currentAnimeDay] || []);
+
+  grid.innerHTML = '';
+  if (list.length === 0) {
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  list.forEach((anime, i) => {
+    const card = createAnimeCard(anime, i);
+    grid.appendChild(card);
+  });
+}
+
+// -- Upcoming banner --
+function renderUpcomingBanner(list) {
+  const wrap = document.getElementById('anime-upcoming-wrap');
+  if (!wrap) return;
+
+  const now = Math.floor(Date.now() / 1000);
+  const upcoming = list
+    .filter(a => a?.nextAiringEpisode?.airingAt && a.nextAiringEpisode.airingAt > now)
+    .sort((a,b) => a.nextAiringEpisode.airingAt - b.nextAiringEpisode.airingAt)[0];
+
+  if (!upcoming) { wrap.innerHTML = ''; return; }
+
+  const tLeft = upcoming.nextAiringEpisode.timeUntilAiring || 0;
+  const h = Math.floor(tLeft / 3600);
+  const m = Math.floor((tLeft % 3600) / 60);
+  const countdownText = h > 0 ? `${h}j ${m}m lagi` : `${m} menit lagi`;
+
+  const title = upcoming.title.english || upcoming.title.romaji;
+  const banner = upcoming.bannerImage || upcoming.coverImage?.extraLarge || upcoming.coverImage?.large || '';
+  const ep = upcoming.nextAiringEpisode.episode;
+  const genres = (upcoming.genres || []).slice(0,3).join(' • ');
+
+  wrap.innerHTML = `
+    <div class="anime-upcoming-section">
+      <div class="anime-upcoming-label"><i class="fa-solid fa-bell"></i> Segera Tayang</div>
+      <div class="anime-upcoming-card" id="upcoming-card-click">
+        <div class="anime-upcoming-thumb">
+          <img src="${banner}" alt="${title}" onerror="this.src='${upcoming.coverImage?.large||''}'" />
+          <div class="anime-upcoming-thumb-overlay"></div>
+        </div>
+        <div class="anime-upcoming-inner">
+          <div class="anime-upcoming-countdown"><i class="fa-solid fa-clock"></i> ${countdownText}</div>
+          <div class="anime-upcoming-title">${title}</div>
+          <div class="anime-upcoming-meta">
+            <span><i class="fa-solid fa-film"></i> Episode ${ep}</span>
+            ${genres ? `<span><i class="fa-solid fa-tags"></i> ${genres}</span>` : ''}
+            ${upcoming.averageScore ? `<span><i class="fa-solid fa-star" style="color:#ffd700"></i> ${upcoming.averageScore/10}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('upcoming-card-click')?.addEventListener('click', () => openAnimeModal(upcoming));
+}
+
+// -- Create Anime Card --
+function createAnimeCard(anime, index) {
+  const div = document.createElement('div');
+  div.className = 'anime-card';
+  div.style.animationDelay = (index * 0.04) + 's';
+
+  const title = anime.title.english || anime.title.romaji;
+  const cover = anime.coverImage?.large || anime.coverImage?.extraLarge || '';
+  const score = anime.averageScore ? (anime.averageScore / 10).toFixed(1) : null;
+  const genres = (anime.genres || []).slice(0, 2);
+  const epInfo = anime.nextAiringEpisode;
+  const now = Math.floor(Date.now() / 1000);
+  const isAiring = epInfo && (epInfo.airingAt - now) < 3600 && (epInfo.airingAt - now) > -3600;
+
+  let timeStr = '';
+  if (epInfo) {
+    const d = new Date(epInfo.airingAt * 1000);
+    timeStr = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+
+  const imgContent = cover
+    ? `<img src="${cover}" alt="${title}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'anime-card-poster-placeholder\\'>🎌</div>'">`
+    : `<div class="anime-card-poster-placeholder">🎌</div>`;
+
+  div.innerHTML = `
+    <div class="anime-card-poster">
+      ${imgContent}
+      <div class="anime-card-overlay"></div>
+      ${score ? `<div class="anime-card-score"><i class="fa-solid fa-star"></i>${score}</div>` : ''}
+      ${epInfo ? `<div class="anime-card-ep-badge">EP ${epInfo.episode}</div>` : ''}
+      ${isAiring ? `<div class="anime-airing-badge"><div class="airing-pill"><span class="live-dot"></span>AIRING</div></div>` : ''}
+      ${timeStr ? `<div class="anime-card-time"><i class="fa-solid fa-clock"></i>${timeStr}</div>` : ''}
+    </div>
+    <div class="anime-card-body">
+      <div class="anime-card-title">${title}</div>
+      <div class="anime-card-genres">
+        ${genres.map(g => `<span class="anime-card-genre-tag">${g}</span>`).join('')}
+      </div>
+    </div>`;
+
+  div.addEventListener('click', () => openAnimeModal(anime));
+  return div;
+}
+
+// -- Anime Modal --
+function openAnimeModal(anime) {
+  const overlay = document.getElementById('anime-modal-overlay');
+  const title = anime.title.english || anime.title.romaji;
+  const titleNative = anime.title.native || '';
+  const banner = anime.bannerImage || anime.coverImage?.extraLarge || anime.coverImage?.large || '';
+  const cover = anime.coverImage?.large || anime.coverImage?.extraLarge || '';
+  const score = anime.averageScore ? (anime.averageScore / 10).toFixed(1) + ' / 10' : 'N/A';
+  const ep = anime.nextAiringEpisode;
+  const genres = anime.genres || [];
+
+  // Banner
+  const bannerImg = document.getElementById('am-banner');
+  bannerImg.src = banner;
+  bannerImg.onerror = () => { bannerImg.src = cover; };
+
+  // Cover
+  const coverImg = document.getElementById('am-cover');
+  coverImg.src = cover;
+  coverImg.onerror = () => { coverImg.style.display = 'none'; };
+
+  // Score badge
+  document.getElementById('am-score').textContent = anime.averageScore ? `⭐ ${score}` : '';
+
+  // Titles & genres
+  document.getElementById('am-title').textContent = title;
+  document.getElementById('am-title-en').textContent = titleNative;
+
+  const genresEl = document.getElementById('am-genres');
+  genresEl.innerHTML = genres.slice(0,5).map(g => `<span class="am-genre-chip">${g}</span>`).join('');
+
+  // Info grid
+  let timeStr = '--';
+  if (ep) {
+    const d = new Date(ep.airingAt * 1000);
+    const h = Math.floor(ep.timeUntilAiring / 3600);
+    const m = Math.floor((ep.timeUntilAiring % 3600) / 60);
+    timeStr = d.toLocaleDateString('id-ID',{weekday:'short',hour:'2-digit',minute:'2-digit'});
+    if (ep.timeUntilAiring > 0) {
+      timeStr += ` (${h > 0 ? h+'j ' : ''}${m}m lagi)`;
+    }
+  }
+  document.getElementById('am-time').textContent = timeStr;
+  document.getElementById('am-ep').textContent = ep ? `EP ${ep.episode}` : (anime.episodes ? `${anime.episodes} EP` : 'Ongoing');
+  document.getElementById('am-format').textContent = anime.format || 'TV';
+  document.getElementById('am-score2').textContent = score;
+  document.getElementById('am-fav').textContent = anime.favourites ? anime.favourites.toLocaleString() : '0';
+  const studio = anime.studios?.nodes?.[0]?.name || 'Unknown';
+  document.getElementById('am-studio').textContent = studio;
+
+  // Description
+  const rawDesc = anime.description || 'Tidak ada deskripsi.';
+  const cleanDesc = rawDesc.replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, ' ').trim();
+  const descEl = document.getElementById('am-desc');
+  const readMoreBtn = document.getElementById('am-read-more');
+  descEl.textContent = cleanDesc;
+  descEl.className = '';
+
+  if (cleanDesc.length > 280) {
+    readMoreBtn.classList.remove('hidden');
+    readMoreBtn.textContent = 'Baca selengkapnya ▼';
+    readMoreBtn.onclick = () => {
+      const expanded = descEl.classList.contains('expanded');
+      descEl.classList.toggle('expanded', !expanded);
+      readMoreBtn.textContent = expanded ? 'Baca selengkapnya ▼' : 'Tutup ▲';
+    };
+  } else {
+    readMoreBtn.classList.add('hidden');
+  }
+
+  // AniList link
+  document.getElementById('am-anilist-link').href = anime.siteUrl || `https://anilist.co/anime/${anime.id}`;
+
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAnimeModal() {
+  document.getElementById('anime-modal-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('anime-modal-close')?.addEventListener('click', closeAnimeModal);
+document.getElementById('anime-modal-overlay')?.addEventListener('click', (e) => {
+  if (e.target === document.getElementById('anime-modal-overlay')) closeAnimeModal();
+});
+
+// -- Day tabs --
+function initAnimeDayTabs() {
+  const tabs = document.getElementById('anime-day-tabs');
+  if (!tabs) return;
+
+  const today = new Date().getDay();
+  // Mark today tab
+  tabs.querySelectorAll('.anime-day-tab').forEach(btn => {
+    const d = parseInt(btn.dataset.day);
+    if (d === today) btn.classList.add('today-tab');
+    if (d === currentAnimeDay) btn.classList.add('active');
+  });
+
+  tabs.addEventListener('click', (e) => {
+    const btn = e.target.closest('.anime-day-tab');
+    if (!btn) return;
+    tabs.querySelectorAll('.anime-day-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentAnimeDay = parseInt(btn.dataset.day);
+    animeSearchQuery = '';
+    document.getElementById('anime-search-input').value = '';
+    document.getElementById('anime-clear-search').classList.add('hidden');
+    renderAnimeDay();
+  });
+}
+
+// -- Genre filter --
+document.getElementById('anime-genre-bar')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.anime-genre-btn');
+  if (!btn) return;
+  document.querySelectorAll('.anime-genre-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentAnimeGenre = btn.dataset.genre;
+  renderAnimeDay();
+});
+
+// -- Anime Search --
+document.getElementById('anime-search-input')?.addEventListener('input', (e) => {
+  animeSearchQuery = e.target.value.trim();
+  document.getElementById('anime-clear-search').classList.toggle('hidden', !animeSearchQuery);
+  renderAnimeDay();
+});
+document.getElementById('anime-clear-search')?.addEventListener('click', () => {
+  document.getElementById('anime-search-input').value = '';
+  animeSearchQuery = '';
+  document.getElementById('anime-clear-search').classList.add('hidden');
+  renderAnimeDay();
+});
+
+// -- Retry btn --
+document.getElementById('anime-retry-btn')?.addEventListener('click', () => {
+  animeLoaded = false;
+  loadAnimeSchedule(true);
+});
+
+// -- Helpers --
+function showAnimeLoading(show) {
+  const el = document.getElementById('anime-loading');
+  if (el) el.classList.toggle('hidden', !show);
+}
+function showAnimeError(show) {
+  const el = document.getElementById('anime-error');
+  if (el) el.classList.toggle('hidden', !show);
+}
+
+// Init anime day tabs on load
+document.addEventListener('DOMContentLoaded', () => {
+  initAnimeDayTabs();
+});

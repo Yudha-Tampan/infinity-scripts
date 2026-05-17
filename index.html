@@ -208,7 +208,136 @@
 
     </section>
 
-    <!-- PROFILE PAGE -->
+    <!-- ANIME PAGE -->
+    <section id="page-anime" class="page">
+      <div class="anime-page-bg"></div>
+
+      <!-- HEADER -->
+      <div class="anime-page-header">
+        <div class="anime-header-glow"></div>
+        <div class="anime-header-content">
+          <div class="anime-header-icon">🎌</div>
+          <h2>Jadwal Anime</h2>
+          <p>Anime musim ini — live dari AniList API</p>
+          <div class="anime-header-meta">
+            <span id="anime-season-label"><i class="fa-solid fa-sun"></i> Memuat...</span>
+            <span class="dot-sep">•</span>
+            <span><i class="fa-solid fa-satellite-dish"></i> AniList</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HARI TABS -->
+      <div class="anime-day-tabs" id="anime-day-tabs">
+        <button class="anime-day-tab" data-day="0">Min</button>
+        <button class="anime-day-tab" data-day="1">Sen</button>
+        <button class="anime-day-tab" data-day="2">Sel</button>
+        <button class="anime-day-tab" data-day="3">Rab</button>
+        <button class="anime-day-tab" data-day="4">Kam</button>
+        <button class="anime-day-tab" data-day="5">Jum</button>
+        <button class="anime-day-tab" data-day="6">Sab</button>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="search-wrap" style="margin-bottom:12px">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="anime-search-input" placeholder="Cari judul anime..." autocomplete="off"/>
+          <button class="clear-btn hidden" id="anime-clear-search"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- GENRE FILTER -->
+      <div class="anime-genre-bar" id="anime-genre-bar">
+        <button class="anime-genre-btn active" data-genre="all">Semua</button>
+        <button class="anime-genre-btn" data-genre="Action">Action</button>
+        <button class="anime-genre-btn" data-genre="Romance">Romance</button>
+        <button class="anime-genre-btn" data-genre="Comedy">Comedy</button>
+        <button class="anime-genre-btn" data-genre="Fantasy">Fantasy</button>
+        <button class="anime-genre-btn" data-genre="Sci-Fi">Sci-Fi</button>
+        <button class="anime-genre-btn" data-genre="Horror">Horror</button>
+        <button class="anime-genre-btn" data-genre="Sports">Sports</button>
+        <button class="anime-genre-btn" data-genre="Mystery">Mystery</button>
+      </div>
+
+      <!-- STATS -->
+      <div class="anime-stat-bar">
+        <div class="anime-stat"><i class="fa-solid fa-tv"></i><div><span id="anime-count-day">0</span><small>Hari ini</small></div></div>
+        <div class="anime-stat"><i class="fa-solid fa-calendar-week"></i><div><span id="anime-count-week">0</span><small>Minggu ini</small></div></div>
+        <div class="anime-stat"><i class="fa-solid fa-clock"></i><div><span id="anime-next-time">--:--</span><small>Tayang berikutnya</small></div></div>
+        <div class="anime-stat"><i class="fa-solid fa-rotate"></i><div><span id="anime-last-update">--</span><small>Last update</small></div></div>
+      </div>
+
+      <!-- LOADING -->
+      <div class="anime-loading hidden" id="anime-loading">
+        <div class="anime-loading-spinner"></div>
+        <p>Mengambil jadwal dari AniList...</p>
+      </div>
+
+      <!-- ERROR -->
+      <div class="anime-error hidden" id="anime-error">
+        <div class="anime-error-icon">📡</div>
+        <p>Gagal memuat data</p>
+        <small>Periksa koneksi internet</small>
+        <button class="anime-retry-btn" id="anime-retry-btn"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button>
+      </div>
+
+      <!-- SEGERA TAYANG -->
+      <div id="anime-upcoming-wrap"></div>
+
+      <!-- JADWAL SECTION -->
+      <div class="section-header">
+        <h3 id="anime-schedule-title"><i class="fa-solid fa-calendar-day" style="color:var(--neon)"></i> Jadwal</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="anime-grid" id="anime-grid"></div>
+      <div class="empty-state hidden" id="anime-empty">
+        <i class="fa-solid fa-film"></i>
+        <p>Tidak ada anime hari ini</p>
+        <small>Coba pilih hari lain</small>
+      </div>
+
+    </section>
+
+    <!-- ANIME DETAIL MODAL -->
+    <div class="modal-overlay hidden" id="anime-modal-overlay">
+      <div class="modal-box anime-modal-box" id="anime-modal-box">
+        <button class="modal-close" id="anime-modal-close"><i class="fa-solid fa-xmark"></i></button>
+        <div class="anime-modal-banner">
+          <img id="am-banner" src="" alt=""/>
+          <div class="anime-modal-banner-overlay"></div>
+          <div class="am-score-badge" id="am-score"></div>
+        </div>
+        <div class="anime-modal-cover-row">
+          <img id="am-cover" src="" alt="" class="anime-modal-cover"/>
+          <div class="anime-modal-title-block">
+            <h2 id="am-title"></h2>
+            <p id="am-title-en" class="am-sub-title"></p>
+            <div class="am-genres" id="am-genres"></div>
+          </div>
+        </div>
+        <div class="modal-body" style="padding-top:14px">
+          <div class="am-info-grid">
+            <div class="am-info-item"><i class="fa-solid fa-clock"></i><div><small>Tayang</small><span id="am-time"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-film"></i><div><small>Episode</small><span id="am-ep"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-tv"></i><div><small>Format</small><span id="am-format"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-star"></i><div><small>Score</small><span id="am-score2"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-heart"></i><div><small>Favorit</small><span id="am-fav"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-building"></i><div><small>Studio</small><span id="am-studio"></span></div></div>
+          </div>
+          <div class="am-desc-wrap">
+            <p id="am-desc"></p>
+            <button class="am-read-more hidden" id="am-read-more">Baca selengkapnya ▼</button>
+          </div>
+          <div class="modal-actions" style="margin-top:16px">
+            <a id="am-anilist-link" href="#" target="_blank" class="btn-download" style="background:linear-gradient(135deg,#1a1a2e,#2d2b55)">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat di AniList
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <section id="page-profile" class="page">
       <div class="profile-bg-effect"></div>
       <div class="profile-wrap">
@@ -297,6 +426,10 @@
         <span class="event-nav-badge hidden" id="event-nav-badge"></span>
       </div>
       <span>Event</span>
+    </button>
+    <button class="nav-item" data-page="anime">
+      <div class="nav-icon-wrap"><span class="nav-anime-icon">🎌</span></div>
+      <span>Anime</span>
     </button>
     <button class="nav-item" data-page="profile">
       <div class="nav-icon-wrap"><i class="fa-solid fa-user"></i></div>
