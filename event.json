@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "nama": "Website Resmi Infinity",
+    "tipe": "Website",
+    "deskripsi": "Kunjungi website resmi Infinity Scripts untuk dokumentasi lengkap, tutorial, dan pembelian script premium. Tampilan modern dan mudah digunakan.",
+    "thumbnail": "web.jpg",
+    "penyelenggara": "Infinity Scripts",
+    "anggota": "",
+    "link": "https://infinity-scripts.vercel.app/",
+    "label_btn": "Kunjungi Website",
+    "featured": true,
+    "aktif": true,
+    "baru": false
+  },
+   {
+    "id": 2,
+    "nama": "Website Jailbreak",
+    "tipe": "Website",
+    "deskripsi": "Website ini menyediakan prompt jailbreak yang sangat banyak, seperti prompt chat gpt,claude,deepseek dll.",
+    "thumbnail": "jail.jpg",
+    "penyelenggara": "Xso",
+    "anggota": "",
+    "link": "https://perpustakaa-prompt.netlify.app",
+    "label_btn": "Kunjungi Website",
+    "featured": false,
+    "aktif": true,
+    "baru": false
+  },
+  {
+    "id": 3,
+    "nama": "Anime Lovers",
+    "tipe": "Grup",
+    "deskripsi": "Grup Anime Lovers Membahas tentang Anime Dll.",
+    "thumbnail": "al.jpg",
+    "penyelenggara": "lvy",
+    "anggota": "200+ Anggota",
+    "link": "https://chat.whatsapp.com/KCcQBC8VESrCZnDBlqLBsm",
+    "label_btn": "Gabung Komunitas",
+    "featured": false,
+    "aktif": true,
+    "baru": true
+  },
+  {
+    "id": 4,
+    "nama": "Website Store Digital",
+    "tipe": "Website",
+    "deskripsi": "Disini kami menyediakan produk produk digital,dari mulai pterodactyl dll.",
+    "thumbnail": "webs.jpg",
+    "penyelenggara": "Fallzx Infinity",
+    "anggota": "",
+    "link": "https://fallxd-store-alpha.vercel.app",
+    "label_btn": "Kunjungi Website",
+    "featured": false,
+    "aktif": true,
+    "baru": false
+  },
+  {
+    "id": 5,
+    "nama": "Grup Jailbreak Official",
+    "tipe": "Grup",
+    "deskripsi": "Ikuti Grup ini untuk Info² tentang jailbreak.",
+    "thumbnail": "gb.jpg",
+    "penyelenggara": "Xso Dan Sky",
+    "anggota": "400+ anggota",
+    "link": "https://chat.whatsapp.com/F3YYt8ptdXDA5AJ1pNNe2h?s=cl&p=a&ilr=4",
+    "label_btn": "Gabung Komunitas",
+    "featured": false,
+    "aktif": true,
+    "baru": true
+  }
+]

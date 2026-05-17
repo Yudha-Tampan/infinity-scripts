@@ -153,6 +153,61 @@
 
     </section>
 
+    <!-- EVENT PAGE -->
+    <section id="page-event" class="page">
+      <div class="event-page-bg"></div>
+
+      <!-- EVENT HEADER -->
+      <div class="event-page-header">
+        <div class="event-header-glow"></div>
+        <div class="event-header-content">
+          <div class="event-header-icon"><i class="fa-solid fa-bolt"></i></div>
+          <h2>Event & Promosi</h2>
+          <p>Grup, website, dan penawaran spesial pilihan</p>
+          <div class="event-header-stats">
+            <span><i class="fa-solid fa-calendar-check"></i> <b id="stat-event-total">0</b> Event Aktif</span>
+            <span class="dot-sep">•</span>
+            <span><i class="fa-solid fa-fire"></i> Update Rutin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENT FILTER TABS -->
+      <div class="event-tabs" id="event-tabs">
+        <button class="event-tab active" data-type="all"><i class="fa-solid fa-border-all"></i> Semua</button>
+        <button class="event-tab" data-type="Grup"><i class="fa-brands fa-whatsapp"></i> Grup</button>
+        <button class="event-tab" data-type="Website"><i class="fa-solid fa-globe"></i> Website</button>
+        <button class="event-tab" data-type="Channel"><i class="fa-brands fa-telegram"></i> Channel</button>
+        <button class="event-tab" data-type="Promo"><i class="fa-solid fa-tag"></i> Promo</button>
+        <button class="event-tab" data-type="Lainnya"><i class="fa-solid fa-ellipsis"></i> Lainnya</button>
+      </div>
+
+      <!-- EVENT SEARCH -->
+      <div class="search-wrap" style="margin-bottom:12px">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="event-search-input" placeholder="Cari event atau promosi..." autocomplete="off" />
+          <button class="clear-btn hidden" id="event-clear-search"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- FEATURED EVENT (otomatis ambil yang featured:true) -->
+      <div id="featured-event-wrap"></div>
+
+      <!-- EVENT GRID -->
+      <div class="section-header">
+        <h3><i class="fa-solid fa-calendar-star" style="color:var(--neon)"></i> Semua Event</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="event-list" id="event-list"></div>
+      <div class="empty-state hidden" id="event-empty">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <p>Event tidak ditemukan</p>
+        <small>Coba kata kunci lain</small>
+      </div>
+
+    </section>
+
     <!-- PROFILE PAGE -->
     <section id="page-profile" class="page">
       <div class="profile-bg-effect"></div>
@@ -172,7 +227,7 @@
         <div class="profile-info">
           <h2 class="profile-name">Infinity Owner</h2>
           <p class="profile-role"><i class="fa-solid fa-crown"></i> Script Developer</p>
-          <p class="profile-bio">Developer script WhatsApp bot sejak 2026. Spesialis dalam pembuatan bot otomatis, AI integration, dan sistem store digital. Melayani dengan profesional dan cepat.</p>
+          <p class="profile-bio">Developer script WhatsApp bot sejak 2020. Spesialis dalam pembuatan bot otomatis, AI integration, dan sistem store digital. Melayani dengan profesional dan cepat.</p>
           <!-- Stats -->
           <div class="profile-stats">
             <div class="p-stat"><span>150+</span><small>Script</small></div>
@@ -191,7 +246,7 @@
           </div>
           <!-- Contact card -->
           <div class="contact-card">
-            <div class="contact-row"><i class="fa-solid fa-phone"></i><span>+6288973461209</span></div>
+            <div class="contact-row"><i class="fa-solid fa-phone"></i><span>+62 889-7346-1209</span></div>
             <div class="contact-row"><i class="fa-solid fa-envelope"></i><span>infinity@scripts.id</span></div>
             <div class="contact-row"><i class="fa-solid fa-location-dot"></i><span>Indonesia 🇮🇩</span></div>
             <div class="contact-row"><i class="fa-solid fa-clock"></i><span>Respon dalam 1x24 jam</span></div>
@@ -236,6 +291,13 @@
       <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
       <span>Home</span>
     </button>
+    <button class="nav-item nav-event-center" data-page="event">
+      <div class="nav-icon-wrap nav-event-icon">
+        <i class="fa-solid fa-bolt"></i>
+        <span class="event-nav-badge hidden" id="event-nav-badge"></span>
+      </div>
+      <span>Event</span>
+    </button>
     <button class="nav-item" data-page="profile">
       <div class="nav-icon-wrap"><i class="fa-solid fa-user"></i></div>
       <span>Profile</span>
@@ -267,6 +329,41 @@
       <div class="modal-actions">
         <a id="modal-link" href="#" target="_blank" class="btn-download"><i class="fa-solid fa-download"></i> Download / Open</a>
         <button class="btn-fav-modal" id="modal-fav-btn"><i class="fa-solid fa-heart"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="modal-overlay hidden" id="event-modal-overlay">
+  <div class="modal-box event-modal-box" id="event-modal-box">
+    <button class="modal-close" id="event-modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="event-modal-header">
+      <div class="event-modal-thumb">
+        <img id="ev-modal-img" src="" alt="" />
+        <div class="event-modal-thumb-overlay"></div>
+      </div>
+      <div class="event-modal-type-badge" id="ev-modal-type"></div>
+      <div class="event-modal-featured-badge hidden" id="ev-modal-featured-badge">
+        <i class="fa-solid fa-star"></i> Featured
+      </div>
+    </div>
+    <div class="modal-body">
+      <h2 id="ev-modal-name"></h2>
+      <p id="ev-modal-desc"></p>
+      <div class="ev-modal-info">
+        <div class="ev-info-row"><i class="fa-solid fa-globe"></i><span id="ev-modal-link-text"></span></div>
+        <div class="ev-info-row" id="ev-modal-penyelenggara-row">
+          <i class="fa-solid fa-user-tie"></i><span id="ev-modal-penyelenggara"></span>
+        </div>
+        <div class="ev-info-row" id="ev-modal-anggota-row">
+          <i class="fa-solid fa-users"></i><span id="ev-modal-anggota"></span>
+        </div>
+      </div>
+      <div class="modal-actions" style="margin-top:20px">
+        <a id="ev-modal-link" href="#" target="_blank" class="btn-download ev-btn-join">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> <span id="ev-btn-label">Gabung Sekarang</span>
+        </a>
       </div>
     </div>
   </div>

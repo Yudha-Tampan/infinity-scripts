@@ -58,6 +58,7 @@ async function initApp() {
   initFakeStats();
   animateLiveText();
   loadScripts();
+  loadEvents();
   animateSkillBars();
 }
 
@@ -528,6 +529,266 @@ function initSplashParticles() {
   }
   draw();
 }
+
+// ===== EVENT SYSTEM =====
+let allEvents = [];
+let currentEventType = 'all';
+let eventSearchQuery = '';
+
+async function loadEvents() {
+  try {
+    const res = await fetch('event.json?v=' + Date.now());
+    if (!res.ok) throw new Error('Failed');
+    allEvents = await res.json();
+  } catch (e) {
+    allEvents = [];
+  }
+  renderEvents();
+  updateEventNavBadge();
+}
+
+function updateEventNavBadge() {
+  const badge = document.getElementById('event-nav-badge');
+  const newCount = allEvents.filter(e => e.baru && e.aktif).length;
+  if (newCount > 0) {
+    badge.textContent = newCount;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+function renderEvents() {
+  const statEl = document.getElementById('stat-event-total');
+  const activeEvents = allEvents.filter(e => e.aktif);
+  if (statEl) statEl.textContent = activeEvents.length;
+
+  let filtered = activeEvents;
+  if (currentEventType !== 'all') filtered = filtered.filter(e => e.tipe === currentEventType);
+  if (eventSearchQuery) {
+    const q = eventSearchQuery.toLowerCase();
+    filtered = filtered.filter(e =>
+      e.nama.toLowerCase().includes(q) ||
+      e.deskripsi.toLowerCase().includes(q) ||
+      e.tipe.toLowerCase().includes(q) ||
+      (e.penyelenggara || '').toLowerCase().includes(q)
+    );
+  }
+
+  // Featured
+  const featuredWrap = document.getElementById('featured-event-wrap');
+  const featured = filtered.filter(e => e.featured);
+  if (featured.length > 0 && currentEventType === 'all' && !eventSearchQuery) {
+    featuredWrap.innerHTML = renderFeaturedSlider(featured);
+    featuredWrap.querySelectorAll('.featured-event-card').forEach((card, i) => {
+      card.addEventListener('click', () => openEventModal(featured[i]));
+    });
+  } else {
+    featuredWrap.innerHTML = '';
+  }
+
+  // List
+  const list = document.getElementById('event-list');
+  const emptyEl = document.getElementById('event-empty');
+  const nonFeatured = (currentEventType !== 'all' || eventSearchQuery) ? filtered : filtered.filter(e => !e.featured);
+
+  list.innerHTML = '';
+  if (nonFeatured.length === 0 && featured.length === 0) {
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+  emptyEl.classList.add('hidden');
+
+  nonFeatured.forEach((ev, i) => {
+    const card = createEventCard(ev, i);
+    list.appendChild(card);
+  });
+}
+
+function renderFeaturedSlider(featured) {
+  const cards = featured.map(ev => {
+    const typeClass = `chip-${ev.tipe}`;
+    const typeIcon = getTypeIcon(ev.tipe);
+    const thumbContent = ev.thumbnail
+      ? `<img src="${ev.thumbnail}" alt="${ev.nama}" onerror="this.parentElement.innerHTML='<div class=\\'featured-thumb-placeholder\\'>${getTypeEmoji(ev.tipe)}</div>'">`
+      : `<div class="featured-thumb-placeholder">${getTypeEmoji(ev.tipe)}</div>`;
+    const anggotaHTML = ev.anggota ? `<span><i class="fa-solid fa-users"></i> ${ev.anggota}</span>` : '';
+    const penHTML = ev.penyelenggara ? `<span><i class="fa-solid fa-user-tie"></i> ${ev.penyelenggara}</span>` : '';
+    return `
+      <div class="featured-event-card">
+        <div class="featured-thumb">
+          ${thumbContent}
+          <div class="featured-thumb-overlay"></div>
+          ${ev.baru ? '<div class="new-chip">NEW</div>' : ''}
+          <div class="feat-star-badge"><i class="fa-solid fa-star"></i> Featured</div>
+        </div>
+        <div class="featured-inner">
+          <div class="featured-type-chip ${typeClass}"><i class="${typeIcon}"></i> ${ev.tipe}</div>
+          <div class="featured-title">${ev.nama}</div>
+          <div class="featured-desc">${ev.deskripsi}</div>
+          <div class="featured-footer">
+            <div class="featured-meta">${anggotaHTML}${penHTML}</div>
+            <button class="featured-btn"><i class="fa-solid fa-arrow-right-to-bracket"></i> ${ev.label_btn || 'Buka'}</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="featured-event-section">
+      <div class="featured-label"><i class="fa-solid fa-star"></i> Featured Event</div>
+      ${cards}
+    </div>
+  `;
+}
+
+function createEventCard(ev, index) {
+  const div = document.createElement('div');
+  div.className = 'event-card';
+  div.style.animationDelay = (index * 0.06) + 's';
+  const typeClass = `chip-${ev.tipe}`;
+  const typeIcon = getTypeIcon(ev.tipe);
+  const thumbContent = ev.thumbnail
+    ? `<img src="${ev.thumbnail}" alt="${ev.nama}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'event-card-thumb-placeholder\\'>${getTypeEmoji(ev.tipe)}</div>'">`
+    : `<div class="event-card-thumb-placeholder">${getTypeEmoji(ev.tipe)}</div>`;
+  const metaText = ev.anggota || ev.penyelenggara || ev.tipe;
+
+  div.innerHTML = `
+    <div class="event-card-thumb">
+      ${thumbContent}
+      ${ev.baru ? '<div class="event-new-chip">NEW</div>' : ''}
+    </div>
+    <div class="event-card-body">
+      <div>
+        <div class="event-card-top">
+          <div class="event-card-name">${ev.nama}</div>
+          <span class="event-type-chip ${typeClass}"><i class="${typeIcon}"></i> ${ev.tipe}</span>
+        </div>
+        <div class="event-card-desc">${ev.deskripsi}</div>
+      </div>
+      <div class="event-card-footer">
+        <div class="event-card-meta"><i class="fa-solid fa-info-circle"></i> ${metaText}</div>
+        <button class="event-card-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${ev.label_btn || 'Buka'}</button>
+      </div>
+    </div>
+  `;
+
+  div.addEventListener('click', (e) => {
+    if (e.target.closest('.event-card-btn')) {
+      e.stopPropagation();
+      window.open(ev.link, '_blank');
+      return;
+    }
+    openEventModal(ev);
+  });
+
+  div.querySelector('.event-card-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    window.open(ev.link, '_blank');
+  });
+
+  return div;
+}
+
+function openEventModal(ev) {
+  const overlay = document.getElementById('event-modal-overlay');
+  const typeClass = `chip-${ev.tipe}`;
+  const typeIcon = getTypeIcon(ev.tipe);
+
+  const img = document.getElementById('ev-modal-img');
+  img.src = ev.thumbnail || '';
+  img.onerror = () => {
+    img.parentElement.innerHTML = `<div class="featured-thumb-placeholder" style="height:200px;display:flex;align-items:center;justify-content:center;font-size:4rem;background:var(--bg3)">${getTypeEmoji(ev.tipe)}</div>`;
+  };
+
+  document.getElementById('ev-modal-name').textContent = ev.nama;
+  document.getElementById('ev-modal-desc').textContent = ev.deskripsi;
+  document.getElementById('ev-modal-link-text').textContent = ev.link;
+  document.getElementById('ev-modal-link').href = ev.link;
+  document.getElementById('ev-btn-label').textContent = ev.label_btn || 'Buka Link';
+
+  const typeEl = document.getElementById('ev-modal-type');
+  typeEl.textContent = ev.tipe;
+  typeEl.className = `event-modal-type-badge event-type-chip ${typeClass}`;
+  typeEl.innerHTML = `<i class="${typeIcon}" style="margin-right:5px"></i>${ev.tipe}`;
+
+  const featBadge = document.getElementById('ev-modal-featured-badge');
+  ev.featured ? featBadge.classList.remove('hidden') : featBadge.classList.add('hidden');
+
+  const penRow = document.getElementById('ev-modal-penyelenggara-row');
+  const penEl = document.getElementById('ev-modal-penyelenggara');
+  if (ev.penyelenggara) {
+    penEl.textContent = ev.penyelenggara;
+    penRow.classList.remove('hidden');
+  } else {
+    penRow.classList.add('hidden');
+  }
+
+  const angRow = document.getElementById('ev-modal-anggota-row');
+  const angEl = document.getElementById('ev-modal-anggota');
+  if (ev.anggota) {
+    angEl.textContent = ev.anggota;
+    angRow.classList.remove('hidden');
+  } else {
+    angRow.classList.add('hidden');
+  }
+
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEventModal() {
+  document.getElementById('event-modal-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('event-modal-close').addEventListener('click', closeEventModal);
+document.getElementById('event-modal-overlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('event-modal-overlay')) closeEventModal();
+});
+
+// Event Tabs
+document.getElementById('event-tabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.event-tab');
+  if (!btn) return;
+  document.querySelectorAll('.event-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentEventType = btn.dataset.type;
+  renderEvents();
+});
+
+// Event Search
+document.getElementById('event-search-input').addEventListener('input', (e) => {
+  eventSearchQuery = e.target.value.trim();
+  const clearBtn = document.getElementById('event-clear-search');
+  clearBtn.classList.toggle('hidden', !eventSearchQuery);
+  renderEvents();
+});
+document.getElementById('event-clear-search').addEventListener('click', () => {
+  document.getElementById('event-search-input').value = '';
+  eventSearchQuery = '';
+  document.getElementById('event-clear-search').classList.add('hidden');
+  renderEvents();
+});
+
+// Helpers
+function getTypeIcon(tipe) {
+  const map = {
+    'Grup': 'fa-brands fa-whatsapp',
+    'Channel': 'fa-brands fa-telegram',
+    'Website': 'fa-solid fa-globe',
+    'Promo': 'fa-solid fa-tag',
+    'Lainnya': 'fa-solid fa-star',
+  };
+  return map[tipe] || 'fa-solid fa-circle-info';
+}
+function getTypeEmoji(tipe) {
+  const map = { 'Grup': '💬', 'Channel': '📢', 'Website': '🌐', 'Promo': '🏷️', 'Lainnya': '🎉' };
+  return map[tipe] || '📌';
+}
+
+// ===== PARTICLES =====
 
 function initBgParticles() {
   const canvas = document.getElementById('bg-particles');
