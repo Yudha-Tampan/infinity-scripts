@@ -1511,3 +1511,158 @@ body {
   color: #ff5c93; font-size: 0.78rem; font-weight: 600;
   padding: 4px 0; display: block; margin-top: 4px;
 }
+
+/* ===== ANIME VIEW TOGGLE ===== */
+.anime-view-toggle {
+  display: flex; gap: 8px;
+  padding: 0 12px 12px;
+  position: relative; z-index: 1;
+}
+.anime-view-btn {
+  flex: 1; padding: 10px 12px; border-radius: 14px;
+  border: 1px solid var(--card-border);
+  background: var(--card); cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem; font-weight: 700;
+  color: var(--text2); transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  position: relative;
+}
+.anime-view-btn:hover { border-color: #ff5c93; color: #ff5c93; }
+.anime-view-btn.active {
+  background: linear-gradient(135deg, rgba(255,92,147,0.18), rgba(124,58,237,0.12));
+  border-color: #ff5c93; color: #ff5c93;
+  box-shadow: 0 4px 18px rgba(255,92,147,0.2);
+}
+.upcoming-count-badge {
+  background: #ff5c93; color: #fff;
+  border-radius: 10px; padding: 1px 7px;
+  font-size: 0.65rem; font-weight: 700; min-width: 18px;
+}
+
+/* ===== ANIME CARD EXTRAS ===== */
+.anime-card-countdown {
+  margin-top: 5px; font-size: 0.68rem;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700; color: #ff5c93;
+  min-height: 16px;
+}
+.cd-val { display: inline-flex; align-items: baseline; gap: 2px; }
+.cd-val small { font-size: 0.55rem; color: var(--text3); font-family: 'Rajdhani', sans-serif; font-weight: 500; }
+.cd-hot { color: var(--accent) !important; animation: pulse-glow 1s infinite; }
+.aired-text { color: var(--neon3); font-size: 0.62rem; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
+.anime-card-time.live { color: var(--neon3) !important; }
+.anime-card-time.aired { color: var(--text3) !important; }
+
+.anime-aired-badge {
+  position: absolute; bottom: 28px; left: 0; right: 0;
+  display: flex; justify-content: center;
+}
+.anime-aired-badge > i, .anime-aired-badge > span {
+  background: rgba(6,255,165,0.2); border: 1px solid rgba(6,255,165,0.4);
+  border-radius: 20px; padding: 2px 8px;
+  font-size: 0.58rem; font-weight: 700; color: var(--neon3);
+  backdrop-filter: blur(6px);
+}
+.anime-upcoming-tag {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(255,92,147,0.85);
+  border-radius: 8px; padding: 3px 8px;
+  font-size: 0.58rem; font-weight: 700; color: #fff;
+  display: flex; align-items: center; gap: 3px;
+}
+.upcoming-time { color: #ff5c93 !important; font-size: 0.62rem !important; }
+.anime-card-upcoming { border-color: rgba(255,92,147,0.2) !important; }
+.anime-card-upcoming:hover { border-color: #ff5c93 !important; }
+
+/* ===== ANIME MODAL EXTRAS ===== */
+.am-modal-countdown {
+  position: absolute; bottom: 12px; left: 12px;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,92,147,0.4);
+  border-radius: 10px; padding: 5px 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem; font-weight: 700; color: #ff5c93;
+  display: flex; align-items: center; gap: 6px;
+}
+.am-native-title {
+  font-size: 0.68rem; color: var(--text3);
+  margin-bottom: 6px; font-style: italic;
+}
+.am-section-block {
+  margin-bottom: 14px;
+}
+.am-section-label {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--text2); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.am-section-label i { color: #ff5c93; }
+.am-tags-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.am-tag-chip {
+  padding: 3px 9px; border-radius: 10px;
+  font-size: 0.62rem; font-weight: 600;
+  background: rgba(255,92,147,0.08);
+  color: var(--text2); border: 1px solid rgba(255,92,147,0.2);
+  transition: all var(--transition);
+}
+.am-tag-chip:hover { background: rgba(255,92,147,0.18); color: #ff5c93; }
+.am-stream-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.stream-btn {
+  padding: 6px 14px; border-radius: 10px;
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.25);
+  color: var(--neon); font-size: 0.75rem; font-weight: 600;
+  text-decoration: none; transition: all var(--transition);
+  display: flex; align-items: center; gap: 5px;
+}
+.stream-btn:hover { background: rgba(0,212,255,0.2); transform: translateY(-1px); }
+.am-actions-row {
+  display: flex; gap: 10px; margin-top: 16px;
+}
+.am-action-btn {
+  flex: 1; padding: 12px; border-radius: 12px;
+  text-decoration: none; text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all var(--transition);
+}
+.am-btn-anilist {
+  background: linear-gradient(135deg, #1a1a2e, #2d2b55);
+  border: 1px solid rgba(124,58,237,0.4); color: #a78bfa;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.2);
+}
+.am-btn-anilist:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(124,58,237,0.35); }
+.am-btn-mal {
+  background: rgba(45,130,209,0.12);
+  border: 1px solid rgba(45,130,209,0.3); color: #2d82d1;
+}
+.am-btn-mal:hover { background: rgba(45,130,209,0.2); transform: translateY(-2px); }
+
+/* ===== SCRIPT CARD — LINK YT BUTTON ===== */
+.card-yt-btn {
+  position: absolute; bottom: 32px; right: 8px;
+  background: rgba(255,0,0,0.15);
+  border: 1px solid rgba(255,0,0,0.3);
+  border-radius: 8px; padding: 3px 7px;
+  color: #ff4444; font-size: 0.65rem;
+  cursor: pointer; transition: all var(--transition);
+  display: flex; align-items: center; gap: 3px;
+  text-decoration: none;
+}
+.card-yt-btn:hover { background: rgba(255,0,0,0.25); transform: scale(1.05); }
+
+/* MODAL LINK YT */
+.btn-yt-modal {
+  padding: 14px; border-radius: 12px;
+  background: rgba(255,0,0,0.12);
+  border: 1px solid rgba(255,0,0,0.3);
+  color: #ff4444;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  text-decoration: none; transition: all var(--transition);
+}
+.btn-yt-modal:hover { background: rgba(255,0,0,0.22); transform: translateY(-2px); }
