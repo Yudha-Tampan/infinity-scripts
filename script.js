@@ -369,17 +369,61 @@ function initFab() {
 }
 
 // ===== MUSIC PLAYER =====
+let audioPlayer = null;
+
 function initMusicPlayer() {
-  const btn  = document.getElementById('music-toggle');
-  const disc = document.getElementById('music-disc');
-  const wave = document.getElementById('music-wave');
+  const btn    = document.getElementById('music-toggle');
+  const disc   = document.getElementById('music-disc');
+  const wave   = document.getElementById('music-wave');
+  const title  = document.getElementById('music-title');
+  const artist = document.getElementById('music-artist');
   if (!btn) return;
-  btn.addEventListener('click', () => {
-    musicPlaying = !musicPlaying;
-    btn.innerHTML = `<i class="fa-solid fa-${musicPlaying ? 'pause' : 'play'}"></i>`;
-    disc.classList.toggle('spinning', musicPlaying);
-    wave.classList.toggle('playing', musicPlaying);
-    showToast(musicPlaying ? '🎵 Musik diputar' : '⏸ Musik dijeda', 'info');
+
+  // Buat elemen audio
+  audioPlayer = new Audio('lagu.mp3');
+  audioPlayer.loop = true;
+  audioPlayer.volume = 0.6;
+
+  // Kalau file tidak ada / error
+  audioPlayer.addEventListener('error', () => {
+    if (title)  title.textContent  = 'Infinity Vibes';
+    if (artist) artist.textContent = 'Taruh lagu.mp3 di folder';
+  });
+
+  // Kalau berhasil load
+  audioPlayer.addEventListener('canplay', () => {
+    if (title)  title.textContent  = 'Infinity Vibes';
+    if (artist) artist.textContent = 'BGM • lagu.mp3';
+  });
+
+  // Update progress bar (opsional visual)
+  audioPlayer.addEventListener('timeupdate', () => {
+    const prog = document.getElementById('music-progress');
+    if (prog && audioPlayer.duration) {
+      prog.style.width = (audioPlayer.currentTime / audioPlayer.duration * 100) + '%';
+    }
+  });
+
+  btn.addEventListener('click', async () => {
+    if (!musicPlaying) {
+      try {
+        await audioPlayer.play();
+        musicPlaying = true;
+        btn.innerHTML  = `<i class="fa-solid fa-pause"></i>`;
+        disc.classList.add('spinning');
+        wave.classList.add('playing');
+        showToast('🎵 Musik diputar', 'info');
+      } catch(e) {
+        showToast('⚠️ Taruh file lagu.mp3 di folder website', 'error');
+      }
+    } else {
+      audioPlayer.pause();
+      musicPlaying = false;
+      btn.innerHTML  = `<i class="fa-solid fa-play"></i>`;
+      disc.classList.remove('spinning');
+      wave.classList.remove('playing');
+      showToast('⏸ Musik dijeda', 'info');
+    }
   });
 }
 
