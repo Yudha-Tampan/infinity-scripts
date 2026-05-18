@@ -82,7 +82,7 @@
     "featured": false,
     "aktif": true,
     "baru": false
-  }, 
+  },
   {
     "id": 7,
     "nama": "Tutorial Cara Install Module Script Bot Di Panel Pterodactyl",
@@ -108,6 +108,20 @@
     "link": "https://youtu.be/T_U-ItqM3aA?si=o09NhwYHqtEU2b94",
     "label_btn": "Tonton Sekarang",
     "featured": false,
+    "aktif": true,
+    "baru": false
+  },
+  {
+    "id": 9,
+    "nama": "ZipRename",
+    "tipe": "Website",
+    "deskripsi": "ZipRename adalah website untuk rename script bot secara sistematis dan akurat tanpa ada eror di script nya.",
+    "thumbnail": "rename.jpg",
+    "penyelenggara": "Infinity Scripts",
+    "anggota": "",
+    "link": "https://ziprename.vercel.app/",
+    "label_btn": "Kunjungi Website",
+    "featured": true,
     "aktif": true,
     "baru": false
   }     
