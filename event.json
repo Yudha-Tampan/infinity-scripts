@@ -117,11 +117,11 @@
     "tipe": "Website",
     "deskripsi": "ZipRename adalah website untuk rename script bot secara sistematis dan akurat tanpa ada eror di script nya.",
     "thumbnail": "rename.jpg",
-    "penyelenggara": "Infinity Scripts",
+    "penyelenggara": "Clara",
     "anggota": "",
     "link": "https://ziprename.vercel.app/",
     "label_btn": "Kunjungi Website",
-    "featured": true,
+    "featured": false,
     "aktif": true,
     "baru": false
   }     
