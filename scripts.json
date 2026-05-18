@@ -376,5 +376,33 @@
     "baru": true,
     "link": "https://www.mediafire.com/file/2ugurinygcgf04n/OchoBot%20V5.0%20fixed.zip/file",
     "linkyt": ""
+  },
+  {
+    "id": 28,
+    "nama": "SEONARI-MD",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa SEONARI-MD.",
+    "thumbnail": "nari.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": false,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/60hgp5mvfh7jd8c/SEONARI-MD.zip/file?dkey=zr32zwzugq0&r=283",
+    "linkyt": "https://youtu.be/SNMfW0Gmloc?si=gnQQ9ZpJXfZ8VuXs"
+  },
+  {
+    "id": 29,
+    "nama": "Terakomari-MD",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa Terakomari-MD.",
+    "thumbnail": "terako.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": false,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/i71eyhpy6tvr5cp/Terakomari_-_MD_%25281%2529.zip/file?dkey=9c5npqoz5z5&r=580",
+    "linkyt": "https://youtu.be/aKWaV25rtQY?si=wvN_KwixEyBCkBfu"
   }
 ]
