@@ -134,7 +134,7 @@ function createCard(script, index) {
       <div class="card-overlay"><span class="card-overlay-text">Lihat Detail →</span></div>
       <span class="card-status ${script.status.toLowerCase()}">${script.status}</span>
       <div class="card-badges">
-        ${script.trending ? '<span class="badge-trending">🔥 HOT</span>' : ''}
+        ${script.trending ? '<span class="badge-trending"><i class="fa-solid fa-fire"></i> HOT</span>' : ''}
         ${script.baru ? '<span class="badge-new">NEW</span>' : ''}
       </div>
     </div>
@@ -182,7 +182,7 @@ function openModal(script) {
 
   img.src = script.thumbnail;
   img.onerror = () => {
-    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'%3E%3Crect fill='%230d0d1f' width='400' height='225'/%3E%3Ctext y='120' x='200' text-anchor='middle' font-size='60' fill='%2300d4ff'%3E📱%3C/text%3E%3C/svg%3E";
+    img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 225'%3E%3Crect fill='%230d0d1f' width='400' height='225'/%3E%3Ctext y='120' x='200' text-anchor='middle' font-size='60' fill='%2300d4ff'%3E%3C/text%3E%3C/svg%3E";
   };
 
   name.textContent    = script.nama;
@@ -241,7 +241,7 @@ function toggleFavorite(id, btn, skipRender = false) {
     favorites.push(id);
     btn.classList.add('active');
     btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
-    showToast('Ditambahkan ke favorit ❤️', 'success');
+    showToast('Ditambahkan ke favorit', 'success');
   } else {
     favorites.splice(idx, 1);
     btn.classList.remove('active');
@@ -352,7 +352,7 @@ function initTheme() {
     document.body.classList.toggle('light-mode');
     localStorage.setItem('is_theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
     updateThemeIcon();
-    showToast(document.body.classList.contains('light-mode') ? '☀️ Light mode' : '🌙 Dark mode', 'info');
+    showToast(document.body.classList.contains('light-mode') ? 'Light mode aktif' : 'Dark mode aktif', 'info');
   });
 }
 function updateThemeIcon() {
@@ -412,9 +412,9 @@ function initMusicPlayer() {
         btn.innerHTML  = `<i class="fa-solid fa-pause"></i>`;
         disc.classList.add('spinning');
         wave.classList.add('playing');
-        showToast('🎵 Musik diputar', 'info');
+        showToast('Musik diputar', 'info');
       } catch(e) {
-        showToast('⚠️ Taruh file lagu.mp3 di folder website', 'error');
+        showToast('Taruh file lagu.mp3 di folder website', 'error');
       }
     } else {
       audioPlayer.pause();
@@ -422,7 +422,7 @@ function initMusicPlayer() {
       btn.innerHTML  = `<i class="fa-solid fa-play"></i>`;
       disc.classList.remove('spinning');
       wave.classList.remove('playing');
-      showToast('⏸ Musik dijeda', 'info');
+      showToast('Musik dijeda', 'info');
     }
   });
 }
@@ -442,14 +442,14 @@ function initFakeStats() {
 
 // ===== LIVE TEXT =====
 const liveMessages = [
-  '🔥 Infinity MD baru saja didownload oleh user dari Jakarta',
-  '⚡ AI Assistant Bot trending hari ini dengan 500+ downloads',
-  '💎 Panel Infinity mendapat update fitur baru!',
-  '🎉 50.000 pengguna aktif telah bergabung',
-  '📦 Script Tools Master baru ditambahkan ke koleksi',
-  '🚀 Server online — semua script tersedia',
-  '💡 Gunakan filter kategori untuk menemukan script lebih cepat',
-  '⭐ Rating rata-rata script: 4.8/5.0',
+  'Infinity MD baru saja didownload oleh user dari Jakarta',
+  'AI Assistant Bot trending hari ini dengan 500+ downloads',
+  'Panel Infinity mendapat update fitur baru!',
+  '50.000 pengguna aktif telah bergabung',
+  'Script Tools Master baru ditambahkan ke koleksi',
+  'Server online — semua script tersedia',
+  'Gunakan filter kategori untuk menemukan script lebih cepat',
+  'Rating rata-rata script: 4.8/5.0',
 ];
 let liveIdx = 0;
 function animateLiveText() {
@@ -714,7 +714,14 @@ function getTypeIcon(t) {
   return { Grup:'fa-brands fa-whatsapp', Channel:'fa-brands fa-telegram', Website:'fa-solid fa-globe', Promo:'fa-solid fa-tag', Lainnya:'fa-solid fa-star' }[t] || 'fa-solid fa-circle-info';
 }
 function getTypeEmoji(t) {
-  return { Grup:'💬', Channel:'📢', Website:'🌐', Promo:'🏷️', Lainnya:'🎉' }[t] || '📌';
+  const map = {
+    Grup:    '<i class="fa-brands fa-whatsapp" style="color:var(--neon3)"></i>',
+    Channel: '<i class="fa-brands fa-telegram" style="color:#0af"></i>',
+    Website: '<i class="fa-solid fa-globe" style="color:var(--neon)"></i>',
+    Promo:   '<i class="fa-solid fa-tag" style="color:var(--accent)"></i>',
+    Lainnya: '<i class="fa-solid fa-star" style="color:var(--premium)"></i>',
+  };
+  return map[t] || '<i class="fa-solid fa-circle-info" style="color:var(--text2)"></i>';
 }
 
 // ===========================
@@ -723,7 +730,7 @@ function getTypeEmoji(t) {
 const ANILIST_API  = 'https://graphql.anilist.co';
 const HARI         = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 const SEASON_MAP   = {0:'WINTER',1:'WINTER',2:'SPRING',3:'SPRING',4:'SPRING',5:'SUMMER',6:'SUMMER',7:'SUMMER',8:'FALL',9:'FALL',10:'FALL',11:'WINTER'};
-const SEASON_LABEL = {WINTER:'❄️ Winter',SPRING:'🌸 Spring',SUMMER:'☀️ Summer',FALL:'🍂 Fall'};
+const SEASON_LABEL = {WINTER:'Winter',SPRING:'Spring',SUMMER:'Summer',FALL:'Fall'};
 const NEXT_SEASON  = {WINTER:'SPRING',SPRING:'SUMMER',SUMMER:'FALL',FALL:'WINTER'};
 
 let animeWeekData     = {};
@@ -938,8 +945,8 @@ function createAnimeScheduleCard(entry, index, now) {
   const isLive = diff >= -1800 && diff <= 1800;
   const aired  = diff < -1800;
   const img = cover
-    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'anime-card-poster-placeholder\\'>🎌</div>'">`
-    : `<div class="anime-card-poster-placeholder">🎌</div>`;
+    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'anime-card-poster-placeholder\\'><i class=\\'fa-solid fa-tv\\'></i></div>'">`
+    : `<div class="anime-card-poster-placeholder"><i class="fa-solid fa-tv"></i></div>`;
   const badge = isLive
     ? `<div class="anime-airing-badge"><div class="airing-pill"><span class="live-dot"></span>LIVE</div></div>`
     : aired
@@ -982,8 +989,8 @@ function createAnimeUpcomingCard(anime, index, now) {
     if (diff > 0) cdStr = formatCountdown(diff);
   } else if (sd?.year) { dateStr = `${sd.day||'??'}/${sd.month||'??'}/${sd.year}`; }
   const img = cover
-    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'anime-card-poster-placeholder\\'>🎌</div>'">`
-    : `<div class="anime-card-poster-placeholder">🎌</div>`;
+    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'anime-card-poster-placeholder\\'><i class=\\'fa-solid fa-tv\\'></i></div>'">`
+    : `<div class="anime-card-poster-placeholder"><i class="fa-solid fa-tv"></i></div>`;
   div.innerHTML = `
     <div class="anime-card-poster">
       ${img}<div class="anime-card-overlay"></div>
@@ -1049,7 +1056,7 @@ function openAnimeModal(anime, scheduleEntry = null, isUpcoming = false) {
   if (cEl) { cEl.src = cover; cEl.onerror = () => { cEl.style.opacity='0'; }; }
 
   const scoreB = document.getElementById('am-score');
-  if (scoreB) scoreB.textContent = anime.averageScore ? `⭐ ${score}/10` : '';
+  if (scoreB) scoreB.innerHTML = anime.averageScore ? `<i class="fa-solid fa-star" style="color:#ffd700"></i> ${score}/10` : '';
 
   const setEl = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
   setEl('am-title',       title);
@@ -1308,3 +1315,92 @@ function initBgParticles() {
   }
   draw();
 }
+
+// ===========================
+// PROTEKSI KONTEN
+// ===========================
+(function() {
+
+  // 1. Blokir klik kanan
+  document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    showToast('Klik kanan dinonaktifkan', 'error');
+  });
+
+  // 2. Blokir shortcut keyboard berbahaya
+  document.addEventListener('keydown', (e) => {
+    const k = e.key.toLowerCase();
+    const ctrl = e.ctrlKey || e.metaKey;
+
+    // Ctrl+S (save), Ctrl+U (view source), Ctrl+C (copy),
+    // Ctrl+A (select all), Ctrl+P (print), Ctrl+Shift+I/J/C (devtools)
+    if (ctrl && ['s','u','p','a'].includes(k)) {
+      e.preventDefault();
+      showToast('Aksi ini dinonaktifkan', 'error');
+      return;
+    }
+    if (ctrl && e.shiftKey && ['i','j','c','k'].includes(k)) {
+      e.preventDefault();
+      showToast('DevTools dinonaktifkan', 'error');
+      return;
+    }
+    // F12 (devtools)
+    if (e.key === 'F12') {
+      e.preventDefault();
+      showToast('DevTools dinonaktifkan', 'error');
+      return;
+    }
+    // PrintScreen
+    if (e.key === 'PrintScreen') {
+      e.preventDefault();
+      showToast('Screenshot dinonaktifkan', 'error');
+    }
+  });
+
+  // 3. Blokir drag & drop gambar
+  document.addEventListener('dragstart', (e) => {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+
+  // 4. Blokir copy teks
+  document.addEventListener('copy', (e) => {
+    e.preventDefault();
+    showToast('Copy dinonaktifkan', 'error');
+  });
+
+  // 5. Blokir cut
+  document.addEventListener('cut', (e) => {
+    e.preventDefault();
+  });
+
+  // 6. Deteksi DevTools dibuka (cek perubahan ukuran window)
+  let devtoolsOpen = false;
+  const threshold = 160;
+  setInterval(() => {
+    const widthDiff  = window.outerWidth  - window.innerWidth;
+    const heightDiff = window.outerHeight - window.innerHeight;
+    if ((widthDiff > threshold || heightDiff > threshold) && !devtoolsOpen) {
+      devtoolsOpen = true;
+      showToast('DevTools terdeteksi!', 'error');
+      // Blur konten saat devtools buka
+      document.getElementById('app')?.style.setProperty('filter', 'blur(8px)');
+    } else if (widthDiff <= threshold && heightDiff <= threshold && devtoolsOpen) {
+      devtoolsOpen = false;
+      document.getElementById('app')?.style.removeProperty('filter');
+    }
+  }, 1000);
+
+  // 7. Blokir inspect element via touch hold (mobile)
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+
+  // 8. Watermark tak kasat mata di body (forensik)
+  const wm = document.createElement('div');
+  wm.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:99999;opacity:0.015;display:flex;align-items:center;justify-content:center;font-size:4rem;font-weight:900;color:#fff;transform:rotate(-30deg);font-family:Orbitron,sans-serif;';
+  wm.textContent = 'INFINITY SCRIPTS';
+  document.body.appendChild(wm);
+
+})();

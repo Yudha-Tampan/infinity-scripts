@@ -1698,3 +1698,64 @@ body {
   transition: width 0.5s linear;
   border-radius: 0 0 14px 14px;
 }
+
+/* ===== PROTEKSI KONTEN ===== */
+
+/* Nonaktifkan select teks di seluruh halaman */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Nonaktifkan drag gambar */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Khusus tombol & input tetap bisa diklik */
+button, a, input, textarea, select, .cat-btn, .nav-item,
+.script-card, .event-card, .anime-card, .featured-event-card,
+.card-fav, .modal-close, .music-btn, .fab, .icon-btn,
+.anime-day-tab, .anime-genre-btn, .event-tab, .anime-view-btn,
+.search-box input, .am-read-more, .stream-btn, .am-action-btn,
+.btn-download, .btn-fav-modal, .btn-yt-modal, .featured-btn,
+.event-card-btn, .anime-retry-btn, .clear-btn {
+  pointer-events: all;
+}
+
+/* Overlay transparan di atas gambar — cegah klik kanan save */
+.card-thumb::after,
+.anime-card-poster::after,
+.featured-thumb::after,
+.event-card-thumb::after,
+.anime-modal-banner::after,
+.anime-modal-cover::after,
+.profile-avatar::after,
+.modal-img-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: all;
+}
+
+/* ===== ICON FA FIXES (ganti emoji) ===== */
+.anime-header-icon {
+  font-size: 2rem !important;
+  color: #ff5c93;
+  filter: drop-shadow(0 0 16px rgba(255,92,147,0.5));
+}
+.anime-header-icon i { font-size: 2rem; }
+
+.anime-card-poster-placeholder i { font-size: 2.5rem; color: var(--text3); }
+.anime-error-icon i { font-size: 3rem; color: var(--text3); }
+
+.banner-tag i { margin-right: 4px; }
+.badge-trending i { font-size: 0.55rem; }
