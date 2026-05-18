@@ -206,6 +206,16 @@ function openModal(script) {
     ytBtn.classList.add('hidden');
   }
 
+  const chBtn = document.getElementById('modal-ch-btn');
+  if (chBtn) {
+    if (script.linkch && script.linkch.trim() !== '') {
+      chBtn.href = script.linkch.trim();
+      chBtn.classList.remove('hidden');
+    } else {
+      chBtn.classList.add('hidden');
+    }
+  }
+
   const isFav = favorites.includes(script.id);
   favBtn.className = 'btn-fav-modal' + (isFav ? ' active' : '');
   favBtn.innerHTML  = `<i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>`;
@@ -584,13 +594,14 @@ function renderFeaturedSection(featured) {
     const cls = `chip-${ev.tipe}`;
     const icon = getTypeIcon(ev.tipe);
     const thumb = ev.thumbnail
-      ? `<img src="${ev.thumbnail}" alt="${escHtml(ev.nama)}" onerror="this.parentElement.innerHTML='<div class=\\'featured-thumb-placeholder\\'>${getTypeEmoji(ev.tipe)}</div>'">`
-      : `<div class="featured-thumb-placeholder">${getTypeEmoji(ev.tipe)}</div>`;
+      ? `<img src="${ev.thumbnail}" alt="${escHtml(ev.nama)}" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML=this.parentElement.dataset.ph;">`
+      : '';
+    const phHTML = `<div class="featured-thumb-placeholder">${getTypeEmoji(ev.tipe)}</div>`;
     const anggota  = ev.anggota ? `<span><i class="fa-solid fa-users"></i> ${ev.anggota}</span>` : '';
     const penyelng = ev.penyelenggara ? `<span><i class="fa-solid fa-user-tie"></i> ${ev.penyelenggara}</span>` : '';
     return `
       <div class="featured-event-card">
-        <div class="featured-thumb">${thumb}<div class="featured-thumb-overlay"></div>${ev.baru?'<div class="new-chip">NEW</div>':''}<div class="feat-star-badge"><i class="fa-solid fa-star"></i> Featured</div></div>
+        <div class="featured-thumb" data-ph="${escHtml(phHTML)}">${thumb || phHTML}<div class="featured-thumb-overlay"></div>${ev.baru?'<div class="new-chip">NEW</div>':''}<div class="feat-star-badge"><i class="fa-solid fa-star"></i> Featured</div></div>
         <div class="featured-inner">
           <div class="featured-type-chip ${cls}"><i class="${icon}"></i> ${ev.tipe}</div>
           <div class="featured-title">${escHtml(ev.nama)}</div>
@@ -612,11 +623,12 @@ function createEventCard(ev, index) {
   const cls  = `chip-${ev.tipe}`;
   const icon = getTypeIcon(ev.tipe);
   const meta = ev.anggota || ev.penyelenggara || ev.tipe;
+  const phHTML = `<div class="event-card-thumb-placeholder">${getTypeEmoji(ev.tipe)}</div>`;
   const thumb = ev.thumbnail
-    ? `<img src="${ev.thumbnail}" alt="${escHtml(ev.nama)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'event-card-thumb-placeholder\\'>${getTypeEmoji(ev.tipe)}</div>'">`
-    : `<div class="event-card-thumb-placeholder">${getTypeEmoji(ev.tipe)}</div>`;
+    ? `<img src="${ev.thumbnail}" alt="${escHtml(ev.nama)}" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML=this.parentElement.dataset.ph;">`
+    : phHTML;
   div.innerHTML = `
-    <div class="event-card-thumb">${thumb}${ev.baru?'<div class="event-new-chip">NEW</div>':''}</div>
+    <div class="event-card-thumb" data-ph="${escHtml(phHTML)}">${thumb}${ev.baru?'<div class="event-new-chip">NEW</div>':''}</div>
     <div class="event-card-body">
       <div>
         <div class="event-card-top">
@@ -711,11 +723,19 @@ function initEventModalListeners() {
 }
 
 function getTypeIcon(t) {
-  return { Grup:'fa-brands fa-whatsapp', Channel:'fa-brands fa-telegram', Website:'fa-solid fa-globe', Promo:'fa-solid fa-tag', Lainnya:'fa-solid fa-star' }[t] || 'fa-solid fa-circle-info';
+  return { 
+    Grup: 'fa-brands fa-whatsapp', 
+    Saluran: 'fa-brands fa-whatsapp',
+    Channel: 'fa-brands fa-telegram', 
+    Website: 'fa-solid fa-globe', 
+    Promo: 'fa-solid fa-tag', 
+    Lainnya: 'fa-solid fa-star' 
+  }[t] || 'fa-solid fa-circle-info';
 }
 function getTypeEmoji(t) {
   const map = {
     Grup:    '<i class="fa-brands fa-whatsapp" style="color:var(--neon3)"></i>',
+    Saluran: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i>',
     Channel: '<i class="fa-brands fa-telegram" style="color:#0af"></i>',
     Website: '<i class="fa-solid fa-globe" style="color:var(--neon)"></i>',
     Promo:   '<i class="fa-solid fa-tag" style="color:var(--accent)"></i>',
@@ -838,8 +858,18 @@ async function loadAnimeSchedule(force = false) {
 
     const upCur = await fetchAllPages(UPCOMING_QUERY, {season:cur, seasonYear:year}, 'media');
     const upNxt = await fetchAllPages(UPCOMING_QUERY, {season:nxt, seasonYear:nxtYr}, 'media');
+    const weekAnimeIds = new Set(entries.map(e => e.media?.id).filter(Boolean));
+    const nowTs = Math.floor(Date.now() / 1000);
     animeUpcomingData = [...upCur, ...upNxt]
       .filter((v,i,a) => a.findIndex(x => x.id === v.id) === i)
+      .filter(a => !weekAnimeIds.has(a.id)) // tidak tampil di schedule view
+      .filter(a => {
+        // hanya anime yang belum tayang sama sekali atau mulai di masa depan
+        const sd = a.startDate;
+        if (!sd || !sd.year) return true;
+        const startTs = new Date(sd.year, (sd.month||1)-1, sd.day||1).getTime() / 1000;
+        return startTs > nowTs - 86400; // toleransi 1 hari
+      })
       .sort((a,b) => getUpcomingTs(a) - getUpcomingTs(b));
 
     animeLoaded = true;
@@ -885,6 +915,8 @@ function renderAnimeSchedule() {
   if (!grid) return;
 
   let list = [...(animeWeekData[currentAnimeDay] || [])];
+  // Hanya tampilkan anime yang sudah/sedang tayang, bukan belum tayang
+  list = list.filter(e => e.media?.status !== 'NOT_YET_RELEASED');
   if (currentAnimeGenre !== 'all') list = list.filter(e => e.media?.genres?.includes(currentAnimeGenre));
   if (animeSearchQuery) {
     const q = animeSearchQuery.toLowerCase();
