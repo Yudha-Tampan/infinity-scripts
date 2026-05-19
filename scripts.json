@@ -446,8 +446,8 @@
     "trending": false,
     "baru": true,
     "link": "https://www.mediafire.com/file/996d8prkn48rogg/%25F0%259D%2598%2583%25F0%259D%2597%25B6%25F0%2590%2590%25AB%25D7%2582%25F0%259D%2597%25BF%25CE%25B1%25CD%25A0-%25F0%259D%2597%25AF%25F0%2590%2590%25AB%25D7%2582%25F0%259D%2598%2581%25E2%259D%25A6%25F0%259D%2590%258C%25F0%259D%2590%2583%25F0%259F%2591%2591.zip/file",
-    "linkyt": "",
-    "linkch": "https://whatsapp.com/channel/0029VbAbqrkBvvseV1Cpk73p"
+    "linkyt": "https://whatsapp.com/channel/0029VbAbqrkBvvseV1Cpk73p",
+    "linkch": ""
   },
   {
     "id": 31,
@@ -476,8 +476,8 @@
     "trending": false,
     "baru": true,
     "link": "https://www.mediafire.com/file/6w190wcds4ndtlu/UPDATE_V3_%255BFIX_FITUR%255D.zip/file",
-    "linkyt": "",
-    "linkch": "https://whatsapp.com/channel/0029Vb6AFUl5Ui2cStMRxz0U"
+    "linkyt": "https://whatsapp.com/channel/0029Vb6AFUl5Ui2cStMRxz0U",
+    "linkch": ""
   },
   {
     "id": 33,
@@ -642,6 +642,21 @@
     "baru": true,
     "link": "https://www.mediafire.com/file/zxmwphlhs102e27/KurokoV-5.0.0.zip/file",
     "linkyt": "https://youtu.be/bmlK2RNJzxg?si=gL_dlWfoETYZ7-Hl",
+    "linkch": ""
+  },
+  {
+    "id": 44,
+    "nama": "GANNAI-FIX",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa GANNAI-FIX.",
+    "thumbnail": "gan.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": false,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/4k7niur0b0ehhkp/GANNAI-FIX.zip/file%E2%9D%A4?dkey=4k7niur0b0ehhkp",
+    "linkyt": "https://youtu.be/vIqTCPl6-RQ?si=DU6LO3v-Oo35pzXO",
     "linkch": ""
   }
 ]
