@@ -31,6 +31,20 @@
 <!-- TOAST -->
 <div id="toast-container"></div>
 
+<!-- ANNOUNCEMENT POPUP -->
+<div id="announcement-overlay" class="ann-overlay hidden">
+  <div class="ann-box" id="ann-box">
+    <button class="ann-close" id="ann-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="ann-icon" id="ann-icon"><i class="fa-solid fa-bullhorn"></i></div>
+    <h3 id="ann-title"></h3>
+    <p id="ann-message"></p>
+    <div class="ann-actions">
+      <button class="ann-btn-primary" id="ann-btn-action"></button>
+      <button class="ann-btn-dismiss" id="ann-btn-dismiss">Tutup</button>
+    </div>
+  </div>
+</div>
+
 <!-- MAIN APP -->
 <div id="app" class="hidden">
 
@@ -151,9 +165,16 @@
         <small>Coba kata kunci lain</small>
       </div>
 
-    </section>
+      <!-- CHANGELOG SECTION -->
+      <div class="section-header" id="changelog-header">
+        <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> Update Log</h3>
+        <span class="section-line"></span>
+      </div>
+      <div id="changelog-wrap" class="changelog-wrap">
+        <div class="changelog-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      </div>
 
-    <!-- EVENT PAGE -->
+    </section>
     <section id="page-event" class="page">
       <div class="event-page-bg"></div>
 
@@ -536,6 +557,14 @@
         <a id="modal-link" href="#" target="_blank" class="btn-download"><i class="fa-solid fa-download"></i> Download / Open</a>
         <button class="btn-fav-modal" id="modal-fav-btn"><i class="fa-solid fa-heart"></i></button>
       </div>
+      <div class="modal-share-row" id="modal-share-row">
+        <button class="share-btn copy-btn" id="modal-copy-btn" title="Salin Link">
+          <i class="fa-solid fa-copy"></i> Salin Link
+        </button>
+        <button class="share-btn wa-share-btn" id="modal-wa-share-btn" title="Share ke WhatsApp">
+          <i class="fa-brands fa-whatsapp"></i> Share WA
+        </button>
+      </div>
       <div class="script-extra-btns" id="script-extra-btns">
         <a id="modal-yt-btn" href="#" target="_blank" class="ev-extra-btn ev-yt-btn hidden">
           <i class="fa-brands fa-youtube"></i> Sumber Script
@@ -553,9 +582,12 @@
   <div class="modal-box event-modal-box" id="event-modal-box">
     <button class="modal-close" id="event-modal-close"><i class="fa-solid fa-xmark"></i></button>
     <div class="event-modal-header">
-      <div class="event-modal-thumb">
+      <div class="event-modal-thumb" id="ev-modal-thumb-wrap">
         <img id="ev-modal-img" src="" alt="" />
         <div class="event-modal-thumb-overlay"></div>
+      </div>
+      <div id="ev-modal-yt-wrap" class="hidden" style="width:100%;aspect-ratio:16/9;background:#000;border-radius:12px 12px 0 0;overflow:hidden;">
+        <iframe id="ev-modal-yt-iframe" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media" style="width:100%;height:100%;display:block;"></iframe>
       </div>
       <div class="event-modal-type-badge" id="ev-modal-type"></div>
       <div class="event-modal-featured-badge hidden" id="ev-modal-featured-badge">
@@ -578,6 +610,14 @@
         <a id="ev-modal-link" href="#" target="_blank" class="btn-download ev-btn-join">
           <i class="fa-solid fa-arrow-right-to-bracket"></i> <span id="ev-btn-label">Gabung Sekarang</span>
         </a>
+      </div>
+      <div class="modal-share-row" id="ev-modal-share-row">
+        <button class="share-btn copy-btn" id="ev-copy-btn" title="Salin Link">
+          <i class="fa-solid fa-copy"></i> Salin Link
+        </button>
+        <button class="share-btn wa-share-btn" id="ev-wa-share-btn" title="Share ke WhatsApp">
+          <i class="fa-brands fa-whatsapp"></i> Share WA
+        </button>
       </div>
     </div>
   </div>

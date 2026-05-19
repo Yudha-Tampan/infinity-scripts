@@ -42,6 +42,8 @@ function initApp() {
   initAnimeModalListeners();
   loadScripts();
   loadEvents();
+  loadChangelog();
+  loadAnnouncement();
   initAnimeDayTabs();
   initAnimeViewToggle();
   animateSkillBars();
@@ -198,6 +200,27 @@ function openModal(script) {
 
   script.baru ? nBadge.classList.remove('hidden') : nBadge.classList.add('hidden');
   link.href = script.link || '#';
+
+  // === COPY LINK ===
+  const copyBtn = document.getElementById('modal-copy-btn');
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(script.link || '').then(() => {
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin!';
+        setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Salin Link'; }, 2000);
+        showToast('Link berhasil disalin!', 'success');
+      }).catch(() => showToast('Gagal menyalin link', 'error'));
+    };
+  }
+
+  // === SHARE WA ===
+  const waShareBtn = document.getElementById('modal-wa-share-btn');
+  if (waShareBtn) {
+    waShareBtn.onclick = () => {
+      const text = `🤖 *${script.nama}*\n📂 Kategori: ${script.kategori}\n⭐ Rating: ${script.rating}\n\n${script.deskripsi}\n\n🔗 Download: ${script.link}\n\n_Via Infinity Scripts_`;
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    };
+  }
 
   if (script.linkyt && script.linkyt.trim() !== '') {
     ytBtn.href = script.linkyt;
@@ -652,6 +675,19 @@ function createEventCard(ev, index) {
   return div;
 }
 
+function getYoutubeId(url) {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
 function openEventModal(ev) {
   const overlay = document.getElementById('event-modal-overlay');
   if (!overlay) return;
@@ -659,14 +695,51 @@ function openEventModal(ev) {
   const cls  = `event-type-chip chip-${ev.tipe}`;
 
   const img = document.getElementById('ev-modal-img');
-  img.src = ev.thumbnail || '';
-  img.onerror = () => { img.parentElement.innerHTML = `<div style="height:200px;display:flex;align-items:center;justify-content:center;font-size:4rem;background:var(--bg3)">${getTypeEmoji(ev.tipe)}</div>`; };
+  const thumbWrap = document.getElementById('ev-modal-thumb-wrap');
+  const ytWrap  = document.getElementById('ev-modal-yt-wrap');
+  const ytIframe = document.getElementById('ev-modal-yt-iframe');
+
+  const ytId = getYoutubeId(ev.link);
+  if (ytId) {
+    // Sembunyikan thumbnail, tampilkan iframe YouTube
+    thumbWrap.classList.add('hidden');
+    ytWrap.classList.remove('hidden');
+    ytIframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=0&rel=0`;
+  } else {
+    // Tampilkan thumbnail biasa
+    ytWrap.classList.add('hidden');
+    ytIframe.src = '';
+    thumbWrap.classList.remove('hidden');
+    img.src = ev.thumbnail || '';
+    img.onerror = () => { img.parentElement.innerHTML = `<div style="height:200px;display:flex;align-items:center;justify-content:center;font-size:4rem;background:var(--bg3)">${getTypeEmoji(ev.tipe)}</div>`; };
+  }
 
   document.getElementById('ev-modal-name').textContent = ev.nama;
   document.getElementById('ev-modal-desc').textContent = ev.deskripsi;
   document.getElementById('ev-modal-link-text').textContent = ev.link;
   document.getElementById('ev-modal-link').href = ev.link;
   document.getElementById('ev-btn-label').textContent = ev.label_btn || 'Buka Link';
+
+  // === COPY LINK EVENT ===
+  const evCopyBtn = document.getElementById('ev-copy-btn');
+  if (evCopyBtn) {
+    evCopyBtn.onclick = () => {
+      navigator.clipboard.writeText(ev.link || '').then(() => {
+        evCopyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin!';
+        setTimeout(() => { evCopyBtn.innerHTML = '<i class="fa-solid fa-copy"></i> Salin Link'; }, 2000);
+        showToast('Link berhasil disalin!', 'success');
+      }).catch(() => showToast('Gagal menyalin link', 'error'));
+    };
+  }
+
+  // === SHARE WA EVENT ===
+  const evWaBtn = document.getElementById('ev-wa-share-btn');
+  if (evWaBtn) {
+    evWaBtn.onclick = () => {
+      const text = `📢 *${ev.nama}*\n🏷️ Tipe: ${ev.tipe}${ev.penyelenggara ? '\n👤 By: ' + ev.penyelenggara : ''}${ev.anggota ? '\n👥 ' + ev.anggota : ''}\n\n${ev.deskripsi}\n\n🔗 Link: ${ev.link}\n\n_Via Infinity Scripts_`;
+      window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    };
+  }
 
   const typeEl = document.getElementById('ev-modal-type');
   typeEl.className = cls; typeEl.innerHTML = `<i class="${icon}" style="margin-right:5px"></i>${ev.tipe}`;
@@ -691,6 +764,8 @@ function openEventModal(ev) {
 function closeEventModal() {
   const overlay = document.getElementById('event-modal-overlay');
   if (overlay) { overlay.classList.add('hidden'); document.body.style.overflow = ''; }
+  const ytIframe = document.getElementById('ev-modal-yt-iframe');
+  if (ytIframe) ytIframe.src = '';
 }
 
 function initEventModalListeners() {
@@ -1617,3 +1692,110 @@ function initBgParticles() {
   document.body.appendChild(wm);
 
 })();
+
+// ===========================
+// CHANGELOG
+// ===========================
+async function loadChangelog() {
+  const wrap = document.getElementById('changelog-wrap');
+  if (!wrap) return;
+  try {
+    const res = await fetch('changelog.json?v=' + Date.now());
+    if (!res.ok) throw new Error('fail');
+    const logs = await res.json();
+    const labelMap = {
+      new:    { cls: 'cl-label-new',    icon: 'fa-solid fa-star',          text: 'NEW'    },
+      update: { cls: 'cl-label-update', icon: 'fa-solid fa-arrow-up-right-dots', text: 'UPDATE' },
+      fix:    { cls: 'cl-label-fix',    icon: 'fa-solid fa-wrench',        text: 'FIX'    },
+    };
+    wrap.innerHTML = logs.map(log => {
+      const lbl = labelMap[log.label] || labelMap.update;
+      const items = (log.perubahan || []).map(p => `<li><i class="fa-solid fa-chevron-right cl-li-icon"></i>${escHtml(p)}</li>`).join('');
+      return `
+        <div class="changelog-card">
+          <div class="changelog-card-header">
+            <div class="cl-versi-wrap">
+              <span class="cl-versi">${escHtml(log.versi)}</span>
+              <span class="cl-label ${lbl.cls}"><i class="${lbl.icon}"></i> ${lbl.text}</span>
+            </div>
+            <span class="cl-tanggal"><i class="fa-regular fa-calendar"></i> ${escHtml(log.tanggal)}</span>
+          </div>
+          <ul class="cl-list">${items}</ul>
+        </div>`;
+    }).join('');
+  } catch {
+    wrap.innerHTML = '<p style="color:var(--text3);text-align:center;padding:16px">Changelog tidak tersedia</p>';
+  }
+}
+
+// ===========================
+// ANNOUNCEMENT POPUP
+// ===========================
+async function loadAnnouncement() {
+  try {
+    const res = await fetch('announcement.json?v=' + Date.now());
+    if (!res.ok) throw new Error('fail');
+    const ann = await res.json();
+    if (!ann.aktif) return;
+
+    // Cek apakah user sudah dismiss announcement ini
+    const dismissed = localStorage.getItem('ann_dismissed');
+    if (dismissed === ann.id) return;
+
+    const overlay  = document.getElementById('announcement-overlay');
+    const titleEl  = document.getElementById('ann-title');
+    const msgEl    = document.getElementById('ann-message');
+    const iconEl   = document.getElementById('ann-icon');
+    const actionBtn= document.getElementById('ann-btn-action');
+    const dismissBtn=document.getElementById('ann-btn-dismiss');
+    const closeBtn = document.getElementById('ann-close');
+    const box      = document.getElementById('ann-box');
+
+    if (!overlay) return;
+
+    titleEl.textContent = ann.judul;
+    msgEl.textContent   = ann.pesan;
+    actionBtn.textContent = ann.label_btn || 'Lihat';
+
+    // Warna aksen
+    if (ann.warna) {
+      box.style.setProperty('--ann-accent', ann.warna);
+      iconEl.style.color = ann.warna;
+    }
+
+    // Icon berdasarkan tipe
+    const icons = { info: 'fa-bullhorn', warning: 'fa-triangle-exclamation', success: 'fa-circle-check', error: 'fa-circle-xmark' };
+    iconEl.innerHTML = `<i class="fa-solid ${icons[ann.tipe] || 'fa-bullhorn'}"></i>`;
+
+    // Tampilkan dengan delay kecil
+    setTimeout(() => overlay.classList.remove('hidden'), 800);
+
+    // Aksi tombol utama
+    actionBtn.onclick = () => {
+      overlay.classList.add('hidden');
+      localStorage.setItem('ann_dismissed', ann.id);
+      if (ann.aksi === 'changelog') {
+        // Navigasi ke home dan scroll ke changelog
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        document.querySelector('.nav-item[data-page="home"]')?.classList.add('active');
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-home')?.classList.add('active');
+        setTimeout(() => {
+          document.getElementById('changelog-header')?.scrollIntoView({ behavior: 'smooth' });
+        }, 200);
+      } else if (ann.aksi && ann.aksi.startsWith('http')) {
+        window.open(ann.aksi, '_blank');
+      }
+    };
+
+    const close = () => {
+      overlay.classList.add('hidden');
+      localStorage.setItem('ann_dismissed', ann.id);
+    };
+    dismissBtn.onclick = close;
+    closeBtn.onclick   = close;
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  } catch { /* silent */ }
+}
+
