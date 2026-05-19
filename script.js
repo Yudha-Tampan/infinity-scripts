@@ -745,22 +745,27 @@ function getTypeEmoji(t) {
 }
 
 // ===========================
-// ANIME SYSTEM v2 — AniList
-// ===========================
-const ANILIST_API  = 'https://graphql.anilist.co';
-const HARI         = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-const SEASON_MAP   = {0:'WINTER',1:'WINTER',2:'SPRING',3:'SPRING',4:'SPRING',5:'SUMMER',6:'SUMMER',7:'SUMMER',8:'FALL',9:'FALL',10:'FALL',11:'WINTER'};
-const SEASON_LABEL = {WINTER:'Winter',SPRING:'Spring',SUMMER:'Summer',FALL:'Fall'};
-const NEXT_SEASON  = {WINTER:'SPRING',SPRING:'SUMMER',SUMMER:'FALL',FALL:'WINTER'};
+// ==========================================
+// ANIME HUB v3 — AniList GraphQL
+// ==========================================
+const ANILIST_API   = 'https://graphql.anilist.co';
+const HARI          = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const SEASON_MAP    = {0:'WINTER',1:'WINTER',2:'SPRING',3:'SPRING',4:'SPRING',5:'SUMMER',6:'SUMMER',7:'SUMMER',8:'FALL',9:'FALL',10:'FALL',11:'WINTER'};
+const SEASON_LABEL  = {WINTER:'❄ Winter',SPRING:'🌸 Spring',SUMMER:'☀ Summer',FALL:'🍂 Fall'};
+const SEASON_LABEL2 = {WINTER:'Winter',SPRING:'Spring',SUMMER:'Summer',FALL:'Fall'};
+const NEXT_SEASON   = {WINTER:'SPRING',SPRING:'SUMMER',SUMMER:'FALL',FALL:'WINTER'};
 
-let animeWeekData     = {};
-let animeUpcomingData = [];
-let currentAnimeDay   = new Date().getDay();
-let currentAnimeGenre = 'all';
-let animeSearchQuery  = '';
-let animeLoaded       = false;
-let animeView         = 'schedule';
-let countdownInterval = null;
+let animeWeekData      = {};
+let animeUpcomingData  = [];
+let animeTrendingData  = [];
+let currentAnimeDay    = new Date().getDay();
+let currentAnimeGenre  = 'all';
+let animeSearchQuery   = '';
+let animeLoaded        = false;
+let animeView          = 'jadwal';   // jadwal | upcoming | trending
+let countdownInterval  = null;
+
+// ── GRAPHQL QUERIES ──────────────────────────────────────────
 
 const SCHEDULE_QUERY = `
 query ($from: Int, $to: Int, $page: Int) {
@@ -799,12 +804,41 @@ query ($season: MediaSeason, $seasonYear: Int, $page: Int) {
   }
 }`;
 
+const TRENDING_QUERY = `
+query ($season: MediaSeason, $seasonYear: Int, $page: Int) {
+  Page(page: $page, perPage: 30) {
+    pageInfo { hasNextPage }
+    media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: TRENDING_DESC, status_in: [RELEASING, FINISHED]) {
+      id title { romaji english native }
+      description(asHtml: false)
+      coverImage { large extraLarge medium }
+      bannerImage genres averageScore popularity favourites episodes duration
+      studios(isMain: true) { nodes { name } }
+      format status season seasonYear siteUrl countryOfOrigin source
+      streamingEpisodes { title thumbnail url site }
+      airingSchedule(notYetAired: true, perPage: 1) { nodes { episode airingAt } }
+      tags { name rank isMediaSpoiler }
+    }
+  }
+}`;
+
+// ── HELPERS ──────────────────────────────────────────────────
+
+async function fetchAniList(query, variables) {
+  const res = await fetch(ANILIST_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ query, variables })
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
 async function fetchAllPages(query, baseVars, dataKey) {
   let page = 1, results = [], hasNext = true;
   while (hasNext && page <= 4) {
     try {
-      const res  = await fetch(ANILIST_API, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({query, variables:{...baseVars, page}}) });
-      const json = await res.json();
+      const json = await fetchAniList(query, { ...baseVars, page });
       const pg   = json?.data?.Page;
       if (!pg) break;
       results  = results.concat(pg[dataKey] || []);
@@ -829,173 +863,280 @@ function getUpcomingTs(anime) {
   return 9999999999;
 }
 
-async function loadAnimeSchedule(force = false) {
-  if (animeLoaded && !force) { renderAnimeView(); return; }
-  showAnimeLoading(true); showAnimeError(false);
-  document.getElementById('anime-grid').innerHTML = '';
-
-  const now   = new Date();
+function getCurrentSeason() {
+  const now = new Date();
   const month = now.getMonth();
   const year  = now.getFullYear();
   const cur   = SEASON_MAP[month];
   const nxt   = NEXT_SEASON[cur];
   const nxtYr = cur === 'FALL' ? year + 1 : year;
+  return { cur, nxt, year, nxtYr };
+}
 
-  const lbl = document.getElementById('anime-season-label');
-  if (lbl) lbl.innerHTML = `<i class="fa-solid fa-calendar"></i> ${SEASON_LABEL[cur]} ${year}`;
+// ── LOAD DATA ────────────────────────────────────────────────
+
+async function loadAnimeSchedule(force = false) {
+  if (animeLoaded && !force) { renderAnimeView(); return; }
+  showAnimeLoading(true);
+  showAnimeError(false);
+  qid('anime-grid').innerHTML = '';
+
+  const { cur, nxt, year, nxtYr } = getCurrentSeason();
+
+  const lbl = qid('anime-season-label');
+  if (lbl) lbl.innerHTML = `<i class="fa-solid fa-calendar"></i> ${SEASON_LABEL2[cur]} ${year}`;
 
   try {
     const from = getStartOfWeek();
     const to   = from + 7 * 24 * 3600;
 
-    const entries = await fetchAllPages(SCHEDULE_QUERY, {from, to}, 'airingSchedules');
-    animeWeekData  = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
+    const [entries, upCur, upNxt, trendData] = await Promise.all([
+      fetchAllPages(SCHEDULE_QUERY, { from, to }, 'airingSchedules'),
+      fetchAllPages(UPCOMING_QUERY, { season: cur, seasonYear: year }, 'media'),
+      fetchAllPages(UPCOMING_QUERY, { season: nxt, seasonYear: nxtYr }, 'media'),
+      fetchAllPages(TRENDING_QUERY, { season: cur, seasonYear: year }, 'media')
+    ]);
+
+    // Week schedule
+    animeWeekData = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
     entries.forEach(e => {
       if (!e.media) return;
       const d = new Date(e.airingAt * 1000).getDay();
       animeWeekData[d].push(e);
     });
 
-    const upCur = await fetchAllPages(UPCOMING_QUERY, {season:cur, seasonYear:year}, 'media');
-    const upNxt = await fetchAllPages(UPCOMING_QUERY, {season:nxt, seasonYear:nxtYr}, 'media');
-    const weekAnimeIds = new Set(entries.map(e => e.media?.id).filter(Boolean));
-    const nowTs = Math.floor(Date.now() / 1000);
+    // Upcoming
+    const weekIds = new Set(entries.map(e => e.media?.id).filter(Boolean));
+    const nowTs   = Math.floor(Date.now() / 1000);
     animeUpcomingData = [...upCur, ...upNxt]
       .filter((v,i,a) => a.findIndex(x => x.id === v.id) === i)
-      .filter(a => !weekAnimeIds.has(a.id)) // tidak tampil di schedule view
+      .filter(a => !weekIds.has(a.id))
       .filter(a => {
-        // hanya anime yang belum tayang sama sekali atau mulai di masa depan
         const sd = a.startDate;
-        if (!sd || !sd.year) return true;
-        const startTs = new Date(sd.year, (sd.month||1)-1, sd.day||1).getTime() / 1000;
-        return startTs > nowTs - 86400; // toleransi 1 hari
+        if (!sd?.year) return true;
+        const ts = new Date(sd.year, (sd.month||1)-1, sd.day||1).getTime() / 1000;
+        return ts > nowTs - 86400;
       })
       .sort((a,b) => getUpcomingTs(a) - getUpcomingTs(b));
 
+    // Trending
+    animeTrendingData = trendData
+      .filter((v,i,a) => a.findIndex(x => x.id === v.id) === i)
+      .slice(0, 30);
+
     animeLoaded = true;
     updateAnimeStats();
+    renderTodaySpotlight();
     showAnimeLoading(false);
     renderAnimeView();
+
     if (countdownInterval) clearInterval(countdownInterval);
     countdownInterval = setInterval(updateCountdowns, 1000);
+
   } catch(e) {
+    console.error('Anime load error:', e);
     showAnimeLoading(false);
     showAnimeError(true);
   }
 }
 
+// ── STATS ────────────────────────────────────────────────────
+
 function updateAnimeStats() {
   const today = animeWeekData[currentAnimeDay] || [];
   const total = Object.values(animeWeekData).reduce((s,a) => s+a.length, 0);
-  const e1 = document.getElementById('anime-count-day');
-  const e2 = document.getElementById('anime-count-week');
-  const e3 = document.getElementById('anime-count-upcoming');
-  const e4 = document.getElementById('anime-next-time');
-  const lu = document.getElementById('anime-last-update');
-  if (e1) e1.textContent = today.length;
-  if (e2) e2.textContent = total;
-  if (e3) e3.textContent = animeUpcomingData.length;
-  const now  = Math.floor(Date.now()/1000);
-  const next = today.filter(e => e.airingAt > now).sort((a,b)=>a.airingAt-b.airingAt)[0];
+  const now   = Math.floor(Date.now()/1000);
+  setTxt('anime-count-day',      today.length);
+  setTxt('anime-count-week',     total);
+  setTxt('anime-count-upcoming', animeUpcomingData.length);
+  setTxt('anime-count-upcoming2',animeUpcomingData.length);
+
+  const next = today.filter(e => e.airingAt > now).sort((a,b) => a.airingAt - b.airingAt)[0];
+  const e4   = qid('anime-next-time');
   if (e4 && next) {
     const d = new Date(next.airingAt*1000);
     e4.textContent = d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
   } else if (e4) { e4.textContent = '--:--'; }
+
+  const lu = qid('anime-last-update');
   if (lu) { const t=new Date(); lu.textContent=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0'); }
 }
 
+function setTxt(id, val) { const e = qid(id); if(e) e.textContent = val; }
+function qid(id) { return document.getElementById(id); }
+
+// ── TODAY SPOTLIGHT ──────────────────────────────────────────
+
+function renderTodaySpotlight() {
+  const wrap = qid('ani-today-wrap');
+  const scrl = qid('ani-today-scroll');
+  if (!scrl) return;
+
+  const today = animeWeekData[new Date().getDay()] || [];
+  if (today.length === 0) { if (wrap) wrap.classList.add('hidden'); return; }
+  if (wrap) wrap.classList.remove('hidden');
+
+  const now = Math.floor(Date.now()/1000);
+  scrl.innerHTML = '';
+  [...today].sort((a,b) => a.airingAt - b.airingAt).forEach(entry => {
+    const anime = entry.media; if (!anime) return;
+    const title = anime.title.english || anime.title.romaji;
+    const cover = anime.coverImage?.large || '';
+    const score = anime.averageScore ? (anime.averageScore/10).toFixed(1) : null;
+    const diff  = entry.airingAt - now;
+    const isLive = diff >= -1800 && diff <= 1800;
+    const aired  = diff < -1800;
+    const d = new Date(entry.airingAt*1000);
+    const timeStr = d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+
+    const chip = document.createElement('div');
+    chip.className = 'ani-today-chip' + (isLive ? ' live-now' : '');
+    chip.innerHTML = `
+      <div class="ani-today-chip-img">
+        ${cover ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy">` : `<div class="ani-card-poster-ph"><i class="fa-solid fa-tv"></i></div>`}
+        <div class="ani-card-overlay"></div>
+        <div class="ani-today-chip-ep">EP ${entry.episode}</div>
+        ${score ? `<div class="ani-today-chip-score"><i class="fa-solid fa-star"></i>${score}</div>` : ''}
+        <div class="ani-today-chip-time ${isLive?'is-live':aired?'is-aired':''}">
+          ${isLive ? '<span class="live-dot"></span> LIVE' : aired ? '✓ Tayang' : '⏰ '+timeStr}
+        </div>
+      </div>
+      <div class="ani-today-chip-body">
+        <div class="ani-today-chip-title">${escHtml(title)}</div>
+      </div>`;
+    chip.addEventListener('click', () => openAnimeModal(anime, entry));
+    scrl.appendChild(chip);
+  });
+}
+
+// ── RENDER VIEWS ─────────────────────────────────────────────
+
 function renderAnimeView() {
-  if (animeView === 'schedule') renderAnimeSchedule();
-  else renderAnimeUpcoming();
+  const header = qid('anime-section-header');
+  if (header) header.classList.remove('hidden');
+
+  if      (animeView === 'jadwal')   renderAnimeSchedule();
+  else if (animeView === 'upcoming') renderAnimeUpcoming();
+  else if (animeView === 'trending') renderAnimeTrending();
 }
 
 function renderAnimeSchedule() {
-  const grid  = document.getElementById('anime-grid');
-  const empty = document.getElementById('anime-empty');
+  const grid  = qid('anime-grid');
+  const empty = qid('anime-empty');
+  const strip = qid('anime-day-tabs');
   if (!grid) return;
+  if (strip) strip.classList.remove('hidden');
 
   let list = [...(animeWeekData[currentAnimeDay] || [])];
-  // Hanya tampilkan anime yang sudah/sedang tayang, bukan belum tayang
   list = list.filter(e => e.media?.status !== 'NOT_YET_RELEASED');
   if (currentAnimeGenre !== 'all') list = list.filter(e => e.media?.genres?.includes(currentAnimeGenre));
   if (animeSearchQuery) {
     const q = animeSearchQuery.toLowerCase();
     list = list.filter(e => {
       const t = e.media?.title;
-      return (t?.romaji||'').toLowerCase().includes(q) || (t?.english||'').toLowerCase().includes(q) || (t?.native||'').toLowerCase().includes(q);
+      return (t?.romaji||'').toLowerCase().includes(q) || (t?.english||'').toLowerCase().includes(q);
     });
   }
   list.sort((a,b) => a.airingAt - b.airingAt);
 
-  const e1 = document.getElementById('anime-count-day');
-  if (e1) e1.textContent = list.length;
-  const ttl = document.getElementById('anime-schedule-title');
-  if (ttl) ttl.innerHTML = `<i class="fa-solid fa-calendar-day" style="color:#ff5c93"></i> ${HARI[currentAnimeDay]}`;
+  setTxt('anime-count-day', list.length);
+  const ttl = qid('anime-schedule-title');
+  if (ttl) ttl.innerHTML = `<i class="fa-solid fa-calendar-day"></i> ${HARI[currentAnimeDay]}`;
 
   grid.innerHTML = '';
   if (list.length === 0) { empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   const now = Math.floor(Date.now()/1000);
-  list.forEach((e,i) => grid.appendChild(createAnimeScheduleCard(e,i,now)));
+  list.forEach((e,i) => grid.appendChild(createScheduleCard(e, i, now)));
 }
 
 function renderAnimeUpcoming() {
-  const grid  = document.getElementById('anime-grid');
-  const empty = document.getElementById('anime-empty');
+  const grid  = qid('anime-grid');
+  const empty = qid('anime-empty');
+  const strip = qid('anime-day-tabs');
   if (!grid) return;
+  if (strip) strip.classList.add('hidden');
 
   let list = [...animeUpcomingData];
   if (currentAnimeGenre !== 'all') list = list.filter(a => a.genres?.includes(currentAnimeGenre));
   if (animeSearchQuery) {
     const q = animeSearchQuery.toLowerCase();
-    list = list.filter(a => (a.title?.romaji||'').toLowerCase().includes(q)||(a.title?.english||'').toLowerCase().includes(q)||(a.title?.native||'').toLowerCase().includes(q));
+    list = list.filter(a => (a.title?.romaji||'').toLowerCase().includes(q)||(a.title?.english||'').toLowerCase().includes(q));
   }
 
-  const ttl = document.getElementById('anime-schedule-title');
-  if (ttl) ttl.innerHTML = `<i class="fa-solid fa-rocket" style="color:#ff5c93"></i> Segera Tayang`;
+  const ttl = qid('anime-schedule-title');
+  if (ttl) ttl.innerHTML = `<i class="fa-solid fa-rocket"></i> Segera Tayang`;
 
   grid.innerHTML = '';
   if (list.length === 0) { empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   const now = Math.floor(Date.now()/1000);
-  list.forEach((a,i) => grid.appendChild(createAnimeUpcomingCard(a,i,now)));
+  list.forEach((a,i) => grid.appendChild(createUpcomingCard(a, i, now)));
 }
 
-function createAnimeScheduleCard(entry, index, now) {
-  const anime = entry.media;
-  if (!anime) return document.createElement('div');
+function renderAnimeTrending() {
+  const grid  = qid('anime-grid');
+  const empty = qid('anime-empty');
+  const strip = qid('anime-day-tabs');
+  if (!grid) return;
+  if (strip) strip.classList.add('hidden');
+
+  let list = [...animeTrendingData];
+  if (currentAnimeGenre !== 'all') list = list.filter(a => a.genres?.includes(currentAnimeGenre));
+  if (animeSearchQuery) {
+    const q = animeSearchQuery.toLowerCase();
+    list = list.filter(a => (a.title?.romaji||'').toLowerCase().includes(q)||(a.title?.english||'').toLowerCase().includes(q));
+  }
+
+  const ttl = qid('anime-schedule-title');
+  if (ttl) ttl.innerHTML = `<i class="fa-solid fa-fire"></i> Trending Season Ini`;
+
+  grid.innerHTML = '';
+  if (list.length === 0) { empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  list.forEach((a,i) => grid.appendChild(createTrendingCard(a, i)));
+}
+
+// ── CARD BUILDERS ─────────────────────────────────────────────
+
+function createScheduleCard(entry, index, now) {
+  const anime = entry.media; if (!anime) return document.createElement('div');
   const div   = document.createElement('div');
-  div.className = 'anime-card';
+  div.className = 'ani-card';
   div.style.animationDelay = (index * 0.04) + 's';
+
   const title  = anime.title.english || anime.title.romaji;
   const cover  = anime.coverImage?.large || anime.coverImage?.extraLarge || '';
   const score  = anime.averageScore ? (anime.averageScore/10).toFixed(1) : null;
   const genres = (anime.genres||[]).slice(0,2);
   const d      = new Date(entry.airingAt * 1000);
-  const timeStr= d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+  const timeStr = d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
   const diff   = entry.airingAt - now;
   const isLive = diff >= -1800 && diff <= 1800;
   const aired  = diff < -1800;
+
   const img = cover
-    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'anime-card-poster-placeholder\\'><i class=\\'fa-solid fa-tv\\'></i></div>'">`
-    : `<div class="anime-card-poster-placeholder"><i class="fa-solid fa-tv"></i></div>`;
-  const badge = isLive
-    ? `<div class="anime-airing-badge"><div class="airing-pill"><span class="live-dot"></span>LIVE</div></div>`
-    : aired
-      ? `<div class="anime-aired-badge"><i class="fa-solid fa-check" style="color:var(--neon3);font-size:0.7rem;background:rgba(6,255,165,0.15);border:1px solid rgba(6,255,165,0.4);border-radius:20px;padding:2px 8px"></i></div>`
-      : '';
+    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'ani-card-poster-ph\\'><i class=\\'fa-solid fa-tv\\'></i></div>'">`
+    : `<div class="ani-card-poster-ph"><i class="fa-solid fa-tv"></i></div>`;
+
   div.innerHTML = `
-    <div class="anime-card-poster">
-      ${img}<div class="anime-card-overlay"></div>
-      ${score ? `<div class="anime-card-score"><i class="fa-solid fa-star"></i>${score}</div>` : ''}
-      <div class="anime-card-ep-badge">EP ${entry.episode}</div>
-      ${badge}
-      <div class="anime-card-time ${aired?'aired':isLive?'live':''}"><i class="fa-solid fa-clock"></i>${timeStr}</div>
+    <div class="ani-card-poster">
+      ${img}<div class="ani-card-overlay"></div>
+      <div class="ani-card-ep">EP ${entry.episode}</div>
+      ${score ? `<div class="ani-card-score"><i class="fa-solid fa-star"></i>${score}</div>` : ''}
+      ${isLive
+        ? `<div class="ani-live-badge"><div class="ani-live-pill"><span class="live-dot"></span>LIVE</div></div>`
+        : aired
+          ? `<div class="ani-aired-badge"><span style="color:var(--neon3);font-size:0.6rem;background:rgba(6,255,165,0.1);border:1px solid rgba(6,255,165,0.3);border-radius:20px;padding:2px 8px;backdrop-filter:blur(4px)">✓ Tayang</span></div>`
+          : ''}
+      <div class="ani-card-time ${aired?'is-aired':isLive?'is-live':''}">
+        <i class="fa-solid fa-clock"></i>${timeStr}
+      </div>
     </div>
-    <div class="anime-card-body">
-      <div class="anime-card-title">${escHtml(title)}</div>
-      <div class="anime-card-genres">${genres.map(g=>`<span class="anime-card-genre-tag">${g}</span>`).join('')}</div>
-      <div class="anime-card-countdown" data-airing="${entry.airingAt}">
+    <div class="ani-card-body">
+      <div class="ani-card-title">${escHtml(title)}</div>
+      <div class="ani-card-genres">${genres.map(g=>`<span class="ani-card-genre-tag">${g}</span>`).join('')}</div>
+      <div class="ani-card-countdown" data-airing="${entry.airingAt}">
         ${aired ? '<span class="aired-text">Sudah tayang</span>' : formatCountdown(Math.max(0,diff))}
       </div>
     </div>`;
@@ -1003,10 +1144,11 @@ function createAnimeScheduleCard(entry, index, now) {
   return div;
 }
 
-function createAnimeUpcomingCard(anime, index, now) {
+function createUpcomingCard(anime, index, now) {
   const div = document.createElement('div');
-  div.className = 'anime-card anime-card-upcoming';
+  div.className = 'ani-card';
   div.style.animationDelay = (index * 0.04) + 's';
+
   const title  = anime.title.english || anime.title.romaji;
   const cover  = anime.coverImage?.large || anime.coverImage?.extraLarge || '';
   const score  = anime.averageScore ? (anime.averageScore/10).toFixed(1) : null;
@@ -1020,26 +1162,67 @@ function createAnimeUpcomingCard(anime, index, now) {
     const diff = firstTs - now;
     if (diff > 0) cdStr = formatCountdown(diff);
   } else if (sd?.year) { dateStr = `${sd.day||'??'}/${sd.month||'??'}/${sd.year}`; }
+
   const img = cover
-    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'anime-card-poster-placeholder\\'><i class=\\'fa-solid fa-tv\\'></i></div>'">`
-    : `<div class="anime-card-poster-placeholder"><i class="fa-solid fa-tv"></i></div>`;
+    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'ani-card-poster-ph\\'><i class=\\'fa-solid fa-tv\\'></i></div>'">`
+    : `<div class="ani-card-poster-ph"><i class="fa-solid fa-tv"></i></div>`;
+
   div.innerHTML = `
-    <div class="anime-card-poster">
-      ${img}<div class="anime-card-overlay"></div>
-      ${score ? `<div class="anime-card-score"><i class="fa-solid fa-star"></i>${score}</div>` : ''}
-      <div class="anime-upcoming-tag"><i class="fa-solid fa-rocket"></i> Upcoming</div>
-      <div class="anime-card-time upcoming-time"><i class="fa-solid fa-calendar"></i>${dateStr}</div>
+    <div class="ani-card-poster">
+      ${img}<div class="ani-card-overlay"></div>
+      ${score ? `<div class="ani-card-score"><i class="fa-solid fa-star"></i>${score}</div>` : ''}
+      <div class="ani-upcoming-tag"><i class="fa-solid fa-rocket"></i> Upcoming</div>
+      <div class="ani-card-time"><i class="fa-solid fa-calendar"></i>${dateStr}</div>
     </div>
-    <div class="anime-card-body">
-      <div class="anime-card-title">${escHtml(title)}</div>
-      <div class="anime-card-genres">${genres.map(g=>`<span class="anime-card-genre-tag">${g}</span>`).join('')}</div>
-      <div class="anime-card-countdown upcoming-cd" data-airing="${firstTs||0}">
-        ${cdStr || `<span style="color:var(--text3);font-size:0.6rem">${anime.season?SEASON_LABEL[anime.season]||anime.season:'TBA'} ${anime.seasonYear||''}</span>`}
+    <div class="ani-card-body">
+      <div class="ani-card-title">${escHtml(title)}</div>
+      <div class="ani-card-genres">${genres.map(g=>`<span class="ani-card-genre-tag">${g}</span>`).join('')}</div>
+      <div class="ani-card-countdown upcoming-cd" data-airing="${firstTs||0}">
+        ${cdStr || `<span style="color:var(--text3);font-size:0.6rem">${anime.season?SEASON_LABEL2[anime.season]||anime.season:'TBA'} ${anime.seasonYear||''}</span>`}
       </div>
     </div>`;
   div.addEventListener('click', () => openAnimeModal(anime, null, true));
   return div;
 }
+
+function createTrendingCard(anime, index) {
+  const div = document.createElement('div');
+  div.className = 'ani-card';
+  div.style.animationDelay = (index * 0.04) + 's';
+
+  const title  = anime.title.english || anime.title.romaji;
+  const cover  = anime.coverImage?.large || anime.coverImage?.extraLarge || '';
+  const score  = anime.averageScore ? (anime.averageScore/10).toFixed(1) : null;
+  const genres = (anime.genres||[]).slice(0,2);
+  const pop    = (anime.popularity||0).toLocaleString('id-ID');
+  const rank   = index + 1;
+
+  const img = cover
+    ? `<img src="${cover}" alt="${escHtml(title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'ani-card-poster-ph\\'><i class=\\'fa-solid fa-tv\\'></i></div>'">`
+    : `<div class="ani-card-poster-ph"><i class="fa-solid fa-tv"></i></div>`;
+
+  div.innerHTML = `
+    <div class="ani-trend-bar"></div>
+    <div class="ani-card-poster">
+      ${img}<div class="ani-card-overlay"></div>
+      <div class="ani-card-rank">#${rank}</div>
+      ${score ? `<div class="ani-card-score"><i class="fa-solid fa-star"></i>${score}</div>` : ''}
+      <div class="ani-card-time"><i class="fa-solid fa-users"></i>${pop}</div>
+    </div>
+    <div class="ani-card-body">
+      <div class="ani-card-title">${escHtml(title)}</div>
+      <div class="ani-card-genres">${genres.map(g=>`<span class="ani-card-genre-tag">${g}</span>`).join('')}</div>
+      <div class="ani-card-countdown">
+        <span style="color:var(--text3);font-size:0.6rem;font-family:'Rajdhani',sans-serif">
+          ${anime.season?SEASON_LABEL2[anime.season]||anime.season:''} ${anime.seasonYear||''}
+        </span>
+      </div>
+    </div>`;
+  div.addEventListener('click', () => openAnimeModal(anime, null, false));
+  return div;
+}
+
+// ── COUNTDOWN ────────────────────────────────────────────────
 
 function formatCountdown(seconds) {
   if (seconds <= 0) return '<span class="aired-text">Sudah tayang</span>';
@@ -1052,20 +1235,25 @@ function formatCountdown(seconds) {
 
 function updateCountdowns() {
   const now = Math.floor(Date.now()/1000);
-  document.querySelectorAll('.anime-card-countdown').forEach(el => {
+  document.querySelectorAll('.ani-card-countdown[data-airing]').forEach(el => {
     const t = parseInt(el.dataset.airing);
     if (!t) return;
     const diff = t - now;
-    el.innerHTML = diff < -1800 ? '<span class="aired-text">Sudah tayang</span>' : formatCountdown(Math.max(0,diff));
-    const card = el.closest('.anime-card');
-    if (!card) return;
-    const tb = card.querySelector('.anime-card-time');
-    if (tb) { tb.classList.toggle('live', diff>=-1800&&diff<=1800); tb.classList.toggle('aired',diff<-1800); }
+    if (!el.classList.contains('upcoming-cd')) {
+      el.innerHTML = diff < -1800 ? '<span class="aired-text">Sudah tayang</span>' : formatCountdown(Math.max(0,diff));
+      const card = el.closest('.ani-card');
+      if (card) {
+        const tb = card.querySelector('.ani-card-time');
+        if (tb) { tb.classList.toggle('is-live', diff>=-1800&&diff<=1800); tb.classList.toggle('is-aired',diff<-1800); }
+      }
+    }
   });
 }
 
+// ── MODAL ────────────────────────────────────────────────────
+
 function openAnimeModal(anime, scheduleEntry = null, isUpcoming = false) {
-  const overlay = document.getElementById('anime-modal-overlay');
+  const overlay = qid('anime-modal-overlay');
   if (!overlay) return;
 
   const title       = anime.title?.english || anime.title?.romaji || '';
@@ -1082,15 +1270,15 @@ function openAnimeModal(anime, scheduleEntry = null, isUpcoming = false) {
   const statusMap = {RELEASING:'Sedang Tayang',FINISHED:'Selesai',NOT_YET_RELEASED:'Belum Tayang',CANCELLED:'Dibatalkan',HIATUS:'Hiatus'};
   const airStatus = statusMap[anime.status] || anime.status || 'N/A';
 
-  const bEl = document.getElementById('am-banner');
+  const bEl = qid('am-banner');
   if (bEl) { bEl.src = banner; bEl.onerror = () => { bEl.src = cover; }; }
-  const cEl = document.getElementById('am-cover');
+  const cEl = qid('am-cover');
   if (cEl) { cEl.src = cover; cEl.onerror = () => { cEl.style.opacity='0'; }; }
 
-  const scoreB = document.getElementById('am-score');
+  const scoreB = qid('am-score');
   if (scoreB) scoreB.innerHTML = anime.averageScore ? `<i class="fa-solid fa-star" style="color:#ffd700"></i> ${score}/10` : '';
 
-  const setEl = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+  const setEl = (id, val) => { const e = qid(id); if(e) e.textContent = val; };
   setEl('am-title',       title);
   setEl('am-title-romaji', titleRomaji !== title ? titleRomaji : '');
   setEl('am-title-native', titleNative);
@@ -1101,23 +1289,22 @@ function openAnimeModal(anime, scheduleEntry = null, isUpcoming = false) {
   setEl('am-studio',      studio);
   setEl('am-source',      source);
   setEl('am-duration',    anime.duration ? `${anime.duration} menit` : 'N/A');
-  setEl('am-season-info', anime.season ? `${SEASON_LABEL[anime.season]||anime.season} ${anime.seasonYear||''}` : 'N/A');
+  setEl('am-season-info', anime.season ? `${SEASON_LABEL2[anime.season]||anime.season} ${anime.seasonYear||''}` : 'N/A');
   setEl('am-country',     country);
   setEl('am-airstatus',   airStatus);
 
-  // Airing time
   const now2 = Math.floor(Date.now()/1000);
   if (scheduleEntry) {
     const d = new Date(scheduleEntry.airingAt*1000);
     const diff = scheduleEntry.airingAt - now2;
     const dateStr = d.toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    const timeEl = document.getElementById('am-time');
+    const timeEl = qid('am-time');
     if (timeEl) timeEl.innerHTML = `${dateStr}<br><small style="color:#ff5c93">${diff>0?formatCountdown(diff):'Sudah tayang'}</small>`;
     setEl('am-ep', `Episode ${scheduleEntry.episode}`);
   } else if (isUpcoming) {
     const node = anime?.airingSchedule?.nodes?.[0];
     const sd   = anime?.startDate;
-    const timeEl = document.getElementById('am-time');
+    const timeEl = qid('am-time');
     if (node && timeEl) {
       const d = new Date(node.airingAt*1000); const diff = node.airingAt - now2;
       timeEl.innerHTML = `${d.toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<br><small style="color:#ff5c93">${diff>0?formatCountdown(diff):'Segera'}</small>`;
@@ -1128,36 +1315,32 @@ function openAnimeModal(anime, scheduleEntry = null, isUpcoming = false) {
     setEl('am-time', 'N/A'); setEl('am-ep', anime.episodes||'Ongoing');
   }
 
-  // Genres
-  const genEl = document.getElementById('am-genres');
+  const genEl = qid('am-genres');
   if (genEl) genEl.innerHTML = genres.slice(0,5).map(g=>`<span class="am-genre-chip">${g}</span>`).join('');
 
-  // Tags
   const tags = (anime.tags||[]).filter(t=>!t.isMediaSpoiler).slice(0,10);
-  const tagW = document.getElementById('am-tags-wrap');
-  const tagL = document.getElementById('am-tags-list');
+  const tagW = qid('am-tags-wrap'), tagL = qid('am-tags-list');
   if (tagW && tagL) {
     if (tags.length > 0) { tagW.classList.remove('hidden'); tagL.innerHTML = tags.map(t=>`<span class="am-tag-chip">${t.name}</span>`).join(''); }
     else { tagW.classList.add('hidden'); }
   }
 
-  // Streaming
   const streams = (anime.streamingEpisodes||[]);
-  const stW = document.getElementById('am-stream-wrap');
-  const stL = document.getElementById('am-stream-list');
+  const stW = qid('am-stream-wrap'), stL = qid('am-stream-list');
   if (stW && stL) {
     const sites = [...new Set(streams.map(s=>s.site))];
     if (sites.length > 0) {
       stW.classList.remove('hidden');
-      stL.innerHTML = sites.map(site => { const ep = streams.find(s=>s.site===site); return `<a href="${ep?.url||'#'}" target="_blank" class="stream-btn">${site}</a>`; }).join('');
+      stL.innerHTML = sites.map(site => {
+        const ep = streams.find(s=>s.site===site);
+        return `<a href="${ep?.url||'#'}" target="_blank" class="stream-btn"><i class="fa-solid fa-play"></i>${site}</a>`;
+      }).join('');
     } else { stW.classList.add('hidden'); }
   }
 
-  // Description
   const rawDesc   = anime.description || 'Tidak ada deskripsi.';
   const cleanDesc = rawDesc.replace(/<[^>]*>/g,'').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim();
-  const descEl = document.getElementById('am-desc');
-  const readBtn = document.getElementById('am-read-more');
+  const descEl = qid('am-desc'), readBtn = qid('am-read-more');
   if (descEl) { descEl.textContent = cleanDesc; descEl.className = ''; }
   if (readBtn) {
     if (cleanDesc.length > 300) {
@@ -1166,12 +1349,10 @@ function openAnimeModal(anime, scheduleEntry = null, isUpcoming = false) {
     } else { readBtn.classList.add('hidden'); }
   }
 
-  // AniList link
-  const alLink = document.getElementById('am-anilist-link');
+  const alLink = qid('am-anilist-link');
   if (alLink) alLink.href = anime.siteUrl || `https://anilist.co/anime/${anime.id}`;
 
-  // Countdown in modal
-  const modalCd = document.getElementById('am-modal-countdown');
+  const modalCd = qid('am-modal-countdown');
   if (modalCd) {
     const target = scheduleEntry?.airingAt || anime?.airingSchedule?.nodes?.[0]?.airingAt;
     if (target) {
@@ -1193,39 +1374,41 @@ function openAnimeModal(anime, scheduleEntry = null, isUpcoming = false) {
 }
 
 function closeAnimeModal() {
-  const overlay = document.getElementById('anime-modal-overlay');
+  const overlay = qid('anime-modal-overlay');
   if (!overlay) return;
   overlay.classList.add('hidden');
   document.body.style.overflow = '';
   if (overlay.dataset.cdInt) { clearInterval(parseInt(overlay.dataset.cdInt)); delete overlay.dataset.cdInt; }
 }
 
+// ── INIT LISTENERS ───────────────────────────────────────────
+
 function initAnimeModalListeners() {
-  const close   = document.getElementById('anime-modal-close');
-  const overlay = document.getElementById('anime-modal-overlay');
+  const close   = qid('anime-modal-close');
+  const overlay = qid('anime-modal-overlay');
   if (close)   close.addEventListener('click', closeAnimeModal);
   if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeAnimeModal(); });
 
-  const retry = document.getElementById('anime-retry-btn');
+  const retry = qid('anime-retry-btn');
   if (retry) retry.addEventListener('click', () => { animeLoaded = false; loadAnimeSchedule(true); });
 
-  const asearch = document.getElementById('anime-search-input');
-  const aclear  = document.getElementById('anime-clear-search');
+  const asearch = qid('anime-search-input');
+  const aclear  = qid('anime-clear-search');
   if (asearch) asearch.addEventListener('input', (e) => {
     animeSearchQuery = e.target.value.trim();
     if (aclear) aclear.classList.toggle('hidden', !animeSearchQuery);
     renderAnimeView();
   });
   if (aclear) aclear.addEventListener('click', () => {
-    document.getElementById('anime-search-input').value = '';
+    qid('anime-search-input').value = '';
     animeSearchQuery = ''; aclear.classList.add('hidden'); renderAnimeView();
   });
 
-  const genreBar = document.getElementById('anime-genre-bar');
+  const genreBar = qid('anime-genre-bar');
   if (genreBar) genreBar.addEventListener('click', (e) => {
-    const btn = e.target.closest('.anime-genre-btn');
+    const btn = e.target.closest('.ani-genre-pill');
     if (!btn) return;
-    document.querySelectorAll('.anime-genre-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.ani-genre-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentAnimeGenre = btn.dataset.genre;
     renderAnimeView();
@@ -1233,37 +1416,31 @@ function initAnimeModalListeners() {
 }
 
 function initAnimeViewToggle() {
-  const btnS = document.getElementById('anime-btn-schedule');
-  const btnU = document.getElementById('anime-btn-upcoming');
-  const tabs = document.getElementById('anime-day-tabs');
-  if (!btnS || !btnU) return;
-  btnS.addEventListener('click', () => {
-    animeView = 'schedule';
-    btnS.classList.add('active'); btnU.classList.remove('active');
-    if (tabs) tabs.classList.remove('hidden');
-    renderAnimeView();
-  });
-  btnU.addEventListener('click', () => {
-    animeView = 'upcoming';
-    btnU.classList.add('active'); btnS.classList.remove('active');
-    if (tabs) tabs.classList.add('hidden');
-    renderAnimeView();
+  ['jadwal','upcoming','trending'].forEach(tab => {
+    const btn = qid(`ani-tab-${tab}`);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ani-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      animeView = tab;
+      renderAnimeView();
+    });
   });
 }
 
 function initAnimeDayTabs() {
-  const tabs = document.getElementById('anime-day-tabs');
+  const tabs = qid('anime-day-tabs');
   if (!tabs) return;
   const today = new Date().getDay();
-  tabs.querySelectorAll('.anime-day-tab').forEach(btn => {
+  tabs.querySelectorAll('.ani-day-btn').forEach(btn => {
     const d = parseInt(btn.dataset.day);
-    btn.classList.toggle('today-tab', d === today);
+    btn.classList.toggle('today-btn',  d === today);
     btn.classList.toggle('active', d === currentAnimeDay);
   });
   tabs.addEventListener('click', (e) => {
-    const btn = e.target.closest('.anime-day-tab');
+    const btn = e.target.closest('.ani-day-btn');
     if (!btn) return;
-    tabs.querySelectorAll('.anime-day-tab').forEach(b => b.classList.remove('active'));
+    tabs.querySelectorAll('.ani-day-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentAnimeDay = parseInt(btn.dataset.day);
     updateAnimeStats();
@@ -1272,17 +1449,21 @@ function initAnimeDayTabs() {
 }
 
 function showAnimeLoading(show) {
-  const el = document.getElementById('anime-loading');
+  const el = qid('anime-loading');
   if (el) el.classList.toggle('hidden', !show);
   if (show) {
-    const g = document.getElementById('anime-grid'); if (g) g.innerHTML = '';
-    const e = document.getElementById('anime-empty'); if (e) e.classList.add('hidden');
+    const g = qid('anime-grid'); if (g) g.innerHTML = '';
+    const e = qid('anime-empty'); if (e) e.classList.add('hidden');
+    const h = qid('anime-section-header'); if (h) h.classList.add('hidden');
+    const t = qid('ani-today-wrap'); if (t) t.classList.add('hidden');
   }
 }
 function showAnimeError(show) {
-  const el = document.getElementById('anime-error');
+  const el = qid('anime-error');
   if (el) el.classList.toggle('hidden', !show);
 }
+
+
 
 // ===========================
 // PARTICLE SYSTEMS
