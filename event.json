@@ -110,5 +110,19 @@
     "featured": false,
     "aktif": true,
     "baru": false
-  }
+  },
+  {
+    "id": 6,
+    "nama": "Tutorial Cara Bikin Bot WhatsApp",
+    "tipe": "Lainnya",
+    "deskripsi": "Tutorial Cara Bikin Bot WhatsApp.",
+    "thumbnail": "bikinbot.webp",
+    "penyelenggara": "lenwy",
+    "anggota": "1000+ Subscriber",
+    "link": "https://youtu.be/U38fzk5czHE?si=aYICbrh6aPdnlf3T",
+    "label_btn": "Tonton Sekarang",
+    "featured": false,
+    "aktif": true,
+    "baru": false
+  } 
 ]
