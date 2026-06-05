@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "nama": "Kuroko MD",
+    "nama": "Kuroko MD V6.1",
     "kategori": "MD",
     "deskripsi": "Multi-device WhatsApp bot dengan fitur lengkap, stabil, dan ringan. Cocok untuk personal maupun bisnis.",
     "thumbnail": "kuroko.jpg",
@@ -988,5 +988,20 @@
     "link": "https://www.mediafire.com/file/nco9wufdwda1bek/BulterBot.zip/file?dkey=nco9wufdwda1bek",
     "linkyt": "",
     "linkch": "https://whatsapp.com/channel/0029Vb816qs6LwHheK1KT044/"
+  },
+  {
+    "id": 67,
+    "nama": "Kuroko MD V6.6",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa Kuroko MD V6.6.",
+    "thumbnail": "kuroko.jpg",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": false,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/3y6s4g6vnnlk12t/KUROKO.zip/file",
+    "linkyt": "https://youtu.be/_kzifuKVW_k?si=OhwujT-yjMT-tXq6",
+    "linkch": "https://whatsapp.com/channel/0029VaBOlsv002TEjlntTE2D/"
   }
 ]
