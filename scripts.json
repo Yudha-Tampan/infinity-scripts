@@ -1003,5 +1003,35 @@
     "link": "https://www.mediafire.com/file/3y6s4g6vnnlk12t/KUROKO.zip/file",
     "linkyt": "https://youtu.be/_kzifuKVW_k?si=OhwujT-yjMT-tXq6",
     "linkch": "https://whatsapp.com/channel/0029VaBOlsv002TEjlntTE2D/"
+  },
+  {
+    "id": 68,
+    "nama": "TENSURA MD",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa TENSURA MD.",
+    "thumbnail": "tensura.webp",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": false,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/v6w9b2wbk2le376/TENSURA-MD.zip/file?dkey=v6w9b2wbk2le376",
+    "linkyt": "https://youtu.be/kD9ucTrhjVI?si=gPDniBRackpSGtBo",
+    "linkch": "https://whatsapp.com/channel/0029VavKSRv6WaKnPwWtZG39/"
+  },
+  {
+    "id": 46,
+    "nama": "Skirk MD",
+    "kategori": "MD",
+    "deskripsi": "Script Bot Wa Skirk MD.",
+    "thumbnail": "skirk.webp",
+    "status": "Free",
+    "rating": "4.6",
+    "views": 7321,
+    "trending": false,
+    "baru": true,
+    "link": "https://www.mediafire.com/file/a1l0hcac5hkmi1j/skirk_md_free.zip/file",
+    "linkyt": "https://youtube.com/erizaoffc",
+    "linkch": ""
   }
 ]
