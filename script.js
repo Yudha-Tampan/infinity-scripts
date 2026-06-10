@@ -44,6 +44,7 @@ function initApp() {
   loadEvents();
   loadChangelog();
   loadAnnouncement();
+  loadNewScriptNotif();
   initAnimeDayTabs();
   initAnimeViewToggle();
   animateSkillBars();
@@ -1799,3 +1800,90 @@ async function loadAnnouncement() {
   } catch { /* silent */ }
 }
 
+
+/* ============================================================
+   NEW SCRIPT NOTIFICATION
+   ============================================================ */
+async function loadNewScriptNotif() {
+  try {
+    const res = await fetch('new_script_notif.json?v=' + Date.now());
+    if (!res.ok) throw new Error('fail');
+    const nsn = await res.json();
+    if (!nsn.aktif) return;
+
+    // Cek apakah user sudah dismiss notif ini
+    const dismissed = localStorage.getItem('nsn_dismissed');
+    if (dismissed === nsn.id) return;
+
+    const overlay   = document.getElementById('nsn-overlay');
+    const box       = document.getElementById('nsn-box');
+    const titleEl   = document.getElementById('nsn-title');
+    const descEl    = document.getElementById('nsn-desc');
+    const catEl     = document.getElementById('nsn-cat');
+    const statusEl  = document.getElementById('nsn-status-badge');
+    const tryBtn    = document.getElementById('nsn-btn-try');
+    const closeBtn1 = document.getElementById('nsn-close');
+    const closeBtn2 = document.getElementById('nsn-btn-close');
+    const glowEl    = document.getElementById('nsn-glow');
+
+    if (!overlay) return;
+
+    titleEl.textContent  = nsn.nama_script || 'Script Baru';
+    descEl.textContent   = nsn.deskripsi   || '';
+    catEl.textContent    = nsn.kategori    || 'Script';
+    statusEl.textContent = nsn.status      || 'Free';
+
+    // Warna aksen dinamis
+    const accent = nsn.warna || '#a259ff';
+    box.style.setProperty('--nsn-accent', accent);
+    if (glowEl) glowEl.style.background = accent;
+
+    // Tampilkan dengan delay (setelah announcement)
+    const delay = localStorage.getItem('ann_dismissed') ? 800 : 2000;
+    setTimeout(() => overlay.classList.remove('hidden'), delay);
+
+    const close = () => {
+      overlay.classList.add('hidden');
+      localStorage.setItem('nsn_dismissed', nsn.id);
+    };
+
+    // Tombol "Coba Sekarang" → navigate ke card script lalu buka modal
+    tryBtn.onclick = () => {
+      close();
+
+      // Pastikan page home aktif
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      document.querySelector('.nav-item[data-page="home"]')?.classList.add('active');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-home')?.classList.add('active');
+
+      // Scroll ke scripts-grid lalu temukan card & highlight
+      setTimeout(() => {
+        const grid = document.getElementById('scripts-grid');
+        if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        setTimeout(() => {
+          const card = document.querySelector(`.script-card[data-id="${nsn.script_id}"]`);
+          if (card) {
+            // Scroll ke card yang tepat
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Efek highlight glow sementara
+            card.classList.add('nsn-highlight');
+            setTimeout(() => card.classList.remove('nsn-highlight'), 2200);
+
+            // Buka modal setelah highlight
+            setTimeout(() => card.click(), 600);
+          }
+        }, 400);
+      }, 200);
+    };
+
+    closeBtn1.onclick = close;
+    closeBtn2.onclick = close;
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+
+  } catch { /* silent */ }
+}

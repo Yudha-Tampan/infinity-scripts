@@ -2073,3 +2073,311 @@ button, a, input, textarea, select, .cat-btn, .nav-item,
 .light-mode .ann-btn-primary { color: #fff; }
 .light-mode .copy-btn { background: rgba(0,150,180,0.1); }
 .light-mode .wa-share-btn { background: rgba(20,180,80,0.1); }
+
+/* ============================================================
+   NEW SCRIPT NOTIFICATION
+   ============================================================ */
+.nsn-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+.nsn-overlay.hidden { display: none; }
+
+.nsn-box {
+  --nsn-accent: #a259ff;
+  position: relative;
+  background: linear-gradient(145deg, #0e0e1a, #13132a);
+  border: 1px solid rgba(162,89,255,0.25);
+  border-radius: 24px;
+  padding: 32px 26px 26px;
+  max-width: 370px;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(162,89,255,0.15),
+    0 24px 64px rgba(0,0,0,0.6),
+    0 0 80px rgba(162,89,255,0.08) inset;
+  animation: nsnPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes nsnPopIn {
+  from { opacity: 0; transform: scale(0.8) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Glow blob di background */
+.nsn-glow {
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 220px;
+  background: var(--nsn-accent);
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  pointer-events: none;
+  transition: background 0.4s;
+}
+
+.nsn-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 2;
+}
+.nsn-close:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* Badge row atas */
+.nsn-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.nsn-badge-new {
+  background: linear-gradient(135deg, #a259ff, #00d4ff);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1.2px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.nsn-badge-status {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* Icon animasi */
+.nsn-icon-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nsn-icon-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#13132a, #13132a) padding-box,
+    linear-gradient(135deg, var(--nsn-accent), #00d4ff) border-box;
+  animation: nsnSpin 3s linear infinite;
+}
+@keyframes nsnSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.nsn-icon-core {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, rgba(162,89,255,0.15), rgba(0,212,255,0.08));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--nsn-accent);
+  z-index: 1;
+}
+
+/* Owner tag */
+.nsn-owner-tag {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.nsn-owner-tag i { color: #f5c542; font-size: 0.65rem; }
+
+/* Judul script */
+.nsn-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 8px;
+  line-height: 1.3;
+  background: linear-gradient(135deg, #fff 60%, var(--nsn-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Kategori badge */
+.nsn-cat-badge {
+  display: inline-block;
+  background: rgba(162,89,255,0.12);
+  border: 1px solid rgba(162,89,255,0.3);
+  color: var(--nsn-accent);
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+/* Deskripsi */
+.nsn-desc {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.65;
+  margin: 0 0 22px;
+}
+
+/* Tombol aksi */
+.nsn-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.nsn-btn-try {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--nsn-accent), #00d4ff);
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 20px rgba(162,89,255,0.3);
+}
+.nsn-btn-try:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(162,89,255,0.45);
+  filter: brightness(1.1);
+}
+.nsn-btn-close {
+  background: transparent;
+  color: rgba(255,255,255,0.35);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-family: 'Rajdhani', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.nsn-btn-close:hover {
+  color: rgba(255,255,255,0.7);
+  border-color: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+}
+
+/* Light mode overrides */
+.light-mode .nsn-box {
+  background: linear-gradient(145deg, #f0f0ff, #e8e8f8);
+  border-color: rgba(162,89,255,0.2);
+  box-shadow:
+    0 0 0 1px rgba(162,89,255,0.1),
+    0 24px 64px rgba(0,0,0,0.12);
+}
+.light-mode .nsn-glow { opacity: 0.07; }
+.light-mode .nsn-title {
+  background: linear-gradient(135deg, #222 60%, var(--nsn-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.light-mode .nsn-desc { color: rgba(0,0,0,0.5); }
+.light-mode .nsn-owner-tag { color: rgba(0,0,0,0.45); }
+.light-mode .nsn-close {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.4);
+}
+.light-mode .nsn-close:hover {
+  background: rgba(0,0,0,0.1);
+  color: #000;
+}
+.light-mode .nsn-badge-status {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.5);
+}
+.light-mode .nsn-icon-ring {
+  background:
+    linear-gradient(#f0f0ff, #f0f0ff) padding-box,
+    linear-gradient(135deg, var(--nsn-accent), #00d4ff) border-box;
+}
+.light-mode .nsn-btn-close {
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.4);
+}
+.light-mode .nsn-btn-close:hover {
+  color: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.04);
+}
+
+/* Highlight efek saat card di-navigate dari notif */
+.script-card.nsn-highlight {
+  animation: nsnCardPulse 2.2s ease forwards;
+  position: relative;
+  z-index: 2;
+}
+@keyframes nsnCardPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(162,89,255,0.7), 0 0 0 0 rgba(0,212,255,0.4); transform: scale(1); }
+  20%  { box-shadow: 0 0 0 8px rgba(162,89,255,0.4), 0 0 24px 4px rgba(0,212,255,0.2); transform: scale(1.03); }
+  60%  { box-shadow: 0 0 0 14px rgba(162,89,255,0.15), 0 0 40px 8px rgba(162,89,255,0.1); transform: scale(1.01); }
+  100% { box-shadow: none; transform: scale(1); }
+}
