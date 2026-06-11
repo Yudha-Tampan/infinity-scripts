@@ -158,11 +158,16 @@ body::before {
   animation-direction: reverse;
   animation-duration: 2.5s;
 }
-.logo-icon {
-  font-size: 2.5rem; color: var(--neon);
-  filter: drop-shadow(0 0 24px var(--neon));
-  animation: pulse-glow 2s ease-in-out infinite;
-  z-index: 1;
+.splash-logo-img {
+  width: 72px; height: 72px;
+  object-fit: contain;
+  position: relative; z-index: 1;
+  filter: drop-shadow(0 0 18px rgba(56,189,248,0.6)) drop-shadow(0 0 36px rgba(129,140,248,0.3));
+  animation: pulse-glow-img 2.5s ease-in-out infinite;
+}
+@keyframes pulse-glow-img {
+  0%,100% { filter: drop-shadow(0 0 14px rgba(56,189,248,0.5)) drop-shadow(0 0 28px rgba(129,140,248,0.25)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 28px rgba(56,189,248,0.8)) drop-shadow(0 0 50px rgba(129,140,248,0.45)); transform: scale(1.06); }
 }
 @keyframes ring-spin { to { transform: rotate(360deg); } }
 @keyframes pulse-glow {
@@ -224,14 +229,15 @@ body::before {
 }
 
 .topbar-logo {
-  display: flex; align-items: center; gap: 9px;
+  display: flex; align-items: center; gap: 8px;
   font-family: 'Orbitron', sans-serif;
   font-size: 0.95rem; font-weight: 700;
   color: var(--text);
 }
-.topbar-logo i {
-  color: var(--neon3); font-size: 1.3rem;
-  filter: drop-shadow(0 0 8px var(--neon3));
+.topbar-logo-img {
+  width: 28px; height: 28px; object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(56,189,248,0.5));
+  flex-shrink: 0;
 }
 .topbar-logo b {
   background: linear-gradient(135deg, var(--neon), var(--neon2));
