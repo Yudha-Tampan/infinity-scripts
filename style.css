@@ -1092,13 +1092,21 @@ body::before {
 /* ===== BOTTOM NAV — Event Center Button ===== */
 .nav-event-center .nav-icon-wrap.nav-event-icon {
   position: relative;
-  background: linear-gradient(135deg, var(--neon2), var(--neon));
+  background: transparent;
   border-radius: var(--radius-sm);
-  width: 46px; height: 38px;
-  box-shadow: 0 4px 16px rgba(56,189,248,0.4);
+  width: 46px; height: 46px;
+  box-shadow: none;
   color: #fff;
-  transform: translateY(-7px);
+  transform: translateY(-10px);
   transition: all var(--transition);
+  overflow: visible;
+}
+.nav-event-img {
+  width: 46px; height: 46px;
+  object-fit: contain;
+  border-radius: 10px;
+  filter: drop-shadow(0 4px 12px rgba(56,189,248,0.5));
+  display: block;
 }
 .nav-event-center { color: var(--neon) !important; }
 .nav-event-center:hover .nav-icon-wrap.nav-event-icon,
@@ -1141,15 +1149,23 @@ body::before {
   pointer-events: none;
 }
 .event-header-content { position: relative; z-index: 1; }
-.event-header-icon {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 58px; height: 58px; border-radius: 18px;
-  background: linear-gradient(135deg, var(--neon2), var(--neon));
-  font-size: 1.5rem; color: #fff; margin-bottom: 14px;
-  box-shadow: 0 8px 28px rgba(56,189,248,0.4);
-  /* animation: icon-float 3s ease-in-out infinite; */
+.event-header-banner {
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: 10px;
 }
-@keyframes icon-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.event-banner-img {
+  width: min(320px, 88vw);
+  height: auto;
+  border-radius: 20px;
+  filter: drop-shadow(0 8px 32px rgba(56,189,248,0.35)) drop-shadow(0 2px 12px rgba(129,140,248,0.25));
+  animation: banner-float 4s ease-in-out infinite;
+  display: block;
+}
+@keyframes banner-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
 .event-page-header h2 {
   font-family: 'Orbitron', sans-serif;
   font-size: clamp(1.2rem, 5vw, 1.6rem);
