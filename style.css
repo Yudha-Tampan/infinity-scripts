@@ -110,19 +110,15 @@ body::before {
 .app-ambient::before {
   content: '';
   position: absolute; width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(56,189,248,0.05) 0%, transparent 70%);
   top: -200px; right: -200px;
-  animation: ambient-drift1 20s ease-in-out infinite;
 }
 .app-ambient::after {
   content: '';
   position: absolute; width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(129,140,248,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(129,140,248,0.05) 0%, transparent 70%);
   bottom: -150px; left: -150px;
-  animation: ambient-drift2 25s ease-in-out infinite;
 }
-@keyframes ambient-drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-50px, 80px); } }
-@keyframes ambient-drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(60px, -40px); } }
 
 /* ===== SPLASH SCREEN ===== */
 #splash {
@@ -168,18 +164,13 @@ body::before {
   width: 140px; height: 140px;
   object-fit: contain;
   position: relative; z-index: 1;
-  filter: drop-shadow(0 0 20px rgba(56,189,248,0.7)) drop-shadow(0 0 40px rgba(129,140,248,0.4));
-  animation: pulse-glow-img 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 18px rgba(56,189,248,0.6));
+  animation: pulse-glow-img 3s ease-in-out infinite;
+  will-change: transform;
 }
 @keyframes pulse-glow-img {
-  0%,100% {
-    filter: drop-shadow(0 0 16px rgba(56,189,248,0.6)) drop-shadow(0 0 32px rgba(129,140,248,0.3)) brightness(1.05);
-    transform: scale(1);
-  }
-  50% {
-    filter: drop-shadow(0 0 30px rgba(56,189,248,0.9)) drop-shadow(0 0 60px rgba(129,140,248,0.55)) brightness(1.15);
-    transform: scale(1.07);
-  }
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
 }
 @keyframes ring-spin { to { transform: rotate(360deg); } }
 @keyframes pulse-glow {
@@ -272,10 +263,11 @@ body::before {
   animation: live-pulse 1.5s infinite;
   display: inline-block;
   flex-shrink: 0;
+  will-change: opacity;
 }
 @keyframes live-pulse {
-  0%,100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(52,211,153,0.4); }
-  50% { opacity: 0.7; transform: scale(0.85); }
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 .icon-btn {
@@ -553,6 +545,7 @@ body::before {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px; padding: 0 14px 18px;
+  contain: layout style;
 }
 @media (min-width: 500px) { .cards-grid { grid-template-columns: repeat(3,1fr); } }
 @media (min-width: 768px) { .cards-grid { grid-template-columns: repeat(4,1fr); } }
@@ -731,7 +724,7 @@ body::before {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
   width: 300px; height: 200px;
   background: radial-gradient(ellipse, rgba(56,189,248,0.15), rgba(129,140,248,0.1), transparent 70%);
-  animation: cover-pulse 4s ease-in-out infinite;
+  /* animation: cover-pulse 4s ease-in-out infinite; */
 }
 @keyframes cover-pulse {
   0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.5; }
@@ -1154,7 +1147,7 @@ body::before {
   background: linear-gradient(135deg, var(--neon2), var(--neon));
   font-size: 1.5rem; color: #fff; margin-bottom: 14px;
   box-shadow: 0 8px 28px rgba(56,189,248,0.4);
-  animation: icon-float 3s ease-in-out infinite;
+  /* animation: icon-float 3s ease-in-out infinite; */
 }
 @keyframes icon-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .event-page-header h2 {
@@ -2124,13 +2117,11 @@ button, a, input, textarea, select, .cat-btn, .nav-item,
   width: 220px; height: 220px;
   background: rgba(56,189,248,0.18);
   top: -60px; left: -40px;
-  animation: orb-drift1 8s ease-in-out infinite;
 }
 .profile-hero-orb.orb2 {
   width: 180px; height: 180px;
   background: rgba(129,140,248,0.18);
   top: -40px; right: -30px;
-  animation: orb-drift2 10s ease-in-out infinite;
 }
 @keyframes orb-drift1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(20px, 15px); } }
 @keyframes orb-drift2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-15px, 20px); } }
