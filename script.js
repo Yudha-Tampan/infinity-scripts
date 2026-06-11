@@ -1831,10 +1831,43 @@ async function loadNewScriptNotif() {
     titleEl.textContent  = nsn.nama_script || 'Script Baru';
     descEl.textContent   = nsn.deskripsi   || '';
     catEl.textContent    = nsn.kategori    || 'Script';
-    statusEl.textContent = nsn.status      || 'Free';
+
+    // Status badge dengan warna
+    const statusText = nsn.status || 'Free';
+    statusEl.textContent = statusText;
+    statusEl.className = 'nsn-badge-status';
+    if (statusText.toLowerCase() === 'free') {
+      statusEl.classList.add('nsn-status-free');
+    } else if (statusText.toLowerCase() === 'premium') {
+      statusEl.classList.add('nsn-status-premium');
+    }
+
+    // Load thumbnail dari scripts.json
+    const thumbImg = document.getElementById('nsn-thumb-img');
+    const thumbPh  = document.getElementById('nsn-thumb-ph');
+    if (thumbImg && nsn.script_id) {
+      try {
+        const sRes = await fetch('scripts.json?v=' + Date.now());
+        const sData = await sRes.json();
+        const scriptData = (Array.isArray(sData) ? sData : []).find(s => s.id === nsn.script_id);
+        if (scriptData && scriptData.thumbnail) {
+          thumbImg.src = scriptData.thumbnail;
+          thumbImg.onerror = () => { thumbImg.classList.add('hidden'); thumbPh.classList.remove('hidden'); };
+        } else {
+          thumbImg.classList.add('hidden');
+          if (thumbPh) thumbPh.classList.remove('hidden');
+        }
+      } catch {
+        thumbImg.classList.add('hidden');
+        if (thumbPh) thumbPh.classList.remove('hidden');
+      }
+    } else if (thumbImg) {
+      thumbImg.classList.add('hidden');
+      if (thumbPh) thumbPh.classList.remove('hidden');
+    }
 
     // Warna aksen dinamis
-    const accent = nsn.warna || '#a259ff';
+    const accent = nsn.warna || '#818cf8';
     box.style.setProperty('--nsn-accent', accent);
     if (glowEl) glowEl.style.background = accent;
 

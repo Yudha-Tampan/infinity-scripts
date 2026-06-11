@@ -49,22 +49,33 @@
 <div id="nsn-overlay" class="nsn-overlay hidden">
   <div class="nsn-box" id="nsn-box">
     <button class="nsn-close" id="nsn-close"><i class="fa-solid fa-xmark"></i></button>
+
+    <!-- Badge row -->
     <div class="nsn-badge-row">
       <span class="nsn-badge-new"><i class="fa-solid fa-sparkles"></i> SCRIPT BARU</span>
       <span class="nsn-badge-status" id="nsn-status-badge">Free</span>
     </div>
-    <div class="nsn-icon-wrap">
-      <div class="nsn-icon-ring"></div>
-      <div class="nsn-icon-core"><i class="fa-solid fa-code"></i></div>
+
+    <!-- Thumbnail gambar script -->
+    <div class="nsn-thumb-wrap">
+      <img class="nsn-thumb-img" id="nsn-thumb-img" src="" alt="" />
+      <div class="nsn-thumb-overlay"></div>
+      <div class="nsn-thumb-placeholder hidden" id="nsn-thumb-ph">
+        <i class="fa-solid fa-code"></i>
+      </div>
     </div>
+
+    <!-- Owner tag -->
     <div class="nsn-owner-tag"><i class="fa-solid fa-crown"></i> Owner baru saja menambahkan</div>
+
+    <!-- Script info -->
     <h3 class="nsn-title" id="nsn-title">Nama Script</h3>
     <span class="nsn-cat-badge" id="nsn-cat">MD</span>
     <p class="nsn-desc" id="nsn-desc">Deskripsi script baru.</p>
+
+    <!-- Actions -->
     <div class="nsn-actions">
-      <button class="nsn-btn-try" id="nsn-btn-try">
-        <i class="fa-solid fa-arrow-right"></i> Coba Sekarang
-      </button>
+      <button class="nsn-btn-try" id="nsn-btn-try">Coba Sekarang</button>
       <button class="nsn-btn-close" id="nsn-btn-close">Nanti Saja</button>
     </div>
     <div class="nsn-glow" id="nsn-glow"></div>
@@ -459,55 +470,128 @@
 
     <section id="page-profile" class="page">
       <div class="profile-bg-effect"></div>
+
+      <!-- COVER HERO -->
+      <div class="profile-hero">
+        <div class="profile-hero-mesh"></div>
+        <div class="profile-hero-orb orb1"></div>
+        <div class="profile-hero-orb orb2"></div>
+      </div>
+
       <div class="profile-wrap">
-        <!-- Cover -->
-        <div class="profile-cover">
-          <div class="profile-cover-glow"></div>
-        </div>
-        <!-- Avatar -->
-        <div class="profile-avatar-wrap">
-          <div class="profile-avatar">
-            <img src="owner.jpg" alt="Owner" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg3);font-size:2.5rem;color:var(--text3)\'><i class=\'fa-solid fa-user\'></i></div>'" />
+
+        <!-- AVATAR SECTION -->
+        <div class="profile-top-row">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-ring">
+              <div class="profile-avatar">
+                <img src="owner.jpg" alt="Owner" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'av-fallback\'><i class=\'fa-solid fa-user\'></i></div>'" />
+              </div>
+            </div>
+            <div class="profile-status-badge"><i class="fa-solid fa-check"></i></div>
           </div>
-          <div class="profile-status-badge"><i class="fa-solid fa-check"></i></div>
-        </div>
-        <!-- Info -->
-        <div class="profile-info">
-          <h2 class="profile-name">Infinity Owner</h2>
-          <p class="profile-role"><i class="fa-solid fa-crown"></i> Script Developer</p>
-          <p class="profile-bio">Developer script WhatsApp bot sejak 2020. Spesialis dalam pembuatan bot otomatis, AI integration, dan sistem store digital. Melayani dengan profesional dan cepat.</p>
-          <!-- Stats -->
-          <div class="profile-stats">
-            <div class="p-stat"><span>150+</span><small>Script</small></div>
-            <div class="p-stat"><span>50K+</span><small>Users</small></div>
-            <div class="p-stat"><span>5★</span><small>Rating</small></div>
-            <div class="p-stat"><span>3yr</span><small>Experience</small></div>
-          </div>
-          <!-- Buttons -->
-          <div class="profile-btns">
-            <a href="https://wa.me/6288973461209" target="_blank" class="prof-btn wa-btn"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
-            <a href="https://t.me/infinityscripts" target="_blank" class="prof-btn tg-btn"><i class="fa-brands fa-telegram"></i> Telegram</a>
-          </div>
-          <div class="profile-btns" style="margin-top:10px">
-            <a href="https://youtube.com/@infinityscripts" target="_blank" class="prof-btn yt-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>
-            <a href="https://github.com/infinityscripts" target="_blank" class="prof-btn gh-btn"><i class="fa-brands fa-github"></i> GitHub</a>
-          </div>
-          <!-- Contact card -->
-          <div class="contact-card">
-            <div class="contact-row"><i class="fa-solid fa-phone"></i><span>+62 889-7346-1209</span></div>
-            <div class="contact-row"><i class="fa-solid fa-envelope"></i><span>infinity@scripts.id</span></div>
-            <div class="contact-row"><i class="fa-solid fa-location-dot"></i><span>Indonesia 🇮🇩</span></div>
-            <div class="contact-row"><i class="fa-solid fa-clock"></i><span>Respon dalam 1x24 jam</span></div>
-          </div>
-          <!-- Skills -->
-          <div class="skills-section">
-            <h4>Keahlian</h4>
-            <div class="skill-bar-wrap"><span>JavaScript</span><div class="skill-bar"><div class="skill-fill" data-w="95"></div></div><span>95%</span></div>
-            <div class="skill-bar-wrap"><span>Node.js</span><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div><span>90%</span></div>
-            <div class="skill-bar-wrap"><span>WhatsApp API</span><div class="skill-bar"><div class="skill-fill" data-w="98"></div></div><span>98%</span></div>
-            <div class="skill-bar-wrap"><span>AI Integration</span><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div><span>85%</span></div>
+          <div class="profile-top-actions">
+            <a href="https://wa.me/6288973461209" target="_blank" class="prof-action-btn wa-action">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
+            <a href="https://t.me/infinityscripts" target="_blank" class="prof-action-btn tg-action">
+              <i class="fa-brands fa-telegram"></i>
+            </a>
           </div>
         </div>
+
+        <!-- IDENTITY -->
+        <div class="profile-identity">
+          <div class="profile-name-row">
+            <h2 class="profile-name">Infinity Owner</h2>
+            <span class="profile-verified"><i class="fa-solid fa-circle-check"></i></span>
+          </div>
+          <div class="profile-role-row">
+            <span class="profile-role-badge"><i class="fa-solid fa-crown"></i> Script Developer</span>
+            <span class="profile-location-tag"><i class="fa-solid fa-location-dot"></i> Indonesia</span>
+          </div>
+          <p class="profile-bio">Developer script WhatsApp bot sejak 2020. Spesialis dalam pembuatan bot otomatis, AI integration, dan sistem store digital.</p>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="profile-stats-grid">
+          <div class="p-stat-card">
+            <div class="p-stat-icon"><i class="fa-solid fa-box-archive"></i></div>
+            <span class="p-stat-val">150+</span>
+            <small>Script</small>
+          </div>
+          <div class="p-stat-card">
+            <div class="p-stat-icon"><i class="fa-solid fa-users"></i></div>
+            <span class="p-stat-val">50K+</span>
+            <small>Users</small>
+          </div>
+          <div class="p-stat-card">
+            <div class="p-stat-icon"><i class="fa-solid fa-star"></i></div>
+            <span class="p-stat-val">5.0</span>
+            <small>Rating</small>
+          </div>
+          <div class="p-stat-card">
+            <div class="p-stat-icon"><i class="fa-solid fa-calendar"></i></div>
+            <span class="p-stat-val">4+</span>
+            <small>Tahun</small>
+          </div>
+        </div>
+
+        <!-- SOCIAL LINKS -->
+        <div class="profile-socials">
+          <a href="https://wa.me/6288973461209" target="_blank" class="social-card wa-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-whatsapp"></i></div>
+            <div class="social-info"><span>WhatsApp</span><small>+62 889-7346-1209</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+          <a href="https://t.me/infinityscripts" target="_blank" class="social-card tg-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-telegram"></i></div>
+            <div class="social-info"><span>Telegram</span><small>@infinityscripts</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+          <a href="https://youtube.com/@infinityscripts" target="_blank" class="social-card yt-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-youtube"></i></div>
+            <div class="social-info"><span>YouTube</span><small>@infinityscripts</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+          <a href="https://github.com/infinityscripts" target="_blank" class="social-card gh-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-github"></i></div>
+            <div class="social-info"><span>GitHub</span><small>infinityscripts</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+        </div>
+
+        <!-- CONTACT INFO -->
+        <div class="profile-info-card">
+          <div class="pic-header"><i class="fa-solid fa-address-card"></i> Informasi Kontak</div>
+          <div class="pic-row"><div class="pic-icon"><i class="fa-solid fa-envelope"></i></div><div class="pic-content"><small>Email</small><span>infinity@scripts.id</span></div></div>
+          <div class="pic-row"><div class="pic-icon"><i class="fa-solid fa-globe"></i></div><div class="pic-content"><small>Website</small><span>infscrip.my.id</span></div></div>
+          <div class="pic-row pic-row-last"><div class="pic-icon"><i class="fa-solid fa-clock"></i></div><div class="pic-content"><small>Respon</small><span>Dalam 1x24 jam</span></div></div>
+        </div>
+
+        <!-- SKILLS -->
+        <div class="profile-skills-card">
+          <div class="pic-header"><i class="fa-solid fa-code"></i> Keahlian</div>
+          <div class="skill-list">
+            <div class="skill-item">
+              <div class="skill-label-row"><span>JavaScript</span><span class="skill-pct">95%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-w="95"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-label-row"><span>Node.js</span><span class="skill-pct">90%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-w="90"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-label-row"><span>WhatsApp API</span><span class="skill-pct">98%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-w="98"></div></div>
+            </div>
+            <div class="skill-item">
+              <div class="skill-label-row"><span>AI Integration</span><span class="skill-pct">85%</span></div>
+              <div class="skill-track"><div class="skill-fill" data-w="85"></div></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
