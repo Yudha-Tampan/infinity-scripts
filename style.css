@@ -2662,14 +2662,7 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
-/* GPU layer hints only on scroll containers */
-#pages {
-  -webkit-overflow-scrolling: touch;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-}
-
-/* Cards — no heavy box-shadow on non-hover, use translate3d */
+/* GPU layer untuk cards — translate3d lebih ringan */
 .script-card {
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -2677,11 +2670,8 @@ html {
 .script-card:hover {
   transform: translate3d(0, -5px, 0) !important;
 }
-
-/* Remove animation delay lag on many cards */
 .script-card { animation-duration: 0.3s !important; }
 
-/* Event & anime cards */
 .event-card, .ani-card {
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -2689,14 +2679,7 @@ html {
 .event-card:hover { transform: translate3d(0, -3px, 0) !important; }
 .ani-card:hover { transform: translate3d(0, -5px, 0) !important; }
 
-/* Bottom nav glass — already blurs, add contain */
-.bottom-nav { contain: layout style; }
-.topbar { contain: layout style; }
-
-/* Reduce paint area for fixed elements */
-.music-player { contain: layout style; }
-
-/* Scrollbar thinner & smoother */
+/* Scrollbar tipis */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.2); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(56,189,248,0.4); }
