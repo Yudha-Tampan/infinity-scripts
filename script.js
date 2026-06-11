@@ -86,6 +86,7 @@ async function loadScripts() {
   filteredScripts = [...allScripts];
   renderTrending();
   renderScripts();
+  updateCategoryCounts();
   updateFavBadge();
 }
 
@@ -131,7 +132,24 @@ function renderScripts() {
   });
 }
 
-// ===== CREATE CARD =====
+// ===== UPDATE CATEGORY COUNTS =====
+function updateCategoryCounts() {
+  document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
+    const cat = btn.dataset.cat;
+    const count = cat === 'all' ? allScripts.length : allScripts.filter(s => s.kategori === cat).length;
+    let badge = btn.querySelector('.cat-count');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'cat-count';
+      btn.appendChild(badge);
+    }
+    badge.textContent = count;
+    // Hide count if 0
+    badge.style.display = count === 0 ? 'none' : '';
+  });
+}
+
+
 function createCard(script, index) {
   const isFav = favorites.includes(script.id);
   const div = document.createElement('div');
@@ -518,26 +536,35 @@ function initFakeStats() {
 
 // ===== LIVE TEXT =====
 const liveMessages = [
-  'Infinity MD baru saja didownload oleh user dari Jakarta',
-  'AI Assistant Bot trending hari ini dengan 500+ downloads',
-  'Panel Infinity mendapat update fitur baru!',
-  '50.000 pengguna aktif telah bergabung',
-  'Script Tools Master baru ditambahkan ke koleksi',
-  'Server online — semua script tersedia',
-  'Gunakan filter kategori untuk menemukan script lebih cepat',
-  'Rating rata-rata script: 4.8/5.0',
+  { icon: 'fa-fire', color: '#ff6b35', text: 'AI Assistant Bot trending hari ini — 500+ downloads' },
+  { icon: 'fa-download', color: '#38bdf8', text: 'Infinity MD V2 baru saja didownload dari Jakarta' },
+  { icon: 'fa-bolt', color: '#fbbf24', text: 'Panel Infinity mendapat update fitur terbaru!' },
+  { icon: 'fa-users', color: '#34d399', text: '50.000+ pengguna aktif telah bergabung' },
+  { icon: 'fa-sparkles', color: '#818cf8', text: 'Script baru ditambahkan ke koleksi minggu ini' },
+  { icon: 'fa-circle-check', color: '#34d399', text: 'Server online — semua script tersedia 24/7' },
+  { icon: 'fa-star', color: '#fbbf24', text: 'Rating rata-rata script: 4.8 / 5.0' },
+  { icon: 'fa-shield-halved', color: '#38bdf8', text: 'Script terverifikasi aman & bebas malware' },
 ];
 let liveIdx = 0;
 function animateLiveText() {
-  const el = document.getElementById('live-text');
-  if (!el) return;
+  const iconEl = document.getElementById('live-icon');
+  const textEl = document.getElementById('live-text');
+  if (!textEl) return;
   function update() {
-    el.style.opacity = '0';
-    setTimeout(() => { el.textContent = liveMessages[liveIdx % liveMessages.length]; el.style.opacity = '1'; liveIdx++; }, 300);
+    const wrap = textEl.closest('.live-update');
+    if (wrap) wrap.style.opacity = '0';
+    setTimeout(() => {
+      const msg = liveMessages[liveIdx % liveMessages.length];
+      if (iconEl) { iconEl.className = `fa-solid ${msg.icon}`; iconEl.style.color = msg.color; }
+      textEl.textContent = msg.text;
+      if (wrap) wrap.style.opacity = '1';
+      liveIdx++;
+    }, 350);
   }
   update();
-  setInterval(update, 5000);
+  setInterval(update, 4500);
 }
+
 
 // ===== SKILL BARS =====
 function animateSkillBars() {
