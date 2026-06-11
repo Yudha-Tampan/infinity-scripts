@@ -141,9 +141,8 @@ body::before {
 }
 
 .splash-logo {
-  position: relative; width: 130px; height: 130px;
+  position: relative; width: 180px; height: 180px;
   display: flex; align-items: center; justify-content: center;
-  /* Soft radial glow behind logo */
 }
 .splash-logo::before {
   content: '';
@@ -166,7 +165,7 @@ body::before {
   animation-duration: 3s;
 }
 .splash-logo-img {
-  width: 90px; height: 90px;
+  width: 140px; height: 140px;
   object-fit: contain;
   position: relative; z-index: 1;
   filter: drop-shadow(0 0 20px rgba(56,189,248,0.7)) drop-shadow(0 0 40px rgba(129,140,248,0.4));
@@ -248,7 +247,7 @@ body::before {
   color: var(--text);
 }
 .topbar-logo-img {
-  width: 28px; height: 28px; object-fit: contain;
+  width: 36px; height: 36px; object-fit: contain;
   filter: drop-shadow(0 0 5px rgba(56,189,248,0.6));
   flex-shrink: 0;
 }
