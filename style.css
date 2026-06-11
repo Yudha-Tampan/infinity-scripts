@@ -169,8 +169,7 @@ body::before {
   width: 90px; height: 90px;
   object-fit: contain;
   position: relative; z-index: 1;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 20px rgba(56,189,248,0.7)) drop-shadow(0 0 40px rgba(129,140,248,0.4)) brightness(1.1);
+  filter: drop-shadow(0 0 20px rgba(56,189,248,0.7)) drop-shadow(0 0 40px rgba(129,140,248,0.4));
   animation: pulse-glow-img 2.5s ease-in-out infinite;
 }
 @keyframes pulse-glow-img {
@@ -250,8 +249,7 @@ body::before {
 }
 .topbar-logo-img {
   width: 28px; height: 28px; object-fit: contain;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 5px rgba(56,189,248,0.5)) brightness(1.1);
+  filter: drop-shadow(0 0 5px rgba(56,189,248,0.6));
   flex-shrink: 0;
 }
 .topbar-logo b {
