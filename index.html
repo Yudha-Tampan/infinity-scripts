@@ -109,35 +109,68 @@
     <!-- HOME PAGE -->
     <section id="page-home" class="page active">
 
-      <!-- BANNER SLIDER -->
-      <div class="banner-slider">
-        <div class="banner-track" id="banner-track">
-          <div class="banner-slide slide1">
-            <div class="banner-content">
-              <span class="banner-tag"><i class="fa-solid fa-fire"></i> Trending</span>
-              <h2>Script Bot<br><span>WhatsApp</span> Terbaik</h2>
-              <p>Ratusan script premium tersedia gratis dan berbayar</p>
-              <button class="btn-glow" onclick="scrollToScripts()">Jelajahi Sekarang</button>
+      <!-- BANNER CAROUSEL -->
+      <div class="carousel-wrap">
+        <div class="carousel-track" id="banner-track">
+
+          <div class="carousel-slide slide1">
+            <div class="cs-bg-mesh"></div>
+            <div class="cs-orb"></div>
+            <div class="cs-content">
+              <span class="cs-tag"><i class="fa-solid fa-fire"></i> Trending</span>
+              <h2 class="cs-title">Script Bot<br><span>WhatsApp</span> Terbaik</h2>
+              <p class="cs-desc">Ratusan script premium tersedia gratis dan berbayar</p>
+              <button class="cs-btn" onclick="scrollToScripts()"><span>Jelajahi Sekarang</span><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="cs-visual">
+              <div class="cs-icon-stack">
+                <div class="cs-icon-main"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="cs-icon-badge b1"><i class="fa-solid fa-code"></i></div>
+                <div class="cs-icon-badge b2"><i class="fa-solid fa-bolt"></i></div>
+              </div>
             </div>
           </div>
-          <div class="banner-slide slide2">
-            <div class="banner-content">
-              <span class="banner-tag"><i class="fa-solid fa-bolt"></i> New Update</span>
-              <h2>AI Bot<br><span>Terbaru</span> 2026</h2>
-              <p>Integrasikan kecerdasan buatan ke WhatsApp kamu</p>
-              <button class="btn-glow" onclick="filterCategory('AI')">Lihat AI Bot</button>
+
+          <div class="carousel-slide slide2">
+            <div class="cs-bg-mesh"></div>
+            <div class="cs-orb"></div>
+            <div class="cs-content">
+              <span class="cs-tag"><i class="fa-solid fa-robot"></i> AI Powered</span>
+              <h2 class="cs-title">AI Bot<br><span>Terbaru</span> 2026</h2>
+              <p class="cs-desc">Integrasikan kecerdasan buatan ke WhatsApp kamu</p>
+              <button class="cs-btn" onclick="filterCategory('AI')"><span>Lihat AI Bot</span><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="cs-visual">
+              <div class="cs-icon-stack">
+                <div class="cs-icon-main ai"><i class="fa-solid fa-robot"></i></div>
+                <div class="cs-icon-badge b1"><i class="fa-solid fa-brain"></i></div>
+                <div class="cs-icon-badge b2"><i class="fa-solid fa-sparkles"></i></div>
+              </div>
             </div>
           </div>
-          <div class="banner-slide slide3">
-            <div class="banner-content">
-              <span class="banner-tag"><i class="fa-solid fa-gem"></i> Premium</span>
-              <h2>Panel<br><span>Control</span> Modern</h2>
-              <p>Kelola semua bot dengan dashboard canggih</p>
-              <button class="btn-glow" onclick="filterCategory('Panel')">Lihat Panel</button>
+
+          <div class="carousel-slide slide3">
+            <div class="cs-bg-mesh"></div>
+            <div class="cs-orb"></div>
+            <div class="cs-content">
+              <span class="cs-tag"><i class="fa-solid fa-gem"></i> Premium</span>
+              <h2 class="cs-title">Panel<br><span>Control</span> Modern</h2>
+              <p class="cs-desc">Kelola semua bot dengan dashboard canggih</p>
+              <button class="cs-btn" onclick="filterCategory('Panel')"><span>Lihat Panel</span><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="cs-visual">
+              <div class="cs-icon-stack">
+                <div class="cs-icon-main panel"><i class="fa-solid fa-desktop"></i></div>
+                <div class="cs-icon-badge b1"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="cs-icon-badge b2"><i class="fa-solid fa-gear"></i></div>
+              </div>
             </div>
           </div>
+
         </div>
-        <div class="banner-dots" id="banner-dots"></div>
+        <div class="cs-dots" id="banner-dots"></div>
+        <button class="cs-arrow cs-prev" id="cs-prev"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="cs-arrow cs-next" id="cs-next"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
 
       <!-- STATS BAR -->
@@ -194,6 +227,14 @@
       <div class="section-header" id="scripts-anchor">
         <h3>Semua Script</h3>
         <span class="section-line"></span>
+      </div>
+      <!-- SORT OPTIONS -->
+      <div class="sort-bar" id="sort-options">
+        <button class="sort-btn active" data-sort="default"><i class="fa-solid fa-star"></i> Populer</button>
+        <button class="sort-btn" data-sort="az"><i class="fa-solid fa-arrow-down-a-z"></i> A–Z</button>
+        <button class="sort-btn" data-sort="za"><i class="fa-solid fa-arrow-up-z-a"></i> Z–A</button>
+        <button class="sort-btn" data-sort="rating"><i class="fa-solid fa-ranking-star"></i> Rating</button>
+        <button class="sort-btn" data-sort="newest"><i class="fa-solid fa-sparkles"></i> Terbaru</button>
       </div>
       <div class="cards-grid" id="scripts-grid"></div>
       <div class="empty-state hidden" id="empty-state">
