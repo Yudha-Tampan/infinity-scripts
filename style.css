@@ -162,7 +162,7 @@ body::before {
 }
 .splash-logo-img {
   width: 140px; height: 140px;
-  object-fit: contain;
+  object-fit: cover;
   position: relative; z-index: 1;
   filter: drop-shadow(0 0 18px rgba(56,189,248,0.6));
   animation: pulse-glow-img 3s ease-in-out infinite;
@@ -238,7 +238,7 @@ body::before {
   color: var(--text);
 }
 .topbar-logo-img {
-  width: 36px; height: 36px; object-fit: contain;
+  width: 36px; height: 36px; object-fit: cover;
   filter: drop-shadow(0 0 5px rgba(56,189,248,0.6));
   flex-shrink: 0;
 }
@@ -2341,7 +2341,7 @@ button, a, input, textarea, select, .cat-btn, .nav-item,
    ============================================================ */
 .carousel-wrap {
   position: relative; overflow: hidden;
-  height: 220px; margin-bottom: 18px;
+  height: 210px; margin-bottom: 18px;
   border-radius: 0;
 }
 .carousel-track {
@@ -2566,7 +2566,7 @@ button, a, input, textarea, select, .cat-btn, .nav-item,
    CAROUSEL — REFINED
    ============================================================ */
 .carousel-wrap {
-  height: 200px !important;
+  height: 210px !important;
   margin-bottom: 16px !important;
   border-radius: 0 !important;
 }
@@ -2828,7 +2828,7 @@ body {
 
 /* Override carousel height untuk banner gambar */
 .carousel-wrap {
-  height: 220px !important;
+  height: 210px !important;
   border-radius: 0 !important;
   margin-bottom: 18px !important;
 }
@@ -2843,7 +2843,9 @@ body {
   display: block;
 }
 
-/* Gambar full cover, crop dari tengah */
+/* object-fit: contain → gambar tampil utuh, tidak terpotong */
+/* object-fit: cover  → gambar full cover tapi mungkin terpotong */
+/* Pakai contain supaya gambar portrait tidak terpotong */
 .slide-bg-img-pure {
   position: absolute;
   inset: 0;
@@ -2854,6 +2856,7 @@ body {
   display: block;
   pointer-events: none;
   will-change: auto;
+  background: #03040f;
 }
 
 /* Sembunyikan element lama yang tidak dipakai */
