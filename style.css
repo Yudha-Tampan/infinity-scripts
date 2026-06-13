@@ -2695,3 +2695,129 @@ html {
 ::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.2); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(56,189,248,0.4); }
 
+
+/* ============================================================
+   IMAGE BANNER SLIDES — v2 UPGRADE
+   Banner gambar full-bleed dengan overlay teks
+   Ukuran banner: 1254x1254 (square) → ditampilkan 390x220px
+   ============================================================ */
+
+/* Override slide backgrounds untuk mode gambar */
+.carousel-slide.img-slide {
+  background: #03040f;
+  padding: 0 20px;
+  justify-content: flex-start;
+}
+
+/* Gambar background full-cover */
+.slide-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 0;
+  pointer-events: none;
+  will-change: auto;
+}
+
+/* Overlay gelap agar teks terbaca */
+.slide-img-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgba(3,4,15,0.88) 0%,
+    rgba(3,4,15,0.72) 45%,
+    rgba(3,4,15,0.35) 75%,
+    rgba(3,4,15,0.15) 100%
+  );
+  pointer-events: none;
+}
+
+/* Variasi warna overlay per slide */
+.slide2-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(3,15,8,0.9) 0%,
+    rgba(3,15,8,0.72) 45%,
+    rgba(3,15,8,0.35) 75%,
+    rgba(3,15,8,0.1) 100%
+  );
+}
+.slide3-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(15,5,3,0.9) 0%,
+    rgba(15,5,3,0.72) 45%,
+    rgba(15,5,3,0.35) 75%,
+    rgba(15,5,3,0.1) 100%
+  );
+}
+
+/* Konten tetap di atas overlay */
+.img-slide .cs-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+/* Hapus bg mesh & orb yang tidak perlu di img-slide */
+.img-slide .cs-bg-mesh { display: none; }
+.img-slide .cs-orb { display: none; }
+
+/* Slide2 button warna hijau */
+.cs-btn.slide2-btn {
+  background: linear-gradient(135deg, #059669, var(--neon3));
+  box-shadow: 0 4px 16px rgba(52,211,153,0.3);
+}
+.cs-btn.slide3-btn {
+  background: linear-gradient(135deg, #ea580c, var(--accent));
+  box-shadow: 0 4px 16px rgba(251,146,60,0.3);
+}
+
+/* ============================================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================================ */
+
+/* Reduce repaints on scroll */
+html {
+  scroll-behavior: auto; /* disable native smooth scroll — JS handles it */
+}
+
+/* Stable overscroll */
+body {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Layer promotion for fixed elements only */
+.topbar,
+.bottom-nav,
+.music-player,
+.fab {
+  transform: translateZ(0);
+}
+
+/* Contain layout for card grid */
+.cards-grid {
+  contain: layout style;
+}
+
+/* Reduce animation on mobile for better perf */
+@media (max-width: 480px) {
+  .cs-orb { display: none !important; }
+  .cs-bg-mesh { display: none !important; }
+  .badge-float1, .badge-float2 { animation: none !important; }
+  .pulse-glow-img { animation-duration: 4s !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

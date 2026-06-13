@@ -412,12 +412,24 @@ function initBanner() {
   if (prevBtn) prevBtn.addEventListener('click', () => goBanner((currentBannerSlide - 1 + slides.length) % slides.length));
   if (nextBtn) nextBtn.addEventListener('click', () => goBanner((currentBannerSlide + 1) % slides.length));
 
-  // Touch swipe
+  // Touch swipe — passive untuk tidak block scroll
   const track = document.getElementById('banner-track');
-  let startX = 0;
+  let startX = 0, startY = 0, isScrolling = null;
   if (track) {
-    track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isScrolling = null;
+    }, { passive: true });
+    track.addEventListener('touchmove', e => {
+      if (isScrolling === null) {
+        const dx = Math.abs(e.touches[0].clientX - startX);
+        const dy = Math.abs(e.touches[0].clientY - startY);
+        isScrolling = dy > dx;
+      }
+    }, { passive: true });
     track.addEventListener('touchend', e => {
+      if (isScrolling) return; // vertical scroll, jangan ganti slide
       const diff = startX - e.changedTouches[0].clientX;
       if (Math.abs(diff) > 40) goBanner(diff > 0
         ? (currentBannerSlide + 1) % slides.length
@@ -458,7 +470,16 @@ function updateThemeIcon() {
 function initFab() {
   const fab = document.getElementById('fab');
   if (!fab) return;
-  window.addEventListener('scroll', () => fab.classList.toggle('visible', window.scrollY > 200));
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        fab.classList.toggle('visible', window.scrollY > 200);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
   fab.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
@@ -1618,12 +1639,15 @@ function initSplashParticles() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const particles = Array.from({length:80}, () => ({
+  // Kurangi dari 80 → 40 untuk performa lebih baik
+  const cnt = window.innerWidth < 480 ? 25 : 40;
+  const particles = Array.from({length:cnt}, () => ({
     x: Math.random()*canvas.width, y: Math.random()*canvas.height,
     vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
     r:Math.random()*2+.5, a:Math.random(),
-    color: Math.random()>.5?'#00d4ff':'#7c3aed'
+    color: Math.random()>.5?'#38bdf8':'#818cf8'
   }));
+  let splashRafId;
   function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     particles.forEach(p => {
@@ -1634,34 +1658,73 @@ function initSplashParticles() {
       if(p.y<0||p.y>canvas.height) p.vy*=-1;
     });
     ctx.globalAlpha=1;
-    requestAnimationFrame(draw);
+    splashRafId = requestAnimationFrame(draw);
   }
   draw();
+  // Stop animasi saat splash selesai untuk hemat CPU
+  setTimeout(() => {
+    cancelAnimationFrame(splashRafId);
+    canvas.width = 0; canvas.height = 0;
+  }, 3500);
 }
 
 function initBgParticles() {
   const canvas = document.getElementById('bg-particles');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  function resize() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
-  resize(); window.addEventListener('resize', resize);
-  const particles = Array.from({length:50}, () => ({
+  const isMobile = window.innerWidth < 600;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+
+  // Debounce resize agar tidak spam
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 200);
+  });
+
+  // Mobile: 20 partikel tanpa garis; Desktop: 35 dengan garis
+  const cnt = isMobile ? 20 : 35;
+  const particles = Array.from({length:cnt}, () => ({
     x:Math.random()*canvas.width, y:Math.random()*canvas.height,
     vx:(Math.random()-.5)*.2, vy:(Math.random()-.5)*.2,
     r:Math.random()*1.5+.3, a:Math.random()*.4,
-    color:['#00d4ff','#7c3aed','#06ffa5'][Math.floor(Math.random()*3)]
+    color:['#38bdf8','#818cf8','#34d399'][Math.floor(Math.random()*3)]
   }));
-  function draw() {
+
+  // Visibility API — pause saat tab tidak aktif
+  let paused = false;
+  document.addEventListener('visibilitychange', () => { paused = document.hidden; });
+
+  let lastTime = 0;
+  function draw(ts) {
+    requestAnimationFrame(draw);
+    if (paused) return;
+    // Throttle ke ~30fps untuk hemat baterai
+    if (ts - lastTime < 33) return;
+    lastTime = ts;
+
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach((p,i) => {
-      particles.slice(i+1).forEach(p2 => {
-        const dx=p.x-p2.x, dy=p.y-p2.y, dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<120) {
-          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y);
-          ctx.strokeStyle=`rgba(0,212,255,${.06*(1-dist/120)})`; ctx.lineWidth=.5; ctx.stroke();
+
+    // Garis koneksi hanya di desktop
+    if (!isMobile) {
+      particles.forEach((p,i) => {
+        for (let j = i+1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx=p.x-p2.x, dy=p.y-p2.y;
+          const dist = Math.sqrt(dx*dx+dy*dy);
+          if(dist<100) {
+            ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y);
+            ctx.strokeStyle=`rgba(56,189,248,${.05*(1-dist/100)})`; ctx.lineWidth=.4; ctx.stroke();
+          }
         }
       });
-    });
+    }
+
     particles.forEach(p => {
       ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
       ctx.fillStyle=p.color; ctx.globalAlpha=p.a; ctx.fill(); ctx.globalAlpha=1;
@@ -1669,9 +1732,8 @@ function initBgParticles() {
       if(p.x<0||p.x>canvas.width) p.vx*=-1;
       if(p.y<0||p.y>canvas.height) p.vy*=-1;
     });
-    requestAnimationFrame(draw);
   }
-  draw();
+  requestAnimationFrame(draw);
 }
 
 // ===========================

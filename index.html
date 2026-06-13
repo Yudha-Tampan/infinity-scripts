@@ -49,14 +49,10 @@
 <div id="nsn-overlay" class="nsn-overlay hidden">
   <div class="nsn-box" id="nsn-box">
     <button class="nsn-close" id="nsn-close"><i class="fa-solid fa-xmark"></i></button>
-
-    <!-- Badge row -->
     <div class="nsn-badge-row">
       <span class="nsn-badge-new"><i class="fa-solid fa-sparkles"></i> SCRIPT BARU</span>
       <span class="nsn-badge-status" id="nsn-status-badge">Free</span>
     </div>
-
-    <!-- Thumbnail gambar script -->
     <div class="nsn-thumb-wrap">
       <img class="nsn-thumb-img" id="nsn-thumb-img" src="" alt="" />
       <div class="nsn-thumb-overlay"></div>
@@ -64,16 +60,10 @@
         <i class="fa-solid fa-code"></i>
       </div>
     </div>
-
-    <!-- Owner tag -->
     <div class="nsn-owner-tag"><i class="fa-solid fa-crown"></i> Owner baru saja menambahkan</div>
-
-    <!-- Script info -->
     <h3 class="nsn-title" id="nsn-title">Nama Script</h3>
     <span class="nsn-cat-badge" id="nsn-cat">MD</span>
     <p class="nsn-desc" id="nsn-desc">Deskripsi script baru.</p>
-
-    <!-- Actions -->
     <div class="nsn-actions">
       <button class="nsn-btn-try" id="nsn-btn-try">Coba Sekarang</button>
       <button class="nsn-btn-close" id="nsn-btn-close">Nanti Saja</button>
@@ -109,61 +99,40 @@
     <!-- HOME PAGE -->
     <section id="page-home" class="page active">
 
-      <!-- BANNER CAROUSEL -->
+      <!-- BANNER CAROUSEL (IMAGE BASED) -->
       <div class="carousel-wrap">
         <div class="carousel-track" id="banner-track">
 
-          <div class="carousel-slide slide1">
-            <div class="cs-bg-mesh"></div>
-            <div class="cs-orb"></div>
+          <div class="carousel-slide img-slide slide1">
+            <img class="slide-bg-img" src="banner1.jpg" alt="Banner 1" loading="eager" />
+            <div class="slide-img-overlay"></div>
             <div class="cs-content">
               <span class="cs-tag"><i class="fa-solid fa-fire"></i> Trending</span>
               <h2 class="cs-title">Script Bot<br><span>WhatsApp</span> Terbaik</h2>
               <p class="cs-desc">Ratusan script premium tersedia gratis dan berbayar</p>
               <button class="cs-btn" onclick="scrollToScripts()"><span>Jelajahi Sekarang</span><i class="fa-solid fa-chevron-right"></i></button>
             </div>
-            <div class="cs-visual">
-              <div class="cs-icon-stack">
-                <div class="cs-icon-main"><i class="fa-brands fa-whatsapp"></i></div>
-                <div class="cs-icon-badge b1"><i class="fa-solid fa-code"></i></div>
-                <div class="cs-icon-badge b2"><i class="fa-solid fa-bolt"></i></div>
-              </div>
+          </div>
+
+          <div class="carousel-slide img-slide slide2">
+            <img class="slide-bg-img" src="banner2.jpg" alt="Banner 2" loading="lazy" />
+            <div class="slide-img-overlay slide2-overlay"></div>
+            <div class="cs-content">
+              <span class="cs-tag"><i class="fa-solid fa-bolt"></i> Premium</span>
+              <h2 class="cs-title">Script<br><span>Terbaru</span> 2026</h2>
+              <p class="cs-desc">Temukan script bot terbaik pilihan komunitas</p>
+              <button class="cs-btn slide2-btn" onclick="filterCategory('MD')"><span>Lihat MD Bot</span><i class="fa-solid fa-chevron-right"></i></button>
             </div>
           </div>
 
-          <div class="carousel-slide slide2">
-            <div class="cs-bg-mesh"></div>
-            <div class="cs-orb"></div>
+          <div class="carousel-slide img-slide slide3">
+            <img class="slide-bg-img" src="banner3.jpg" alt="Banner 3" loading="lazy" />
+            <div class="slide-img-overlay slide3-overlay"></div>
             <div class="cs-content">
-              <span class="cs-tag"><i class="fa-solid fa-robot"></i> AI Powered</span>
-              <h2 class="cs-title">AI Bot<br><span>Terbaru</span> 2026</h2>
-              <p class="cs-desc">Integrasikan kecerdasan buatan ke WhatsApp kamu</p>
-              <button class="cs-btn" onclick="filterCategory('AI')"><span>Lihat AI Bot</span><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-            <div class="cs-visual">
-              <div class="cs-icon-stack">
-                <div class="cs-icon-main ai"><i class="fa-solid fa-robot"></i></div>
-                <div class="cs-icon-badge b1"><i class="fa-solid fa-brain"></i></div>
-                <div class="cs-icon-badge b2"><i class="fa-solid fa-sparkles"></i></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="carousel-slide slide3">
-            <div class="cs-bg-mesh"></div>
-            <div class="cs-orb"></div>
-            <div class="cs-content">
-              <span class="cs-tag"><i class="fa-solid fa-gem"></i> Premium</span>
+              <span class="cs-tag"><i class="fa-solid fa-gem"></i> Pilihan</span>
               <h2 class="cs-title">Panel<br><span>Control</span> Modern</h2>
               <p class="cs-desc">Kelola semua bot dengan dashboard canggih</p>
-              <button class="cs-btn" onclick="filterCategory('Panel')"><span>Lihat Panel</span><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-            <div class="cs-visual">
-              <div class="cs-icon-stack">
-                <div class="cs-icon-main panel"><i class="fa-solid fa-desktop"></i></div>
-                <div class="cs-icon-badge b1"><i class="fa-solid fa-chart-line"></i></div>
-                <div class="cs-icon-badge b2"><i class="fa-solid fa-gear"></i></div>
-              </div>
+              <button class="cs-btn slide3-btn" onclick="filterCategory('Panel')"><span>Lihat Panel</span><i class="fa-solid fa-chevron-right"></i></button>
             </div>
           </div>
 
@@ -212,7 +181,6 @@
         <button class="cat-btn" data-cat="Pairing"><i class="fa-solid fa-link"></i><span>Pairing</span></button>
         <button class="cat-btn" data-cat="Panel"><i class="fa-solid fa-desktop"></i><span>Panel</span></button>
         <button class="cat-btn" data-cat="Downloader"><i class="fa-solid fa-download"></i><span>Downloader</span></button>
-        <button class="cat-btn" data-cat="AI"><i class="fa-solid fa-robot"></i><span>AI</span></button>
         <button class="cat-btn" data-cat="Game"><i class="fa-solid fa-gamepad"></i><span>Game</span></button>
         <button class="cat-btn" data-cat="Tools"><i class="fa-solid fa-wrench"></i><span>Tools</span></button>
       </div>
@@ -229,7 +197,6 @@
         <h3>Semua Script</h3>
         <span class="section-line"></span>
       </div>
-      <!-- SORT OPTIONS -->
       <div class="sort-bar" id="sort-options">
         <button class="sort-btn active" data-sort="default"><i class="fa-solid fa-star"></i> Populer</button>
         <button class="sort-btn" data-sort="az"><i class="fa-solid fa-arrow-down-a-z"></i> A–Z</button>
@@ -254,10 +221,9 @@
       </div>
 
     </section>
+
     <section id="page-event" class="page">
       <div class="event-page-bg"></div>
-
-      <!-- EVENT HEADER -->
       <div class="event-page-header">
         <div class="event-header-glow"></div>
         <div class="event-header-content">
@@ -273,8 +239,6 @@
           </div>
         </div>
       </div>
-
-      <!-- EVENT FILTER TABS -->
       <div class="event-tabs" id="event-tabs">
         <button class="event-tab active" data-type="all"><i class="fa-solid fa-border-all"></i> Semua</button>
         <button class="event-tab" data-type="Grup"><i class="fa-brands fa-whatsapp"></i> Grup WA</button>
@@ -284,8 +248,6 @@
         <button class="event-tab" data-type="Promo"><i class="fa-solid fa-tag"></i> Promo</button>
         <button class="event-tab" data-type="Lainnya"><i class="fa-solid fa-ellipsis"></i> Lainnya</button>
       </div>
-
-      <!-- EVENT SEARCH -->
       <div class="search-wrap" style="margin-bottom:12px">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -293,11 +255,7 @@
           <button class="clear-btn hidden" id="event-clear-search"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </div>
-
-      <!-- FEATURED EVENT (otomatis ambil yang featured:true) -->
       <div id="featured-event-wrap"></div>
-
-      <!-- EVENT GRID -->
       <div class="section-header">
         <h3><i class="fa-solid fa-calendar-star" style="color:var(--neon)"></i> Semua Event</h3>
         <span class="section-line"></span>
@@ -308,14 +266,11 @@
         <p>Event tidak ditemukan</p>
         <small>Coba kata kunci lain</small>
       </div>
-
     </section>
 
     <!-- ANIME PAGE -->
     <section id="page-anime" class="page">
       <div class="ani-bg"></div>
-
-      <!-- HERO HEADER -->
       <div class="ani-hero">
         <div class="ani-hero-glow"></div>
         <div class="ani-hero-content">
@@ -330,50 +285,23 @@
           </div>
         </div>
       </div>
-
-      <!-- QUICK STATS -->
       <div class="ani-stats-row">
-        <div class="ani-stat-card">
-          <i class="fa-solid fa-tv"></i>
-          <div><span id="anime-count-day">0</span><small>Hari ini</small></div>
-        </div>
-        <div class="ani-stat-card">
-          <i class="fa-solid fa-calendar-week"></i>
-          <div><span id="anime-count-week">0</span><small>Minggu ini</small></div>
-        </div>
-        <div class="ani-stat-card">
-          <i class="fa-solid fa-rocket"></i>
-          <div><span id="anime-count-upcoming">0</span><small>Upcoming</small></div>
-        </div>
-        <div class="ani-stat-card">
-          <i class="fa-solid fa-clock"></i>
-          <div><span id="anime-next-time">--:--</span><small>Berikutnya</small></div>
-        </div>
+        <div class="ani-stat-card"><i class="fa-solid fa-tv"></i><div><span id="anime-count-day">0</span><small>Hari ini</small></div></div>
+        <div class="ani-stat-card"><i class="fa-solid fa-calendar-week"></i><div><span id="anime-count-week">0</span><small>Minggu ini</small></div></div>
+        <div class="ani-stat-card"><i class="fa-solid fa-rocket"></i><div><span id="anime-count-upcoming">0</span><small>Upcoming</small></div></div>
+        <div class="ani-stat-card"><i class="fa-solid fa-clock"></i><div><span id="anime-next-time">--:--</span><small>Berikutnya</small></div></div>
       </div>
-
-      <!-- AIRING TODAY SPOTLIGHT -->
       <div class="ani-today-wrap" id="ani-today-wrap">
         <div class="ani-section-title">
           <span class="ani-pill-badge pulse"><span class="live-dot"></span> Tayang Hari Ini</span>
         </div>
         <div class="ani-today-scroll" id="ani-today-scroll"></div>
       </div>
-
-      <!-- TAB NAVIGATION -->
       <div class="ani-tabs">
-        <button class="ani-tab active" id="ani-tab-jadwal" data-tab="jadwal">
-          <i class="fa-solid fa-calendar-week"></i> Jadwal
-        </button>
-        <button class="ani-tab" id="ani-tab-upcoming" data-tab="upcoming">
-          <i class="fa-solid fa-rocket"></i> Upcoming
-          <span class="ani-badge-count" id="anime-count-upcoming2">0</span>
-        </button>
-        <button class="ani-tab" id="ani-tab-trending" data-tab="trending">
-          <i class="fa-solid fa-fire"></i> Trending
-        </button>
+        <button class="ani-tab active" id="ani-tab-jadwal" data-tab="jadwal"><i class="fa-solid fa-calendar-week"></i> Jadwal</button>
+        <button class="ani-tab" id="ani-tab-upcoming" data-tab="upcoming"><i class="fa-solid fa-rocket"></i> Upcoming<span class="ani-badge-count" id="anime-count-upcoming2">0</span></button>
+        <button class="ani-tab" id="ani-tab-trending" data-tab="trending"><i class="fa-solid fa-fire"></i> Trending</button>
       </div>
-
-      <!-- DAY TABS (only for jadwal) -->
       <div class="ani-day-strip" id="anime-day-tabs">
         <button class="ani-day-btn" data-day="0">Min</button>
         <button class="ani-day-btn" data-day="1">Sen</button>
@@ -383,8 +311,6 @@
         <button class="ani-day-btn" data-day="5">Jum</button>
         <button class="ani-day-btn" data-day="6">Sab</button>
       </div>
-
-      <!-- SEARCH & FILTER BAR -->
       <div class="ani-filter-bar">
         <div class="ani-search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -411,54 +337,39 @@
           <button class="ani-genre-pill" data-genre="Thriller">Thriller</button>
         </div>
       </div>
-
-      <!-- LOADING STATE -->
       <div class="ani-loading hidden" id="anime-loading">
         <div class="ani-loading-ring"></div>
         <p>Mengambil data dari AniList...</p>
         <small>Mohon tunggu sebentar</small>
       </div>
-
-      <!-- ERROR STATE -->
       <div class="ani-error hidden" id="anime-error">
         <div class="ani-error-ico"><i class="fa-solid fa-satellite-dish"></i></div>
         <p>Gagal memuat data</p>
         <small>Periksa koneksi internet kamu</small>
-        <button class="ani-retry-btn" id="anime-retry-btn">
-          <i class="fa-solid fa-rotate-right"></i> Coba Lagi
-        </button>
+        <button class="ani-retry-btn" id="anime-retry-btn"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button>
       </div>
-
-      <!-- CONTENT SECTION HEADER -->
       <div class="ani-content-header hidden" id="anime-section-header">
         <h3 id="anime-schedule-title"><i class="fa-solid fa-calendar-day"></i> Jadwal</h3>
         <span id="anime-last-update" class="ani-update-time">--</span>
       </div>
-
-      <!-- MAIN GRID -->
       <div class="ani-grid" id="anime-grid"></div>
-
-      <!-- EMPTY STATE -->
       <div class="ani-empty hidden" id="anime-empty">
         <i class="fa-solid fa-film"></i>
         <p>Tidak ada anime ditemukan</p>
         <small>Coba hari lain atau ubah filter</small>
       </div>
-
     </section>
 
     <!-- ANIME DETAIL MODAL -->
     <div class="modal-overlay hidden" id="anime-modal-overlay">
       <div class="modal-box ani-modal">
         <button class="modal-close" id="anime-modal-close"><i class="fa-solid fa-xmark"></i></button>
-
         <div class="ani-modal-banner">
           <img id="am-banner" src="" alt=""/>
           <div class="ani-modal-banner-overlay"></div>
           <div class="am-score-badge" id="am-score"></div>
           <div class="am-modal-countdown" id="am-modal-countdown"></div>
         </div>
-
         <div class="ani-modal-cover-row">
           <img id="am-cover" src="" alt="" class="ani-modal-cover"/>
           <div class="ani-modal-title-block">
@@ -468,7 +379,6 @@
             <div class="am-genres" id="am-genres"></div>
           </div>
         </div>
-
         <div class="modal-body" style="padding-top:14px">
           <div class="am-info-grid">
             <div class="am-info-item"><i class="fa-solid fa-clock"></i><div><small>Waktu Tayang</small><span id="am-time"></span></div></div>
@@ -484,17 +394,14 @@
             <div class="am-info-item"><i class="fa-solid fa-flag"></i><div><small>Negara</small><span id="am-country"></span></div></div>
             <div class="am-info-item"><i class="fa-solid fa-signal"></i><div><small>Status</small><span id="am-airstatus"></span></div></div>
           </div>
-
           <div class="am-section-block" id="am-tags-wrap">
             <div class="am-section-label"><i class="fa-solid fa-tags"></i> Tags</div>
             <div class="am-tags-list" id="am-tags-list"></div>
           </div>
-
           <div class="am-section-block hidden" id="am-stream-wrap">
             <div class="am-section-label"><i class="fa-solid fa-play-circle"></i> Tonton di</div>
             <div class="am-stream-list" id="am-stream-list"></div>
           </div>
-
           <div class="am-section-block">
             <div class="am-section-label"><i class="fa-solid fa-align-left"></i> Sinopsis</div>
             <div class="am-desc-wrap">
@@ -502,7 +409,6 @@
               <button class="am-read-more hidden" id="am-read-more">Baca selengkapnya ▼</button>
             </div>
           </div>
-
           <div class="am-actions-row">
             <a id="am-anilist-link" href="#" target="_blank" class="am-action-btn am-btn-anilist">
               <i class="fa-solid fa-arrow-up-right-from-square"></i> AniList
@@ -514,17 +420,12 @@
 
     <section id="page-profile" class="page">
       <div class="profile-bg-effect"></div>
-
-      <!-- COVER HERO -->
       <div class="profile-hero">
         <div class="profile-hero-mesh"></div>
         <div class="profile-hero-orb orb1"></div>
         <div class="profile-hero-orb orb2"></div>
       </div>
-
       <div class="profile-wrap">
-
-        <!-- AVATAR SECTION -->
         <div class="profile-top-row">
           <div class="profile-avatar-wrap">
             <div class="profile-avatar-ring">
@@ -535,16 +436,10 @@
             <div class="profile-status-badge"><i class="fa-solid fa-check"></i></div>
           </div>
           <div class="profile-top-actions">
-            <a href="https://wa.me/6288973461209" target="_blank" class="prof-action-btn wa-action">
-              <i class="fa-brands fa-whatsapp"></i>
-            </a>
-            <a href="https://t.me/infinityscripts" target="_blank" class="prof-action-btn tg-action">
-              <i class="fa-brands fa-telegram"></i>
-            </a>
+            <a href="https://wa.me/6288973461209" target="_blank" class="prof-action-btn wa-action"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://t.me/infinityscripts" target="_blank" class="prof-action-btn tg-action"><i class="fa-brands fa-telegram"></i></a>
           </div>
         </div>
-
-        <!-- IDENTITY -->
         <div class="profile-identity">
           <div class="profile-name-row">
             <h2 class="profile-name">Infinity Owner</h2>
@@ -556,32 +451,12 @@
           </div>
           <p class="profile-bio">Developer script WhatsApp bot sejak 2020. Spesialis dalam pembuatan bot otomatis, AI integration, dan sistem store digital.</p>
         </div>
-
-        <!-- STATS GRID -->
         <div class="profile-stats-grid">
-          <div class="p-stat-card">
-            <div class="p-stat-icon"><i class="fa-solid fa-box-archive"></i></div>
-            <span class="p-stat-val">150+</span>
-            <small>Script</small>
-          </div>
-          <div class="p-stat-card">
-            <div class="p-stat-icon"><i class="fa-solid fa-users"></i></div>
-            <span class="p-stat-val">50K+</span>
-            <small>Users</small>
-          </div>
-          <div class="p-stat-card">
-            <div class="p-stat-icon"><i class="fa-solid fa-star"></i></div>
-            <span class="p-stat-val">5.0</span>
-            <small>Rating</small>
-          </div>
-          <div class="p-stat-card">
-            <div class="p-stat-icon"><i class="fa-solid fa-calendar"></i></div>
-            <span class="p-stat-val">4+</span>
-            <small>Tahun</small>
-          </div>
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-box-archive"></i></div><span class="p-stat-val">150+</span><small>Script</small></div>
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-users"></i></div><span class="p-stat-val">50K+</span><small>Users</small></div>
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-star"></i></div><span class="p-stat-val">5.0</span><small>Rating</small></div>
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-calendar"></i></div><span class="p-stat-val">4+</span><small>Tahun</small></div>
         </div>
-
-        <!-- SOCIAL LINKS -->
         <div class="profile-socials">
           <a href="https://wa.me/6288973461209" target="_blank" class="social-card wa-card">
             <div class="social-icon-wrap"><i class="fa-brands fa-whatsapp"></i></div>
@@ -604,38 +479,21 @@
             <i class="fa-solid fa-chevron-right social-arrow"></i>
           </a>
         </div>
-
-        <!-- CONTACT INFO -->
         <div class="profile-info-card">
           <div class="pic-header"><i class="fa-solid fa-address-card"></i> Informasi Kontak</div>
           <div class="pic-row"><div class="pic-icon"><i class="fa-solid fa-envelope"></i></div><div class="pic-content"><small>Email</small><span>infinity@scripts.id</span></div></div>
           <div class="pic-row"><div class="pic-icon"><i class="fa-solid fa-globe"></i></div><div class="pic-content"><small>Website</small><span>infscrip.my.id</span></div></div>
           <div class="pic-row pic-row-last"><div class="pic-icon"><i class="fa-solid fa-clock"></i></div><div class="pic-content"><small>Respon</small><span>Dalam 1x24 jam</span></div></div>
         </div>
-
-        <!-- SKILLS -->
         <div class="profile-skills-card">
           <div class="pic-header"><i class="fa-solid fa-code"></i> Keahlian</div>
           <div class="skill-list">
-            <div class="skill-item">
-              <div class="skill-label-row"><span>JavaScript</span><span class="skill-pct">95%</span></div>
-              <div class="skill-track"><div class="skill-fill" data-w="95"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-label-row"><span>Node.js</span><span class="skill-pct">90%</span></div>
-              <div class="skill-track"><div class="skill-fill" data-w="90"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-label-row"><span>WhatsApp API</span><span class="skill-pct">98%</span></div>
-              <div class="skill-track"><div class="skill-fill" data-w="98"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-label-row"><span>AI Integration</span><span class="skill-pct">85%</span></div>
-              <div class="skill-track"><div class="skill-fill" data-w="85"></div></div>
-            </div>
+            <div class="skill-item"><div class="skill-label-row"><span>JavaScript</span><span class="skill-pct">95%</span></div><div class="skill-track"><div class="skill-fill" data-w="95"></div></div></div>
+            <div class="skill-item"><div class="skill-label-row"><span>Node.js</span><span class="skill-pct">90%</span></div><div class="skill-track"><div class="skill-fill" data-w="90"></div></div></div>
+            <div class="skill-item"><div class="skill-label-row"><span>WhatsApp API</span><span class="skill-pct">98%</span></div><div class="skill-track"><div class="skill-fill" data-w="98"></div></div></div>
+            <div class="skill-item"><div class="skill-label-row"><span>Bot Development</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill" data-w="85"></div></div></div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -712,20 +570,12 @@
         <button class="btn-fav-modal" id="modal-fav-btn"><i class="fa-solid fa-heart"></i></button>
       </div>
       <div class="modal-share-row" id="modal-share-row">
-        <button class="share-btn copy-btn" id="modal-copy-btn" title="Salin Link">
-          <i class="fa-solid fa-copy"></i> Salin Link
-        </button>
-        <button class="share-btn wa-share-btn" id="modal-wa-share-btn" title="Share ke WhatsApp">
-          <i class="fa-brands fa-whatsapp"></i> Share WA
-        </button>
+        <button class="share-btn copy-btn" id="modal-copy-btn" title="Salin Link"><i class="fa-solid fa-copy"></i> Salin Link</button>
+        <button class="share-btn wa-share-btn" id="modal-wa-share-btn" title="Share ke WhatsApp"><i class="fa-brands fa-whatsapp"></i> Share WA</button>
       </div>
       <div class="script-extra-btns" id="script-extra-btns">
-        <a id="modal-yt-btn" href="#" target="_blank" class="ev-extra-btn ev-yt-btn hidden">
-          <i class="fa-brands fa-youtube"></i> Sumber Script
-        </a>
-        <a id="modal-ch-btn" href="#" target="_blank" class="ev-extra-btn ev-ch-btn hidden">
-          <i class="fa-brands fa-whatsapp"></i> Saluran WhatsApp
-        </a>
+        <a id="modal-yt-btn" href="#" target="_blank" class="ev-extra-btn ev-yt-btn hidden"><i class="fa-brands fa-youtube"></i> Sumber Script</a>
+        <a id="modal-ch-btn" href="#" target="_blank" class="ev-extra-btn ev-ch-btn hidden"><i class="fa-brands fa-whatsapp"></i> Saluran WhatsApp</a>
       </div>
     </div>
   </div>
@@ -744,21 +594,15 @@
         <iframe id="ev-modal-yt-iframe" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media" style="width:100%;height:100%;display:block;"></iframe>
       </div>
       <div class="event-modal-type-badge" id="ev-modal-type"></div>
-      <div class="event-modal-featured-badge hidden" id="ev-modal-featured-badge">
-        <i class="fa-solid fa-star"></i> Featured
-      </div>
+      <div class="event-modal-featured-badge hidden" id="ev-modal-featured-badge"><i class="fa-solid fa-star"></i> Featured</div>
     </div>
     <div class="modal-body">
       <h2 id="ev-modal-name"></h2>
       <p id="ev-modal-desc"></p>
       <div class="ev-modal-info">
         <div class="ev-info-row"><i class="fa-solid fa-globe"></i><span id="ev-modal-link-text"></span></div>
-        <div class="ev-info-row" id="ev-modal-penyelenggara-row">
-          <i class="fa-solid fa-user-tie"></i><span id="ev-modal-penyelenggara"></span>
-        </div>
-        <div class="ev-info-row" id="ev-modal-anggota-row">
-          <i class="fa-solid fa-users"></i><span id="ev-modal-anggota"></span>
-        </div>
+        <div class="ev-info-row" id="ev-modal-penyelenggara-row"><i class="fa-solid fa-user-tie"></i><span id="ev-modal-penyelenggara"></span></div>
+        <div class="ev-info-row" id="ev-modal-anggota-row"><i class="fa-solid fa-users"></i><span id="ev-modal-anggota"></span></div>
       </div>
       <div class="modal-actions" style="margin-top:20px">
         <a id="ev-modal-link" href="#" target="_blank" class="btn-download ev-btn-join">
@@ -766,12 +610,8 @@
         </a>
       </div>
       <div class="modal-share-row" id="ev-modal-share-row">
-        <button class="share-btn copy-btn" id="ev-copy-btn" title="Salin Link">
-          <i class="fa-solid fa-copy"></i> Salin Link
-        </button>
-        <button class="share-btn wa-share-btn" id="ev-wa-share-btn" title="Share ke WhatsApp">
-          <i class="fa-brands fa-whatsapp"></i> Share WA
-        </button>
+        <button class="share-btn copy-btn" id="ev-copy-btn"><i class="fa-solid fa-copy"></i> Salin Link</button>
+        <button class="share-btn wa-share-btn" id="ev-wa-share-btn"><i class="fa-brands fa-whatsapp"></i> Share WA</button>
       </div>
     </div>
   </div>
