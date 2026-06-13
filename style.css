@@ -2821,3 +2821,56 @@ body {
   }
 }
 
+
+/* ============================================================
+   PURE IMAGE BANNER — tanpa teks, gambar penuh
+   ============================================================ */
+
+/* Override carousel height untuk banner gambar */
+.carousel-wrap {
+  height: 220px !important;
+  border-radius: 0 !important;
+  margin-bottom: 18px !important;
+}
+
+.carousel-slide.img-slide-pure {
+  min-width: 100%;
+  height: 100%;
+  padding: 0 !important;
+  position: relative;
+  overflow: hidden;
+  background: #03040f;
+  display: block;
+}
+
+/* Gambar full cover, crop dari tengah */
+.slide-bg-img-pure {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  pointer-events: none;
+  will-change: auto;
+}
+
+/* Sembunyikan element lama yang tidak dipakai */
+.img-slide-pure .cs-bg-mesh,
+.img-slide-pure .cs-orb,
+.img-slide-pure .cs-content,
+.img-slide-pure .cs-visual {
+  display: none !important;
+}
+
+/* Arrow tetap tampil di atas gambar */
+.cs-arrow {
+  z-index: 10;
+}
+
+/* Dots tetap tampil */
+.cs-dots {
+  z-index: 10;
+}
+
