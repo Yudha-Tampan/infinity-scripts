@@ -4,7 +4,72 @@
    ============================================ */
 'use strict';
 
-// ===== STATE GLOBAL =====
+// ===== PWA — Service Worker & Install Prompt =====
+let deferredInstallPrompt = null;
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('[SW] Registered:', reg.scope))
+      .catch(err => console.warn('[SW] Register failed:', err));
+  });
+}
+
+// Tangkap event beforeinstallprompt
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Tampilkan banner hanya kalau user belum dismiss sebelumnya
+  if (!localStorage.getItem('pwa_dismissed')) {
+    setTimeout(() => showPwaBanner(), 3000); // delay 3 detik setelah load
+  }
+});
+
+function showPwaBanner() {
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.classList.remove('hidden');
+}
+
+function hidePwaBanner() {
+  const banner = document.getElementById('pwa-install-banner');
+  if (banner) banner.classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Tombol Install
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') {
+        showToast('Infinity Scripts berhasil diinstall! 🎉', 'success');
+      }
+      deferredInstallPrompt = null;
+      hidePwaBanner();
+    });
+  }
+
+  // Tombol Dismiss
+  const dismissBtn = document.getElementById('pwa-dismiss-btn');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', () => {
+      localStorage.setItem('pwa_dismissed', '1');
+      hidePwaBanner();
+    });
+  }
+});
+
+// Event saat PWA sudah terinstall
+window.addEventListener('appinstalled', () => {
+  showToast('App berhasil diinstall di homescreen!', 'success');
+  hidePwaBanner();
+  deferredInstallPrompt = null;
+});
+
+
 let allScripts = [];
 let filteredScripts = [];
 let favorites = JSON.parse(localStorage.getItem('is_favorites') || '[]');
