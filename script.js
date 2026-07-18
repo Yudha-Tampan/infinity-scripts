@@ -73,12 +73,18 @@ window.addEventListener('appinstalled', () => {
 let allScripts = [];
 let filteredScripts = [];
 let favorites = JSON.parse(localStorage.getItem('is_favorites') || '[]');
+let recentlyViewed = JSON.parse(localStorage.getItem('botify_recently_viewed') || '[]');
 let currentCategory = 'all';
 let searchQuery = '';
 let currentSort = 'default'; // default | az | za | rating | newest
 let currentBannerSlide = 0;
 let bannerInterval;
 let musicPlaying = false;
+
+// ===== KONFIGURASI REQUEST SCRIPT =====
+// GANTI nomor di bawah dengan nomor WhatsApp Admin (format: kode negara tanpa "+", "0", atau spasi)
+// Contoh: nomor 0812-3456-7890 -> ditulis "6281234567890"
+const REQUEST_WA_NUMBER = '6288293669411'; // TODO: ganti dengan nomor WA admin
 
 // ===== INIT SETELAH LOAD =====
 window.addEventListener('load', () => {
@@ -114,6 +120,7 @@ function initApp() {
   initAnimeDayTabs();
   initAnimeViewToggle();
   animateSkillBars();
+  initRequestPage();
 }
 
 // ===== NAVIGATION =====
@@ -121,15 +128,22 @@ function initNavigation() {
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
       const page = btn.dataset.page;
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-' + page).classList.add('active');
-      if (page === 'profile') animateSkillBars();
-      if (page === 'anime') loadAnimeSchedule();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      goToPage(page);
     });
   });
+}
+
+// Util: pindah halaman secara terprogram (dipakai tombol/promo card di luar bottom-nav)
+function goToPage(page) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (!target) return;
+  target.classList.add('active');
+  if (page === 'profile') animateSkillBars();
+  if (page === 'anime') loadAnimeSchedule();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ===== LOAD SCRIPTS =====
@@ -150,9 +164,11 @@ async function loadScripts() {
   if (statTotal) statTotal.textContent = allScripts.length;
   filteredScripts = [...allScripts];
   renderTrending();
+  renderRecentlyViewed();
   renderScripts();
   updateCategoryCounts();
   updateFavBadge();
+  initRecentClearBtn();
 }
 
 // ===== RENDER TRENDING =====
@@ -272,6 +288,8 @@ function openModal(script) {
   const favBtn   = document.getElementById('modal-fav-btn');
 
   if (!overlay) return;
+
+  trackRecentlyViewed(script.id);
 
   img.src = script.thumbnail;
   img.onerror = () => {
@@ -2153,3 +2171,107 @@ async function loadNewScriptNotif() {
 
   } catch { /* silent */ }
 }
+
+// ===========================
+// RECENTLY VIEWED (localStorage, tanpa backend)
+// ===========================
+const RECENT_MAX = 8;
+
+function trackRecentlyViewed(scriptId) {
+  recentlyViewed = recentlyViewed.filter(id => id !== scriptId);
+  recentlyViewed.unshift(scriptId);
+  if (recentlyViewed.length > RECENT_MAX) recentlyViewed = recentlyViewed.slice(0, RECENT_MAX);
+  localStorage.setItem('botify_recently_viewed', JSON.stringify(recentlyViewed));
+  renderRecentlyViewed();
+}
+
+function renderRecentlyViewed() {
+  const grid = document.getElementById('recent-grid');
+  const header = document.getElementById('recent-header');
+  if (!grid || !header) return;
+
+  const items = recentlyViewed
+    .map(id => allScripts.find(s => s.id === id))
+    .filter(Boolean);
+
+  grid.innerHTML = '';
+  if (items.length === 0) { header.classList.add('hidden'); return; }
+  header.classList.remove('hidden');
+  items.forEach((s, i) => grid.appendChild(createCard(s, i)));
+}
+
+function initRecentClearBtn() {
+  const btn = document.getElementById('recent-clear-btn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    recentlyViewed = [];
+    localStorage.setItem('botify_recently_viewed', JSON.stringify(recentlyViewed));
+    renderRecentlyViewed();
+    showToast('Riwayat dilihat sudah dihapus', 'info');
+  });
+}
+
+// ===========================
+// REQUEST SCRIPT (kirim ke WhatsApp, tanpa backend/database)
+// ===========================
+function initRequestPage() {
+  // Buka halaman request dari promo card di Home
+  const promoCard = document.getElementById('request-promo-card');
+  if (promoCard) {
+    promoCard.addEventListener('click', () => goToPage('request'));
+  }
+
+  // Tombol kembali dari halaman request
+  const backBtn = document.getElementById('req-back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => goToPage('home'));
+  }
+
+  // Counter karakter untuk textarea detail
+  const detailInput = document.getElementById('req-detail');
+  const detailCount = document.getElementById('req-detail-count');
+  if (detailInput && detailCount) {
+    detailInput.addEventListener('input', () => {
+      detailCount.textContent = detailInput.value.length;
+    });
+  }
+
+  // Submit form -> buka WhatsApp dengan pesan siap kirim
+  const form = document.getElementById('req-form');
+  if (!form) return;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const nama = document.getElementById('req-nama').value.trim();
+    const kategori = document.getElementById('req-kategori').value;
+    const detail = document.getElementById('req-detail').value.trim();
+    const kontak = document.getElementById('req-kontak').value.trim();
+
+    if (!nama || !detail) {
+      showToast('Nama script dan detail wajib diisi', 'error');
+      return;
+    }
+
+    const lines = [
+      '👋 *Request Script Baru — Botify*',
+      '',
+      `📝 Nama Script: ${nama}`,
+      `📂 Kategori: ${kategori}`,
+      `📋 Detail: ${detail}`,
+    ];
+    if (kontak) lines.push(`📞 Kontak: ${kontak}`);
+    lines.push('', '_Dikirim otomatis via halaman Request Script Botify_');
+
+    const text = lines.join('\n');
+    const waNumber = (typeof REQUEST_WA_NUMBER === 'string' && REQUEST_WA_NUMBER.trim()) || '';
+    const waUrl = waNumber
+      ? `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+    window.open(waUrl, '_blank');
+    showToast('Membuka WhatsApp...', 'success');
+    form.reset();
+    if (detailCount) detailCount.textContent = '0';
+  });
+}
+
