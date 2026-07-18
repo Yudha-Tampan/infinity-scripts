@@ -1,0 +1,32 @@
+[
+  {
+    "versi": "v2.5",
+    "tanggal": "20 Mei 2026",
+    "label": "new",
+    "perubahan": [
+      "Embed YouTube video langsung di modal event",
+      "Tambah 5 script MD terbaru",
+      "Perbaikan bug pada filter kategori"
+    ]
+  },
+  {
+    "versi": "v2.4",
+    "tanggal": "15 Mei 2026",
+    "label": "update",
+    "perubahan": [
+      "Halaman Anime sekarang support multi-tab hari",
+      "Optimasi loading script card",
+      "Tambah fitur favorit dengan penyimpanan lokal"
+    ]
+  },
+  {
+    "versi": "v2.3",
+    "tanggal": "10 Mei 2026",
+    "label": "fix",
+    "perubahan": [
+      "Fix crash saat thumbnail gagal load",
+      "Perbaikan tampilan dark/light mode",
+      "Update script Ourin MD ke versi 2.4"
+    ]
+  }
+]
