@@ -1,5 +1,5 @@
 /* ============================================
-   INFINITY SCRIPTS — script.js v3 (FIXED)
+   BOTIFY — script.js v3 (FIXED)
    Semua DOM refs di dalam fungsi, bukan global
    ============================================ */
 'use strict';
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       deferredInstallPrompt.prompt();
       const { outcome } = await deferredInstallPrompt.userChoice;
       if (outcome === 'accepted') {
-        showToast('Infinity Scripts berhasil diinstall! 🎉', 'success');
+        showToast('Botify berhasil diinstall! 🎉', 'success');
       }
       deferredInstallPrompt = null;
       hidePwaBanner();
@@ -308,7 +308,7 @@ function openModal(script) {
   const waShareBtn = document.getElementById('modal-wa-share-btn');
   if (waShareBtn) {
     waShareBtn.onclick = () => {
-      const text = `🤖 *${script.nama}*\n📂 Kategori: ${script.kategori}\n⭐ Rating: ${script.rating}\n\n${script.deskripsi}\n\n🔗 Download: ${script.link}\n\n_Via Infinity Scripts_`;
+      const text = `🤖 *${script.nama}*\n📂 Kategori: ${script.kategori}\n⭐ Rating: ${script.rating}\n\n${script.deskripsi}\n\n🔗 Download: ${script.link}\n\n_Via Botify_`;
       window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
     };
   }
@@ -623,8 +623,8 @@ function initFakeStats() {
 // ===== LIVE TEXT =====
 const liveMessages = [
   { icon: 'fa-fire', color: '#ff6b35', text: 'AI Assistant Bot trending hari ini — 500+ downloads' },
-  { icon: 'fa-download', color: '#38bdf8', text: 'Infinity MD V2 baru saja didownload dari Jakarta' },
-  { icon: 'fa-bolt', color: '#fbbf24', text: 'Panel Infinity mendapat update fitur terbaru!' },
+  { icon: 'fa-download', color: '#38bdf8', text: 'Botify MD V2 baru saja didownload dari Jakarta' },
+  { icon: 'fa-bolt', color: '#fbbf24', text: 'Panel Botify mendapat update fitur terbaru!' },
   { icon: 'fa-users', color: '#34d399', text: '50.000+ pengguna aktif telah bergabung' },
   { icon: 'fa-sparkles', color: '#818cf8', text: 'Script baru ditambahkan ke koleksi minggu ini' },
   { icon: 'fa-circle-check', color: '#34d399', text: 'Server online — semua script tersedia 24/7' },
@@ -892,7 +892,7 @@ function openEventModal(ev) {
   const evWaBtn = document.getElementById('ev-wa-share-btn');
   if (evWaBtn) {
     evWaBtn.onclick = () => {
-      const text = `📢 *${ev.nama}*\n🏷️ Tipe: ${ev.tipe}${ev.penyelenggara ? '\n👤 By: ' + ev.penyelenggara : ''}${ev.anggota ? '\n👥 ' + ev.anggota : ''}\n\n${ev.deskripsi}\n\n🔗 Link: ${ev.link}\n\n_Via Infinity Scripts_`;
+      const text = `📢 *${ev.nama}*\n🏷️ Tipe: ${ev.tipe}${ev.penyelenggara ? '\n👤 By: ' + ev.penyelenggara : ''}${ev.anggota ? '\n👥 ' + ev.anggota : ''}\n\n${ev.deskripsi}\n\n🔗 Link: ${ev.link}\n\n_Via Botify_`;
       window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
     };
   }
@@ -1885,7 +1885,7 @@ function initBgParticles() {
   // 8. Watermark tak kasat mata di body (forensik)
   const wm = document.createElement('div');
   wm.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:99999;opacity:0.015;display:flex;align-items:center;justify-content:center;font-size:4rem;font-weight:900;color:#fff;transform:rotate(-30deg);font-family:Orbitron,sans-serif;';
-  wm.textContent = 'INFINITY SCRIPTS';
+  wm.textContent = 'BOTIFY';
   document.body.appendChild(wm);
 
 })();

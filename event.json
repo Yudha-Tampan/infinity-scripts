@@ -1,13 +1,13 @@
 [
   {
     "id": 1,
-    "nama": "Website Resmi Infinity",
+    "nama": "Website Resmi Botify",
     "tipe": "Website",
-    "deskripsi": "Kunjungi website resmi Infinity Scripts untuk dokumentasi lengkap, tutorial, dan pembelian script premium. Tampilan modern dan mudah digunakan.",
+    "deskripsi": "Kunjungi website resmi Botify untuk dokumentasi lengkap, tutorial, dan pembelian script premium. Tampilan modern dan mudah digunakan.",
     "thumbnail": "web.jpg",
-    "penyelenggara": "Infinity Scripts",
+    "penyelenggara": "Botify",
     "anggota": "",
-    "link": "https://infinity-scripts.vercel.app/",
+    "link": "https://botify.id/",
     "label_btn": "Kunjungi Website",
     "featured": true,
     "aktif": true,

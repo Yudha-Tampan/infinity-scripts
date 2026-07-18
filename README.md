@@ -1,4 +1,4 @@
-# Infinity Scripts — Changelog v2
+# Botify — Changelog v2
 
 Dokumentasi semua perubahan dari versi sebelumnya ke **v2**.
 
@@ -79,7 +79,7 @@ Gambar di-crop dari **tengah** (`object-position: center center`) — jadi pasti
 ## Struktur File
 
 ```
-infinityscript_v2/
+botify_v2/
 ├── index.html              ← Halaman utama
 ├── style.css               ← Stylesheet
 ├── script.js               ← JavaScript

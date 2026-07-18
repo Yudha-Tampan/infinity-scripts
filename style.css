@@ -163,6 +163,7 @@ body::before {
 .splash-logo-img {
   width: 140px; height: 140px;
   object-fit: cover;
+  border-radius: 32px;
   position: relative; z-index: 1;
   filter: drop-shadow(0 0 18px rgba(56,189,248,0.6));
   animation: pulse-glow-img 3s ease-in-out infinite;
@@ -239,6 +240,7 @@ body::before {
 }
 .topbar-logo-img {
   width: 36px; height: 36px; object-fit: cover;
+  border-radius: 10px;
   filter: drop-shadow(0 0 5px rgba(56,189,248,0.6));
   flex-shrink: 0;
 }
