@@ -1,7 +1,7 @@
 // Botify — Service Worker v1
 // Cache static assets untuk offline support
 
-const CACHE_NAME = 'botify-v1';
+const CACHE_NAME = 'botify-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

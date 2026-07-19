@@ -156,15 +156,14 @@
         <div class="stat-item"><i class="fa-solid fa-star"></i><div><span>4.9</span><small>Rating</small></div></div>
       </div>
 
-      <!-- REQUEST SCRIPT PROMO CARD -->
-      <button class="request-promo-card" id="request-promo-card">
-        <div class="request-promo-icon"><i class="fa-solid fa-paper-plane"></i></div>
-        <div class="request-promo-text">
-          <span>Tidak menemukan script yang kamu cari?</span>
-          <small>Request langsung ke Admin via WhatsApp</small>
+      <!-- LEADERBOARD SECTION -->
+      <div class="leaderboard-wrap" id="leaderboard-wrap">
+        <div class="leaderboard-header">
+          <h3><i class="fa-solid fa-ranking-star" style="color:var(--gold)"></i> Leaderboard Script Terpopuler</h3>
+          <span class="leaderboard-sub">Top 10 berdasarkan jumlah views</span>
         </div>
-        <i class="fa-solid fa-chevron-right request-promo-arrow"></i>
-      </button>
+        <div class="leaderboard-list" id="leaderboard-list"></div>
+      </div>
 
       <!-- LIVE UPDATE -->
       <div class="live-update">
@@ -518,68 +517,6 @@
             <div class="skill-item"><div class="skill-label-row"><span>Bot Development</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill" data-w="85"></div></div></div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- REQUEST SCRIPT PAGE -->
-    <section id="page-request" class="page">
-      <button class="req-back-btn" id="req-back-btn"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
-      <div class="req-hero">
-        <div class="req-hero-glow"></div>
-        <div class="req-hero-content">
-          <div class="req-hero-badge"><i class="fa-solid fa-paper-plane"></i> Request Script</div>
-          <h2 class="req-hero-title">Ada Script yang Kamu Cari?</h2>
-          <p class="req-hero-sub">Isi form singkat ini, request kamu langsung terkirim ke WhatsApp Admin — tanpa perlu daftar akun.</p>
-        </div>
-      </div>
-
-      <form class="req-form" id="req-form">
-        <div class="req-field">
-          <label for="req-nama">Nama Script <span class="req-required">*</span></label>
-          <input type="text" id="req-nama" placeholder="Contoh: Bot Auto Reply Toko Online" maxlength="100" required />
-        </div>
-
-        <div class="req-field">
-          <label for="req-kategori">Kategori</label>
-          <select id="req-kategori">
-            <option value="MD">MD</option>
-            <option value="Bug">Bug</option>
-            <option value="Store">Store</option>
-            <option value="Pushkontak">Pushkontak</option>
-            <option value="JPM">JPM</option>
-            <option value="Pairing">Pairing</option>
-            <option value="Panel">Panel</option>
-            <option value="Downloader">Downloader</option>
-            <option value="Game">Game</option>
-            <option value="Tools">Tools</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-
-        <div class="req-field">
-          <label for="req-detail">Detail Kebutuhan <span class="req-required">*</span></label>
-          <textarea id="req-detail" rows="4" placeholder="Jelaskan fitur yang kamu butuhkan, contoh referensi script, atau kendala yang kamu alami..." maxlength="500" required></textarea>
-          <small class="req-counter"><span id="req-detail-count">0</span>/500</small>
-        </div>
-
-        <div class="req-field">
-          <label for="req-kontak">Kontak Kamu (opsional)</label>
-          <input type="text" id="req-kontak" placeholder="Nomor WA / username Telegram (biar gampang dihubungi)" maxlength="60" />
-        </div>
-
-        <button type="submit" class="req-submit-btn">
-          <i class="fa-brands fa-whatsapp"></i> Kirim Request via WhatsApp
-        </button>
-        <p class="req-note"><i class="fa-solid fa-circle-info"></i> Request akan dibuka di aplikasi WhatsApp kamu. Tidak ada data yang disimpan di server.</p>
-      </form>
-
-      <div class="req-tips">
-        <div class="req-tips-header"><i class="fa-solid fa-lightbulb"></i> Tips Request Cepat Diproses</div>
-        <ul class="req-tips-list">
-          <li>Sebutkan platform bot (Baileys, WWebJS, dll) kalau tahu</li>
-          <li>Jelaskan fitur spesifik, bukan cuma "bot lengkap"</li>
-          <li>Sertakan contoh/referensi kalau ada</li>
-        </ul>
       </div>
     </section>
 

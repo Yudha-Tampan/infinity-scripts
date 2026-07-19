@@ -81,11 +81,6 @@ let currentBannerSlide = 0;
 let bannerInterval;
 let musicPlaying = false;
 
-// ===== KONFIGURASI REQUEST SCRIPT =====
-// GANTI nomor di bawah dengan nomor WhatsApp Admin (format: kode negara tanpa "+", "0", atau spasi)
-// Contoh: nomor 0812-3456-7890 -> ditulis "6281234567890"
-const REQUEST_WA_NUMBER = '6288293669411'; // TODO: ganti dengan nomor WA admin
-
 // ===== INIT SETELAH LOAD =====
 window.addEventListener('load', () => {
   initSplashParticles();
@@ -120,7 +115,6 @@ function initApp() {
   initAnimeDayTabs();
   initAnimeViewToggle();
   animateSkillBars();
-  initRequestPage();
 }
 
 // ===== NAVIGATION =====
@@ -165,6 +159,7 @@ async function loadScripts() {
   filteredScripts = [...allScripts];
   renderTrending();
   renderRecentlyViewed();
+  renderLeaderboard();
   renderScripts();
   updateCategoryCounts();
   updateFavBadge();
@@ -2212,66 +2207,55 @@ function initRecentClearBtn() {
 }
 
 // ===========================
-// REQUEST SCRIPT (kirim ke WhatsApp, tanpa backend/database)
+// LEADERBOARD SCRIPT TERPOPULER (berbasis field 'views', tanpa backend)
 // ===========================
-function initRequestPage() {
-  // Buka halaman request dari promo card di Home
-  const promoCard = document.getElementById('request-promo-card');
-  if (promoCard) {
-    promoCard.addEventListener('click', () => goToPage('request'));
+const LEADERBOARD_MAX = 10;
+const LEADERBOARD_MEDALS = ['🥇', '🥈', '🥉'];
+
+function renderLeaderboard() {
+  const list = document.getElementById('leaderboard-list');
+  if (!list) return;
+
+  const top = [...allScripts]
+    .sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0))
+    .slice(0, LEADERBOARD_MAX);
+
+  list.innerHTML = '';
+
+  if (top.length === 0) {
+    list.innerHTML = `<div class="leaderboard-empty">Belum ada data script</div>`;
+    return;
   }
 
-  // Tombol kembali dari halaman request
-  const backBtn = document.getElementById('req-back-btn');
-  if (backBtn) {
-    backBtn.addEventListener('click', () => goToPage('home'));
-  }
-
-  // Counter karakter untuk textarea detail
-  const detailInput = document.getElementById('req-detail');
-  const detailCount = document.getElementById('req-detail-count');
-  if (detailInput && detailCount) {
-    detailInput.addEventListener('input', () => {
-      detailCount.textContent = detailInput.value.length;
+  top.forEach((s, i) => {
+    const rank = i + 1;
+    const rankDisplay = LEADERBOARD_MEDALS[i] || `#${rank}`;
+    const row = document.createElement('div');
+    row.className = 'leaderboard-item' + (rank <= 3 ? ' top3' : '');
+    row.dataset.id = s.id;
+    row.innerHTML = `
+      <span class="leaderboard-rank">${rankDisplay}</span>
+      <img class="leaderboard-thumb" src="${s.thumbnail}" alt="${escHtml(s.nama)}" loading="lazy"
+           onerror="this.onerror=null;this.src='logo.png';" />
+      <div class="leaderboard-info">
+        <span class="leaderboard-name">${escHtml(s.nama)}</span>
+        <span class="leaderboard-meta"><i class="fa-solid fa-eye"></i> ${formatViews(s.views)} views</span>
+      </div>
+      <i class="fa-solid fa-chevron-right leaderboard-arrow"></i>
+    `;
+    row.addEventListener('click', () => {
+      const card = document.querySelector(`.script-card[data-id="${s.id}"]`);
+      if (card) { card.click(); return; }
+      openModal(s);
     });
-  }
-
-  // Submit form -> buka WhatsApp dengan pesan siap kirim
-  const form = document.getElementById('req-form');
-  if (!form) return;
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const nama = document.getElementById('req-nama').value.trim();
-    const kategori = document.getElementById('req-kategori').value;
-    const detail = document.getElementById('req-detail').value.trim();
-    const kontak = document.getElementById('req-kontak').value.trim();
-
-    if (!nama || !detail) {
-      showToast('Nama script dan detail wajib diisi', 'error');
-      return;
-    }
-
-    const lines = [
-      '👋 *Request Script Baru — Botify*',
-      '',
-      `📝 Nama Script: ${nama}`,
-      `📂 Kategori: ${kategori}`,
-      `📋 Detail: ${detail}`,
-    ];
-    if (kontak) lines.push(`📞 Kontak: ${kontak}`);
-    lines.push('', '_Dikirim otomatis via halaman Request Script Botify_');
-
-    const text = lines.join('\n');
-    const waNumber = (typeof REQUEST_WA_NUMBER === 'string' && REQUEST_WA_NUMBER.trim()) || '';
-    const waUrl = waNumber
-      ? `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`
-      : `https://wa.me/?text=${encodeURIComponent(text)}`;
-
-    window.open(waUrl, '_blank');
-    showToast('Membuka WhatsApp...', 'success');
-    form.reset();
-    if (detailCount) detailCount.textContent = '0';
+    list.appendChild(row);
   });
+}
+
+function formatViews(n) {
+  const num = Number(n) || 0;
+  if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'jt';
+  if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'rb';
+  return String(num);
 }
 
