@@ -1,13 +1,8 @@
-/* ============================================
-   BOTIFY — script.js v3 (FIXED)
-   Semua DOM refs di dalam fungsi, bukan global
-   ============================================ */
+
 'use strict';
 
-// ===== PWA — Service Worker & Install Prompt =====
 let deferredInstallPrompt = null;
 
-// Register service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
@@ -16,13 +11,12 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Tangkap event beforeinstallprompt
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  // Tampilkan banner hanya kalau user belum dismiss sebelumnya
+  
   if (!localStorage.getItem('pwa_dismissed')) {
-    setTimeout(() => showPwaBanner(), 3000); // delay 3 detik setelah load
+    setTimeout(() => showPwaBanner(), 3000);
   }
 });
 
@@ -37,7 +31,7 @@ function hidePwaBanner() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Tombol Install
+  
   const installBtn = document.getElementById('pwa-install-btn');
   if (installBtn) {
     installBtn.addEventListener('click', async () => {
@@ -52,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Tombol Dismiss
   const dismissBtn = document.getElementById('pwa-dismiss-btn');
   if (dismissBtn) {
     dismissBtn.addEventListener('click', () => {
@@ -62,29 +55,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Event saat PWA sudah terinstall
 window.addEventListener('appinstalled', () => {
   showToast('App berhasil diinstall di homescreen!', 'success');
   hidePwaBanner();
   deferredInstallPrompt = null;
 });
 
-
 let allScripts = [];
 let filteredScripts = [];
 let favorites = JSON.parse(localStorage.getItem('is_favorites') || '[]');
-// recentlyViewed: array of {id, ts}. Migrasi otomatis dari format lama (array of id polos)
+
 let recentlyViewed = (JSON.parse(localStorage.getItem('botify_recently_viewed') || '[]'))
   .map(item => (typeof item === 'object' && item !== null) ? item : { id: item, ts: Date.now() });
 let currentCategory = 'all';
 let searchQuery = '';
-let currentSort = 'default'; // default | az | za | rating | newest
+let currentSort = 'default';
 let currentBannerSlide = 0;
 let bannerInterval;
 let musicPlaying = false;
-let compareList = []; // max 2 id, sengaja tidak disimpan ke localStorage (state sesi sementara)
+let compareList = [];
 
-// ===== INIT SETELAH LOAD =====
 window.addEventListener('load', () => {
   initSplashParticles();
   setTimeout(() => {
@@ -122,7 +112,6 @@ function initApp() {
   setInterval(refreshRecentTimeBadges, 60000);
 }
 
-// ===== NAVIGATION =====
 function initNavigation() {
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -132,7 +121,6 @@ function initNavigation() {
   });
 }
 
-// Util: pindah halaman secara terprogram (dipakai tombol/promo card di luar bottom-nav)
 function goToPage(page) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
@@ -145,7 +133,6 @@ function goToPage(page) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ===== LOAD SCRIPTS =====
 async function loadScripts() {
   const scriptsGrid = document.getElementById('scripts-grid');
   const trendingGrid = document.getElementById('trending-grid');
@@ -173,7 +160,6 @@ async function loadScripts() {
   initRecentClearBtn();
 }
 
-// ===== RENDER TRENDING =====
 function renderTrending() {
   const trendingGrid = document.getElementById('trending-grid');
   const trendingHeader = document.getElementById('trending-header');
@@ -184,7 +170,6 @@ function renderTrending() {
   trending.forEach((s, i) => trendingGrid.appendChild(createCard(s, i)));
 }
 
-// ===== RENDER SCRIPTS =====
 function renderScripts() {
   const scriptsGrid = document.getElementById('scripts-grid');
   const emptyState = document.getElementById('empty-state');
@@ -198,7 +183,7 @@ function renderScripts() {
       s.kategori.toLowerCase().includes(q)
     );
   }
-  // Sort
+  
   if (currentSort === 'az') result.sort((a,b) => a.nama.localeCompare(b.nama, 'id'));
   else if (currentSort === 'za') result.sort((a,b) => b.nama.localeCompare(a.nama, 'id'));
   else if (currentSort === 'rating') result.sort((a,b) => (b.rating||0) - (a.rating||0));
@@ -215,7 +200,6 @@ function renderScripts() {
   });
 }
 
-// ===== UPDATE CATEGORY COUNTS =====
 function updateCategoryCounts() {
   document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
     const cat = btn.dataset.cat;
@@ -227,11 +211,10 @@ function updateCategoryCounts() {
       btn.appendChild(badge);
     }
     badge.textContent = count;
-    // Hide count if 0
+    
     badge.style.display = count === 0 ? 'none' : '';
   });
 }
-
 
 function createCard(script, index) {
   const isFav = favorites.includes(script.id);
@@ -285,7 +268,6 @@ function createCard(script, index) {
   return div;
 }
 
-// ===== SCRIPT MODAL =====
 function openModal(script) {
   const overlay  = document.getElementById('modal-overlay');
   const img      = document.getElementById('modal-img');
@@ -325,7 +307,6 @@ function openModal(script) {
   script.baru ? nBadge.classList.remove('hidden') : nBadge.classList.add('hidden');
   link.href = script.link || '#';
 
-  // === COPY LINK ===
   const copyBtn = document.getElementById('modal-copy-btn');
   if (copyBtn) {
     copyBtn.onclick = () => {
@@ -337,7 +318,6 @@ function openModal(script) {
     };
   }
 
-  // === SHARE WA ===
   const waShareBtn = document.getElementById('modal-wa-share-btn');
   if (waShareBtn) {
     waShareBtn.onclick = () => {
@@ -391,7 +371,6 @@ function initModalListeners() {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); closeEventModal(); closeAnimeModal(); } });
 }
 
-// ===== FAVORITES =====
 function toggleFavorite(id, btn, skipRender = false) {
   const idx = favorites.indexOf(id);
   if (idx === -1) {
@@ -436,10 +415,46 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ===== CATEGORIES =====
 document.addEventListener('DOMContentLoaded', () => {
   const cats = document.getElementById('categories');
-  if (cats) cats.addEventListener('click', (e) => {
+  if (!cats) return;
+
+  let isDown = false;
+  let didDrag = false;
+  let startX = 0;
+  let scrollStart = 0;
+
+  const dragStart = (x) => {
+    isDown = true;
+    didDrag = false;
+    startX = x;
+    scrollStart = cats.scrollLeft;
+    cats.classList.add('dragging');
+  };
+
+  const dragMove = (x) => {
+    if (!isDown) return;
+    const delta = x - startX;
+    if (Math.abs(delta) > 5) didDrag = true;
+    cats.scrollLeft = scrollStart - delta;
+  };
+
+  const dragEnd = () => {
+    isDown = false;
+    cats.classList.remove('dragging');
+  };
+
+  cats.addEventListener('mousedown', (e) => dragStart(e.pageX));
+  cats.addEventListener('mousemove', (e) => dragMove(e.pageX));
+  window.addEventListener('mouseup', dragEnd);
+  cats.addEventListener('mouseleave', dragEnd);
+
+  cats.addEventListener('touchstart', (e) => dragStart(e.touches[0].pageX), { passive: true });
+  cats.addEventListener('touchmove', (e) => dragMove(e.touches[0].pageX), { passive: true });
+  cats.addEventListener('touchend', dragEnd);
+
+  cats.addEventListener('click', (e) => {
+    if (didDrag) { e.preventDefault(); e.stopPropagation(); return; }
     const btn = e.target.closest('.cat-btn');
     if (!btn) return;
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -461,7 +476,6 @@ function filterCategory(cat) {
 }
 window.filterCategory = filterCategory;
 
-// ===== SORT =====
 document.addEventListener('DOMContentLoaded', () => {
   const sortWrap = document.getElementById('sort-options');
   if (sortWrap) sortWrap.addEventListener('click', (e) => {
@@ -473,7 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderScripts();
   });
 });
-
 
 function initSearch() {
   const input = document.getElementById('search-input');
@@ -500,7 +513,7 @@ function initSearch() {
   });
   input.addEventListener('blur', () => {
     if (input.value.trim()) saveSearchHistory(input.value.trim());
-    // Delay agar klik pada chip riwayat sempat terdaftar sebelum box disembunyikan
+    
     setTimeout(() => historyBox?.classList.add('hidden'), 150);
   });
   input.addEventListener('keydown', (e) => {
@@ -513,9 +526,6 @@ function initSearch() {
   renderSearchHistory();
 }
 
-// ===========================
-// RIWAYAT PENCARIAN (localStorage, tanpa backend)
-// ===========================
 const SEARCH_HISTORY_MAX = 8;
 let searchHistory = JSON.parse(localStorage.getItem('botify_search_history') || '[]');
 
@@ -534,7 +544,6 @@ function renderSearchHistory() {
   const input = document.getElementById('search-input');
   if (!box || !input) return;
 
-  // Sembunyikan kalau user sedang mengetik query aktif (fokus ke hasil pencarian, bukan riwayat)
   if (input.value.trim() !== '') { box.innerHTML = ''; box.classList.add('hidden'); return; }
 
   if (searchHistory.length === 0) { box.innerHTML = ''; box.classList.add('hidden'); return; }
@@ -550,7 +559,7 @@ function renderSearchHistory() {
   `;
 
   box.querySelectorAll('.search-chip').forEach(chip => {
-    chip.addEventListener('mousedown', (e) => e.preventDefault()); // cegah blur sebelum click terdaftar
+    chip.addEventListener('mousedown', (e) => e.preventDefault());
     chip.addEventListener('click', () => {
       const q = chip.dataset.q;
       input.value = q;
@@ -573,7 +582,6 @@ function renderSearchHistory() {
   }
 }
 
-// ===== BANNER =====
 function initBanner() {
   const slides = document.querySelectorAll('.carousel-slide');
   const dotsEl = document.getElementById('banner-dots');
@@ -586,13 +594,11 @@ function initBanner() {
     dotsEl.appendChild(dot);
   });
 
-  // Prev / Next arrows
   const prevBtn = document.getElementById('cs-prev');
   const nextBtn = document.getElementById('cs-next');
   if (prevBtn) prevBtn.addEventListener('click', () => goBanner((currentBannerSlide - 1 + slides.length) % slides.length));
   if (nextBtn) nextBtn.addEventListener('click', () => goBanner((currentBannerSlide + 1) % slides.length));
 
-  // Touch swipe — passive untuk tidak block scroll
   const track = document.getElementById('banner-track');
   let startX = 0, startY = 0, isScrolling = null;
   if (track) {
@@ -609,7 +615,7 @@ function initBanner() {
       }
     }, { passive: true });
     track.addEventListener('touchend', e => {
-      if (isScrolling) return; // vertical scroll, jangan ganti slide
+      if (isScrolling) return;
       const diff = startX - e.changedTouches[0].clientX;
       if (Math.abs(diff) > 40) goBanner(diff > 0
         ? (currentBannerSlide + 1) % slides.length
@@ -628,7 +634,6 @@ function goBanner(idx) {
   document.querySelectorAll('.cs-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
 }
 
-// ===== THEME =====
 function initTheme() {
   const saved = localStorage.getItem('is_theme') || 'dark';
   if (saved === 'light') document.body.classList.add('light-mode');
@@ -646,7 +651,6 @@ function updateThemeIcon() {
   if (icon) icon.className = document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
 }
 
-// ===== FAB =====
 function initFab() {
   const fab = document.getElementById('fab');
   if (!fab) return;
@@ -663,7 +667,6 @@ function initFab() {
   fab.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-// ===== MUSIC PLAYER =====
 let audioPlayer = null;
 
 function initMusicPlayer() {
@@ -674,24 +677,20 @@ function initMusicPlayer() {
   const artist = document.getElementById('music-artist');
   if (!btn) return;
 
-  // Buat elemen audio
   audioPlayer = new Audio('lagu.mp3');
   audioPlayer.loop = true;
   audioPlayer.volume = 0.6;
 
-  // Kalau file tidak ada / error
   audioPlayer.addEventListener('error', () => {
     if (title)  title.textContent  = 'Everything u are';
     if (artist) artist.textContent = 'Taruh lagu.mp3 di folder';
   });
 
-  // Kalau berhasil load
   audioPlayer.addEventListener('canplay', () => {
     if (title)  title.textContent  = 'Everything u are';
     if (artist) artist.textContent = 'Hindia';
   });
 
-  // Update progress bar (opsional visual)
   audioPlayer.addEventListener('timeupdate', () => {
     const prog = document.getElementById('music-progress');
     if (prog && audioPlayer.duration) {
@@ -722,7 +721,6 @@ function initMusicPlayer() {
   });
 }
 
-// ===== FAKE STATS =====
 function initFakeStats() {
   const el = document.getElementById('visitor-count');
   if (!el) return;
@@ -735,7 +733,6 @@ function initFakeStats() {
   }, 3000);
 }
 
-// ===== LIVE TEXT =====
 const liveMessages = [
   { icon: 'fa-fire', color: '#ff6b35', text: 'AI Assistant Bot trending hari ini — 500+ downloads' },
   { icon: 'fa-download', color: '#38bdf8', text: 'Botify MD V2 baru saja didownload dari Jakarta' },
@@ -766,15 +763,12 @@ function animateLiveText() {
   setInterval(update, 4500);
 }
 
-
-// ===== SKILL BARS =====
 function animateSkillBars() {
   setTimeout(() => {
     document.querySelectorAll('.skill-fill').forEach(b => { b.style.width = b.dataset.w + '%'; });
   }, 300);
 }
 
-// ===== SKELETON =====
 function showSkeletons(container, count) {
   if (!container) return;
   container.innerHTML = '';
@@ -807,7 +801,6 @@ function showLeaderboardSkeletons(container, count) {
   }
 }
 
-// ===== TOAST =====
 function showToast(msg, type = 'info') {
   const icons = { success: 'circle-check', error: 'circle-xmark', info: 'circle-info' };
   const container = document.getElementById('toast-container');
@@ -822,7 +815,6 @@ function showToast(msg, type = 'info') {
   }, 2800);
 }
 
-// ===== UTILS =====
 function scrollToScripts() {
   const el = document.getElementById('scripts-anchor');
   if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -1080,13 +1072,13 @@ function initEventModalListeners() {
 }
 
 function getTypeIcon(t) {
-  return { 
-    Grup: 'fa-brands fa-whatsapp', 
+  return {
+    Grup: 'fa-brands fa-whatsapp',
     Saluran: 'fa-brands fa-whatsapp',
-    Channel: 'fa-brands fa-telegram', 
-    Website: 'fa-solid fa-globe', 
-    Promo: 'fa-solid fa-tag', 
-    Lainnya: 'fa-solid fa-star' 
+    Channel: 'fa-brands fa-telegram',
+    Website: 'fa-solid fa-globe',
+    Promo: 'fa-solid fa-tag',
+    Lainnya: 'fa-solid fa-star'
   }[t] || 'fa-solid fa-circle-info';
 }
 function getTypeEmoji(t) {
@@ -1820,8 +1812,6 @@ function showAnimeError(show) {
   if (el) el.classList.toggle('hidden', !show);
 }
 
-
-
 // ===========================
 // PARTICLE SYSTEMS
 // ===========================
@@ -2121,7 +2111,6 @@ async function loadAnnouncement() {
 
   } catch { /* silent */ }
 }
-
 
 /* ============================================================
    NEW SCRIPT NOTIFICATION
@@ -2535,4 +2524,3 @@ function closeCompareModal() {
   overlay.classList.add('hidden');
   document.body.style.overflow = '';
 }
-

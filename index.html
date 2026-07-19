@@ -6,7 +6,6 @@
   <title>Botify — WhatsApp Bot Center</title>
   <meta name="description" content="Platform terbaik untuk script bot WhatsApp premium dan gratis." />
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#00d4ff" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -24,7 +23,6 @@
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
 <div id="splash">
   <canvas id="splash-particles"></canvas>
   <div class="splash-content">
@@ -40,10 +38,8 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast-container"></div>
 
-<!-- PWA INSTALL PROMPT -->
 <div id="pwa-install-banner" class="pwa-banner hidden">
   <div class="pwa-banner-left">
     <img src="icons/icon-72x72.png" alt="icon" class="pwa-banner-icon" />
@@ -58,7 +54,6 @@
   </div>
 </div>
 
-<!-- ANNOUNCEMENT POPUP -->
 <div id="announcement-overlay" class="ann-overlay hidden">
   <div class="ann-box" id="ann-box">
     <button class="ann-close" id="ann-close"><i class="fa-solid fa-xmark"></i></button>
@@ -72,7 +67,6 @@
   </div>
 </div>
 
-<!-- New Script Notification -->
 <div id="nsn-overlay" class="nsn-overlay hidden">
   <div class="nsn-box" id="nsn-box">
     <button class="nsn-close" id="nsn-close"><i class="fa-solid fa-xmark"></i></button>
@@ -99,13 +93,10 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app" class="hidden">
 
-  <!-- PARTICLE BG -->
   <canvas id="bg-particles"></canvas>
 
-  <!-- NAVBAR TOP -->
   <header class="topbar">
     <div class="topbar-left">
       <div class="topbar-logo">
@@ -120,13 +111,10 @@
     </div>
   </header>
 
-  <!-- PAGES -->
   <main id="pages">
 
-    <!-- HOME PAGE -->
     <section id="page-home" class="page active">
 
-      <!-- BANNER CAROUSEL (IMAGE ONLY - NO TEXT) -->
       <div class="carousel-wrap">
         <div class="carousel-track" id="banner-track">
 
@@ -148,7 +136,6 @@
         <button class="cs-arrow cs-next" id="cs-next"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
 
-      <!-- STATS BAR -->
       <div class="stats-bar">
         <div class="stat-item"><i class="fa-solid fa-box-archive"></i><div><span id="stat-total">0</span><small>Total Script</small></div></div>
         <div class="stat-item"><i class="fa-solid fa-fire"></i><div><span>150K+</span><small>Downloads</small></div></div>
@@ -156,7 +143,6 @@
         <div class="stat-item"><i class="fa-solid fa-star"></i><div><span>4.9</span><small>Rating</small></div></div>
       </div>
 
-      <!-- LEADERBOARD SECTION -->
       <div class="leaderboard-wrap" id="leaderboard-wrap">
         <div class="leaderboard-header">
           <h3><i class="fa-solid fa-ranking-star" style="color:var(--gold)"></i> Leaderboard Script Terpopuler</h3>
@@ -165,14 +151,12 @@
         <div class="leaderboard-list" id="leaderboard-list"></div>
       </div>
 
-      <!-- LIVE UPDATE -->
       <div class="live-update">
         <span class="live-dot"></span>
         <i class="fa-solid fa-fire" id="live-icon" style="color:#ff6b35;font-size:0.75rem;flex-shrink:0"></i>
         <span id="live-text">Loading...</span>
       </div>
 
-      <!-- SEARCH -->
       <div class="search-wrap">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -182,7 +166,6 @@
         <div class="search-history hidden" id="search-history"></div>
       </div>
 
-      <!-- CATEGORIES -->
       <div class="section-header">
         <h3>Kategori</h3>
         <span class="section-line"></span>
@@ -201,14 +184,12 @@
         <button class="cat-btn" data-cat="Tools"><i class="fa-solid fa-wrench"></i><span>Tools</span></button>
       </div>
 
-      <!-- TRENDING SECTION -->
       <div class="section-header" id="trending-header">
         <h3><i class="fa-solid fa-fire" style="color:#ff6b35"></i> Trending</h3>
         <span class="section-line"></span>
       </div>
       <div class="cards-grid" id="trending-grid"></div>
 
-      <!-- RECENTLY VIEWED SECTION -->
       <div class="section-header hidden" id="recent-header">
         <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--neon2)"></i> Terakhir Dilihat</h3>
         <span class="section-line"></span>
@@ -216,7 +197,6 @@
       </div>
       <div class="cards-grid" id="recent-grid"></div>
 
-      <!-- ALL SCRIPTS -->
       <div class="section-header" id="scripts-anchor">
         <h3>Semua Script</h3>
         <span class="section-line"></span>
@@ -235,7 +215,6 @@
         <small>Coba kata kunci lain</small>
       </div>
 
-      <!-- CHANGELOG SECTION -->
       <div class="section-header" id="changelog-header">
         <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> Update Log</h3>
         <span class="section-line"></span>
@@ -292,7 +271,6 @@
       </div>
     </section>
 
-    <!-- ANIME PAGE -->
     <section id="page-anime" class="page">
       <div class="ani-bg"></div>
       <div class="ani-hero">
@@ -384,7 +362,6 @@
       </div>
     </section>
 
-    <!-- ANIME DETAIL MODAL -->
     <div class="modal-overlay hidden" id="anime-modal-overlay">
       <div class="modal-box ani-modal">
         <button class="modal-close" id="anime-modal-close"><i class="fa-solid fa-xmark"></i></button>
@@ -523,7 +500,6 @@
 
   </main>
 
-  <!-- MUSIC PLAYER -->
   <div class="music-player" id="music-player">
     <div class="music-info">
       <div class="music-disc" id="music-disc"><i class="fa-solid fa-music"></i></div>
@@ -541,10 +517,8 @@
     <div class="music-progress-bar"><div class="music-progress-fill" id="music-progress"></div></div>
   </div>
 
-  <!-- FAB -->
   <button class="fab" id="fab" title="Scroll to top"><i class="fa-solid fa-chevron-up"></i></button>
 
-  <!-- COMPARE BAR -->
   <div class="compare-bar hidden" id="compare-bar">
     <div class="compare-bar-slots" id="compare-bar-slots"></div>
     <button class="compare-bar-btn" id="compare-bar-btn" disabled>
@@ -553,7 +527,6 @@
     <button class="compare-bar-close" id="compare-bar-close" title="Batal"><i class="fa-solid fa-xmark"></i></button>
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-page="home">
       <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
@@ -578,7 +551,6 @@
 
 </div>
 
-<!-- POPUP MODAL -->
 <div class="modal-overlay hidden" id="modal-overlay">
   <div class="modal-box" id="modal-box">
     <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
@@ -614,7 +586,6 @@
   </div>
 </div>
 
-<!-- EVENT MODAL -->
 <div class="modal-overlay hidden" id="event-modal-overlay">
   <div class="modal-box event-modal-box" id="event-modal-box">
     <button class="modal-close" id="event-modal-close"><i class="fa-solid fa-xmark"></i></button>
@@ -650,7 +621,6 @@
   </div>
 </div>
 
-<!-- COMPARE MODAL -->
 <div class="modal-overlay hidden" id="compare-modal-overlay">
   <div class="compare-modal-box" id="compare-modal-box">
     <button class="modal-close" id="compare-modal-close"><i class="fa-solid fa-xmark"></i></button>
