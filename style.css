@@ -490,53 +490,55 @@ body::before {
   background: linear-gradient(90deg, rgba(56,189,248,0.2), transparent);
 }
 
-.categories {
-  display: flex; gap: 8px;
-  padding: 0 14px 18px;
-  overflow-x: auto; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x proximity;
-  scroll-behavior: smooth;
+.cat-carousel-wrap {
+  position: relative; overflow: hidden;
+  margin: 0 14px 18px;
+  border-radius: var(--radius-sm);
+}
+.cat-carousel-track {
+  display: flex;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
   cursor: grab;
   user-select: none;
 }
-.categories.dragging {
-  scroll-snap-type: none;
-  scroll-behavior: auto;
+.cat-carousel-track.dragging {
+  transition: none;
   cursor: grabbing;
 }
-.categories::-webkit-scrollbar { display: none; }
-.cat-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  min-width: 62px; padding: 11px 8px;
+.cat-slide {
+  min-width: 100%; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 22px 14px;
   background: var(--card);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-sm);
   cursor: pointer; color: var(--text2);
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.68rem; font-weight: 600;
+  font-size: 0.9rem; font-weight: 600;
   transition: all var(--transition);
-  white-space: nowrap; position: relative; overflow: hidden;
-  scroll-snap-align: start;
-  flex-shrink: 0;
 }
-.cat-btn i { font-size: 1rem; }
-.cat-btn::after {
-  content: '';
-  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  width: 0; height: 2px;
-  background: var(--neon);
-  border-radius: 2px 2px 0 0;
-  transition: width var(--transition);
-}
-.cat-btn:hover, .cat-btn.active {
+.cat-slide i { font-size: 1.6rem; }
+.cat-slide.active {
   background: rgba(56,189,248,0.08);
   border-color: rgba(56,189,248,0.35);
   color: var(--neon);
-  transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(56,189,248,0.15);
 }
-.cat-btn:hover::after, .cat-btn.active::after { width: 70%; }
+.cat-dots {
+  display: flex; justify-content: center; gap: 6px;
+  margin-top: 10px;
+}
+.cat-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none; padding: 0; cursor: pointer;
+  transition: all var(--transition);
+}
+.cat-dot.active {
+  background: var(--neon);
+  width: 18px; border-radius: 3px;
+}
 
 .cards-grid {
   display: grid;
@@ -1773,7 +1775,7 @@ body::before {
 * { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
 img { -webkit-user-drag: none; -khtml-user-drag: none; -moz-user-drag: none; -o-user-drag: none; user-drag: none; pointer-events: none; }
 
-button, a, input, textarea, select, .cat-btn, .nav-item,
+button, a, input, textarea, select, .cat-slide, .nav-item,
 .script-card, .event-card, .anime-card, .featured-event-card,
 .card-fav, .modal-close, .music-btn, .fab, .icon-btn,
 .anime-day-tab, .anime-genre-btn, .event-tab, .anime-view-btn,
@@ -2493,7 +2495,7 @@ button, a, input, textarea, select, .cat-btn, .nav-item,
   box-shadow: 0 2px 12px rgba(56,189,248,0.12);
 }
 
-.cat-btn {
+.cat-slide {
   position: relative;
 }
 .cat-count {
@@ -2509,11 +2511,11 @@ button, a, input, textarea, select, .cat-btn, .nav-item,
   line-height: 1;
   transition: all var(--transition);
 }
-.cat-btn.active .cat-count {
+.cat-slide.active .cat-count {
   background: rgba(56,189,248,0.25);
   border-color: rgba(56,189,248,0.45);
 }
-.cat-btn:not(.active) .cat-count {
+.cat-slide:not(.active) .cat-count {
   background: rgba(255,255,255,0.06);
   border-color: rgba(255,255,255,0.1);
   color: var(--text3);

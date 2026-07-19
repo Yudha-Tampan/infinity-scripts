@@ -201,7 +201,7 @@ function renderScripts() {
 }
 
 function updateCategoryCounts() {
-  document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
+  document.querySelectorAll('.cat-slide[data-cat]').forEach(btn => {
     const cat = btn.dataset.cat;
     const count = cat === 'all' ? allScripts.length : allScripts.filter(s => s.kategori === cat).length;
     let badge = btn.querySelector('.cat-count');
@@ -403,8 +403,9 @@ document.addEventListener('DOMContentLoaded', () => {
     currentCategory = 'all';
     document.getElementById('search-input').value = '';
     searchQuery = '';
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.cat-slide').forEach(b => b.classList.remove('active'));
     document.querySelector('[data-cat="all"]').classList.add('active');
+    goCatSlide(0);
     const grid = document.getElementById('scripts-grid');
     grid.innerHTML = '';
     allScripts.filter(s => favorites.includes(s.id)).forEach((s,i) => grid.appendChild(createCard(s,i)));
@@ -415,49 +416,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const cats = document.getElementById('categories');
-  if (!cats) return;
+let currentCatSlide = 0;
 
-  let isDown = false;
-  let didDrag = false;
-  let startX = 0;
-  let scrollStart = 0;
+function initCatCarousel() {
+  const track = document.getElementById('cat-carousel-track');
+  const dotsEl = document.getElementById('cat-dots');
+  if (!track || !dotsEl) return;
 
-  const dragStart = (x) => {
-    isDown = true;
-    didDrag = false;
-    startX = x;
-    scrollStart = cats.scrollLeft;
-    cats.classList.add('dragging');
-  };
+  const slides = Array.from(track.querySelectorAll('.cat-slide'));
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'cat-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goCatSlide(i));
+    dotsEl.appendChild(dot);
+  });
 
-  const dragMove = (x) => {
-    if (!isDown) return;
-    const delta = x - startX;
-    if (Math.abs(delta) > 5) didDrag = true;
-    cats.scrollLeft = scrollStart - delta;
-  };
-
-  const dragEnd = () => {
-    isDown = false;
-    cats.classList.remove('dragging');
-  };
-
-  cats.addEventListener('mousedown', (e) => dragStart(e.pageX));
-  cats.addEventListener('mousemove', (e) => dragMove(e.pageX));
-  window.addEventListener('mouseup', dragEnd);
-  cats.addEventListener('mouseleave', dragEnd);
-
-  cats.addEventListener('touchstart', (e) => dragStart(e.touches[0].pageX), { passive: true });
-  cats.addEventListener('touchmove', (e) => dragMove(e.touches[0].pageX), { passive: true });
-  cats.addEventListener('touchend', dragEnd);
-
-  cats.addEventListener('click', (e) => {
-    if (didDrag) { e.preventDefault(); e.stopPropagation(); return; }
-    const btn = e.target.closest('.cat-btn');
-    if (!btn) return;
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  const selectCategory = (btn) => {
+    document.querySelectorAll('.cat-slide').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentCategory = btn.dataset.cat;
     document.getElementById('search-input').value = '';
@@ -465,12 +440,82 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('clear-search').classList.add('hidden');
     renderScripts();
     renderTrending();
+  };
+
+  let isDown = false;
+  let didDrag = false;
+  let startX = 0;
+  let currentTranslate = 0;
+  let trackWidth = 0;
+
+  const getTrackWidth = () => track.getBoundingClientRect().width;
+
+  const dragStart = (x) => {
+    isDown = true;
+    didDrag = false;
+    startX = x;
+    trackWidth = getTrackWidth();
+    currentTranslate = -currentCatSlide * trackWidth;
+    track.classList.add('dragging');
+  };
+
+  const dragMove = (x) => {
+    if (!isDown) return;
+    const delta = x - startX;
+    if (Math.abs(delta) > 5) didDrag = true;
+    track.style.transform = `translateX(${currentTranslate + delta}px)`;
+  };
+
+  const dragEnd = (x) => {
+    if (!isDown) return;
+    isDown = false;
+    track.classList.remove('dragging');
+    const delta = x - startX;
+    if (Math.abs(delta) > trackWidth * 0.18) {
+      if (delta < 0 && currentCatSlide < slides.length - 1) currentCatSlide++;
+      else if (delta > 0 && currentCatSlide > 0) currentCatSlide--;
+    }
+    goCatSlide(currentCatSlide);
+  };
+
+  track.addEventListener('mousedown', (e) => dragStart(e.pageX));
+  track.addEventListener('mousemove', (e) => dragMove(e.pageX));
+  window.addEventListener('mouseup', (e) => dragEnd(e.pageX));
+  track.addEventListener('mouseleave', () => { if (isDown) dragEnd(startX); });
+
+  track.addEventListener('touchstart', (e) => dragStart(e.touches[0].pageX), { passive: true });
+  track.addEventListener('touchmove', (e) => dragMove(e.touches[0].pageX), { passive: true });
+  track.addEventListener('touchend', (e) => dragEnd(e.changedTouches[0].pageX));
+
+  track.addEventListener('click', (e) => {
+    if (didDrag) { e.preventDefault(); e.stopPropagation(); return; }
+    const btn = e.target.closest('.cat-slide');
+    if (!btn) return;
+    selectCategory(btn);
   });
+
+  window.addEventListener('resize', () => goCatSlide(currentCatSlide));
+}
+
+function goCatSlide(idx) {
+  const track = document.getElementById('cat-carousel-track');
+  if (!track) return;
+  currentCatSlide = idx;
+  const trackWidth = track.getBoundingClientRect().width;
+  track.style.transform = `translateX(-${idx * trackWidth}px)`;
+  document.querySelectorAll('.cat-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initCatCarousel();
 });
 
 function filterCategory(cat) {
   currentCategory = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  const slides = Array.from(document.querySelectorAll('.cat-slide'));
+  slides.forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  const idx = slides.findIndex(b => b.dataset.cat === cat);
+  if (idx !== -1) goCatSlide(idx);
   renderScripts();
   scrollToScripts();
 }
