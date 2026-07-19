@@ -172,7 +172,25 @@ function renderTrending() {
 
 function renderScripts() {
   const scriptsGrid = document.getElementById('scripts-grid');
+  const byCategoryEl = document.getElementById('scripts-by-category');
   const emptyState = document.getElementById('empty-state');
+  const sortBar = document.getElementById('sort-options');
+
+  const showByCategory = currentCategory === 'all' && !searchQuery;
+
+  if (showByCategory) {
+    scriptsGrid.classList.add('hidden');
+    scriptsGrid.innerHTML = '';
+    if (sortBar) sortBar.classList.add('hidden');
+    renderScriptsByCategory();
+    return;
+  }
+
+  if (sortBar) sortBar.classList.remove('hidden');
+  byCategoryEl.classList.add('hidden');
+  byCategoryEl.innerHTML = '';
+  scriptsGrid.classList.remove('hidden');
+
   let result = [...allScripts];
   if (currentCategory !== 'all') result = result.filter(s => s.kategori === currentCategory);
   if (searchQuery) {
@@ -183,7 +201,7 @@ function renderScripts() {
       s.kategori.toLowerCase().includes(q)
     );
   }
-  
+
   if (currentSort === 'az') result.sort((a,b) => a.nama.localeCompare(b.nama, 'id'));
   else if (currentSort === 'za') result.sort((a,b) => b.nama.localeCompare(a.nama, 'id'));
   else if (currentSort === 'rating') result.sort((a,b) => (b.rating||0) - (a.rating||0));
@@ -200,8 +218,54 @@ function renderScripts() {
   });
 }
 
+function renderScriptsByCategory() {
+  const byCategoryEl = document.getElementById('scripts-by-category');
+  const emptyState = document.getElementById('empty-state');
+  byCategoryEl.innerHTML = '';
+
+  const categoryOrder = ['MD','Bug','Store','Pushkontak','JPM','Pairing','Panel','Downloader','Game','Tools'];
+  const presentCats = categoryOrder.filter(cat => allScripts.some(s => s.kategori === cat));
+
+  if (presentCats.length === 0) {
+    byCategoryEl.classList.add('hidden');
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+  byCategoryEl.classList.remove('hidden');
+
+  filteredScripts = [...allScripts];
+
+  presentCats.forEach(cat => {
+    const items = allScripts.filter(s => s.kategori === cat);
+    if (items.length === 0) return;
+
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+
+    const header = document.createElement('div');
+    header.className = 'cat-row-header';
+    header.innerHTML = `
+      <h4>${escHtml(cat)} <span class="cat-row-count">${items.length}</span></h4>
+      <button class="cat-row-see-all" data-cat="${escHtml(cat)}">Lihat semua <i class="fa-solid fa-chevron-right"></i></button>
+    `;
+
+    const track = document.createElement('div');
+    track.className = 'cat-row-track';
+    items.forEach((s, i) => track.appendChild(createCard(s, i)));
+
+    row.appendChild(header);
+    row.appendChild(track);
+    byCategoryEl.appendChild(row);
+  });
+
+  byCategoryEl.querySelectorAll('.cat-row-see-all').forEach(btn => {
+    btn.addEventListener('click', () => filterCategory(btn.dataset.cat));
+  });
+}
+
 function updateCategoryCounts() {
-  document.querySelectorAll('.cat-slide[data-cat]').forEach(btn => {
+  document.querySelectorAll('.cat-btn[data-cat]').forEach(btn => {
     const cat = btn.dataset.cat;
     const count = cat === 'all' ? allScripts.length : allScripts.filter(s => s.kategori === cat).length;
     let badge = btn.querySelector('.cat-count');
@@ -403,9 +467,8 @@ document.addEventListener('DOMContentLoaded', () => {
     currentCategory = 'all';
     document.getElementById('search-input').value = '';
     searchQuery = '';
-    document.querySelectorAll('.cat-slide').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('[data-cat="all"]').classList.add('active');
-    goCatSlide(0);
     const grid = document.getElementById('scripts-grid');
     grid.innerHTML = '';
     allScripts.filter(s => favorites.includes(s.id)).forEach((s,i) => grid.appendChild(createCard(s,i)));
@@ -416,23 +479,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-let currentCatSlide = 0;
-
-function initCatCarousel() {
-  const track = document.getElementById('cat-carousel-track');
-  const dotsEl = document.getElementById('cat-dots');
-  if (!track || !dotsEl) return;
-
-  const slides = Array.from(track.querySelectorAll('.cat-slide'));
-  slides.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'cat-dot' + (i === 0 ? ' active' : '');
-    dot.addEventListener('click', () => goCatSlide(i));
-    dotsEl.appendChild(dot);
-  });
-
-  const selectCategory = (btn) => {
-    document.querySelectorAll('.cat-slide').forEach(b => b.classList.remove('active'));
+document.addEventListener('DOMContentLoaded', () => {
+  const cats = document.getElementById('categories');
+  if (cats) cats.addEventListener('click', (e) => {
+    const btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentCategory = btn.dataset.cat;
     document.getElementById('search-input').value = '';
@@ -440,82 +492,12 @@ function initCatCarousel() {
     document.getElementById('clear-search').classList.add('hidden');
     renderScripts();
     renderTrending();
-  };
-
-  let isDown = false;
-  let didDrag = false;
-  let startX = 0;
-  let currentTranslate = 0;
-  let trackWidth = 0;
-
-  const getTrackWidth = () => track.getBoundingClientRect().width;
-
-  const dragStart = (x) => {
-    isDown = true;
-    didDrag = false;
-    startX = x;
-    trackWidth = getTrackWidth();
-    currentTranslate = -currentCatSlide * trackWidth;
-    track.classList.add('dragging');
-  };
-
-  const dragMove = (x) => {
-    if (!isDown) return;
-    const delta = x - startX;
-    if (Math.abs(delta) > 5) didDrag = true;
-    track.style.transform = `translateX(${currentTranslate + delta}px)`;
-  };
-
-  const dragEnd = (x) => {
-    if (!isDown) return;
-    isDown = false;
-    track.classList.remove('dragging');
-    const delta = x - startX;
-    if (Math.abs(delta) > trackWidth * 0.18) {
-      if (delta < 0 && currentCatSlide < slides.length - 1) currentCatSlide++;
-      else if (delta > 0 && currentCatSlide > 0) currentCatSlide--;
-    }
-    goCatSlide(currentCatSlide);
-  };
-
-  track.addEventListener('mousedown', (e) => dragStart(e.pageX));
-  track.addEventListener('mousemove', (e) => dragMove(e.pageX));
-  window.addEventListener('mouseup', (e) => dragEnd(e.pageX));
-  track.addEventListener('mouseleave', () => { if (isDown) dragEnd(startX); });
-
-  track.addEventListener('touchstart', (e) => dragStart(e.touches[0].pageX), { passive: true });
-  track.addEventListener('touchmove', (e) => dragMove(e.touches[0].pageX), { passive: true });
-  track.addEventListener('touchend', (e) => dragEnd(e.changedTouches[0].pageX));
-
-  track.addEventListener('click', (e) => {
-    if (didDrag) { e.preventDefault(); e.stopPropagation(); return; }
-    const btn = e.target.closest('.cat-slide');
-    if (!btn) return;
-    selectCategory(btn);
   });
-
-  window.addEventListener('resize', () => goCatSlide(currentCatSlide));
-}
-
-function goCatSlide(idx) {
-  const track = document.getElementById('cat-carousel-track');
-  if (!track) return;
-  currentCatSlide = idx;
-  const trackWidth = track.getBoundingClientRect().width;
-  track.style.transform = `translateX(-${idx * trackWidth}px)`;
-  document.querySelectorAll('.cat-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  initCatCarousel();
 });
 
 function filterCategory(cat) {
   currentCategory = cat;
-  const slides = Array.from(document.querySelectorAll('.cat-slide'));
-  slides.forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
-  const idx = slides.findIndex(b => b.dataset.cat === cat);
-  if (idx !== -1) goCatSlide(idx);
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
   renderScripts();
   scrollToScripts();
 }

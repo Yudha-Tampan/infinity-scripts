@@ -170,21 +170,18 @@
         <h3>Kategori</h3>
         <span class="section-line"></span>
       </div>
-      <div class="cat-carousel-wrap">
-        <div class="cat-carousel-track" id="cat-carousel-track">
-          <button class="cat-slide active" data-cat="all"><i class="fa-solid fa-border-all"></i><span>Semua</span></button>
-          <button class="cat-slide" data-cat="MD"><i class="fa-solid fa-mobile-screen"></i><span>MD</span></button>
-          <button class="cat-slide" data-cat="Bug"><i class="fa-solid fa-bug"></i><span>Bug</span></button>
-          <button class="cat-slide" data-cat="Store"><i class="fa-solid fa-store"></i><span>Store</span></button>
-          <button class="cat-slide" data-cat="Pushkontak"><i class="fa-solid fa-address-book"></i><span>Pushkontak</span></button>
-          <button class="cat-slide" data-cat="JPM"><i class="fa-solid fa-bolt"></i><span>JPM</span></button>
-          <button class="cat-slide" data-cat="Pairing"><i class="fa-solid fa-link"></i><span>Pairing</span></button>
-          <button class="cat-slide" data-cat="Panel"><i class="fa-solid fa-desktop"></i><span>Panel</span></button>
-          <button class="cat-slide" data-cat="Downloader"><i class="fa-solid fa-download"></i><span>Downloader</span></button>
-          <button class="cat-slide" data-cat="Game"><i class="fa-solid fa-gamepad"></i><span>Game</span></button>
-          <button class="cat-slide" data-cat="Tools"><i class="fa-solid fa-wrench"></i><span>Tools</span></button>
-        </div>
-        <div class="cat-dots" id="cat-dots"></div>
+      <div class="categories" id="categories">
+        <button class="cat-btn active" data-cat="all"><i class="fa-solid fa-border-all"></i><span>Semua</span></button>
+        <button class="cat-btn" data-cat="MD"><i class="fa-solid fa-mobile-screen"></i><span>MD</span></button>
+        <button class="cat-btn" data-cat="Bug"><i class="fa-solid fa-bug"></i><span>Bug</span></button>
+        <button class="cat-btn" data-cat="Store"><i class="fa-solid fa-store"></i><span>Store</span></button>
+        <button class="cat-btn" data-cat="Pushkontak"><i class="fa-solid fa-address-book"></i><span>Pushkontak</span></button>
+        <button class="cat-btn" data-cat="JPM"><i class="fa-solid fa-bolt"></i><span>JPM</span></button>
+        <button class="cat-btn" data-cat="Pairing"><i class="fa-solid fa-link"></i><span>Pairing</span></button>
+        <button class="cat-btn" data-cat="Panel"><i class="fa-solid fa-desktop"></i><span>Panel</span></button>
+        <button class="cat-btn" data-cat="Downloader"><i class="fa-solid fa-download"></i><span>Downloader</span></button>
+        <button class="cat-btn" data-cat="Game"><i class="fa-solid fa-gamepad"></i><span>Game</span></button>
+        <button class="cat-btn" data-cat="Tools"><i class="fa-solid fa-wrench"></i><span>Tools</span></button>
       </div>
 
       <div class="section-header" id="trending-header">
@@ -212,6 +209,7 @@
         <button class="sort-btn" data-sort="newest"><i class="fa-solid fa-sparkles"></i> Terbaru</button>
       </div>
       <div class="cards-grid" id="scripts-grid"></div>
+      <div class="scripts-by-category" id="scripts-by-category"></div>
       <div class="empty-state hidden" id="empty-state">
         <i class="fa-solid fa-ghost"></i>
         <p>Script tidak ditemukan</p>
