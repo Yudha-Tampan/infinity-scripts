@@ -179,6 +179,7 @@
           <input type="text" id="search-input" placeholder="Cari script bot..." autocomplete="off" />
           <button class="clear-btn hidden" id="clear-search"><i class="fa-solid fa-xmark"></i></button>
         </div>
+        <div class="search-history hidden" id="search-history"></div>
       </div>
 
       <!-- CATEGORIES -->
@@ -543,6 +544,15 @@
   <!-- FAB -->
   <button class="fab" id="fab" title="Scroll to top"><i class="fa-solid fa-chevron-up"></i></button>
 
+  <!-- COMPARE BAR -->
+  <div class="compare-bar hidden" id="compare-bar">
+    <div class="compare-bar-slots" id="compare-bar-slots"></div>
+    <button class="compare-bar-btn" id="compare-bar-btn" disabled>
+      <i class="fa-solid fa-code-compare"></i> Bandingkan
+    </button>
+    <button class="compare-bar-close" id="compare-bar-close" title="Batal"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-page="home">
@@ -637,6 +647,18 @@
         <button class="share-btn wa-share-btn" id="ev-wa-share-btn"><i class="fa-brands fa-whatsapp"></i> Share WA</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- COMPARE MODAL -->
+<div class="modal-overlay hidden" id="compare-modal-overlay">
+  <div class="compare-modal-box" id="compare-modal-box">
+    <button class="modal-close" id="compare-modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="compare-modal-header">
+      <i class="fa-solid fa-code-compare"></i>
+      <h2>Bandingkan Script</h2>
+    </div>
+    <div class="compare-modal-grid" id="compare-modal-grid"></div>
   </div>
 </div>
 

@@ -73,13 +73,16 @@ window.addEventListener('appinstalled', () => {
 let allScripts = [];
 let filteredScripts = [];
 let favorites = JSON.parse(localStorage.getItem('is_favorites') || '[]');
-let recentlyViewed = JSON.parse(localStorage.getItem('botify_recently_viewed') || '[]');
+// recentlyViewed: array of {id, ts}. Migrasi otomatis dari format lama (array of id polos)
+let recentlyViewed = (JSON.parse(localStorage.getItem('botify_recently_viewed') || '[]'))
+  .map(item => (typeof item === 'object' && item !== null) ? item : { id: item, ts: Date.now() });
 let currentCategory = 'all';
 let searchQuery = '';
 let currentSort = 'default'; // default | az | za | rating | newest
 let currentBannerSlide = 0;
 let bannerInterval;
 let musicPlaying = false;
+let compareList = []; // max 2 id, sengaja tidak disimpan ke localStorage (state sesi sementara)
 
 // ===== INIT SETELAH LOAD =====
 window.addEventListener('load', () => {
@@ -115,6 +118,8 @@ function initApp() {
   initAnimeDayTabs();
   initAnimeViewToggle();
   animateSkillBars();
+  initCompareFeature();
+  setInterval(refreshRecentTimeBadges, 60000);
 }
 
 // ===== NAVIGATION =====
@@ -144,8 +149,10 @@ function goToPage(page) {
 async function loadScripts() {
   const scriptsGrid = document.getElementById('scripts-grid');
   const trendingGrid = document.getElementById('trending-grid');
+  const leaderboardList = document.getElementById('leaderboard-list');
   showSkeletons(scriptsGrid, 6);
   showSkeletons(trendingGrid, 3);
+  showLeaderboardSkeletons(leaderboardList, 5);
   try {
     const res = await fetch('scripts.json?v=' + Date.now());
     if (!res.ok) throw new Error('fail');
@@ -228,6 +235,7 @@ function updateCategoryCounts() {
 
 function createCard(script, index) {
   const isFav = favorites.includes(script.id);
+  const isCompare = compareList.includes(script.id);
   const div = document.createElement('div');
   div.className = 'script-card';
   div.setAttribute('data-id', script.id);
@@ -250,18 +258,30 @@ function createCard(script, index) {
         <span class="rating"><i class="fa-solid fa-star"></i>${script.rating}</span>
         <span><i class="fa-solid fa-eye"></i>${formatViews(script.views)}</span>
       </div>
+      <label class="card-compare-check ${isCompare ? 'active' : ''}">
+        <input type="checkbox" data-id="${script.id}" ${isCompare ? 'checked' : ''} />
+        <span><i class="fa-solid fa-code-compare"></i> Bandingkan</span>
+      </label>
     </div>
     <button class="card-fav ${isFav ? 'active' : ''}" data-id="${script.id}" title="Favorite">
       <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
     </button>`;
   div.addEventListener('click', (e) => {
     if (e.target.closest('.card-fav')) return;
+    if (e.target.closest('.card-compare-check')) return;
     openModal(script);
   });
   div.querySelector('.card-fav').addEventListener('click', (e) => {
     e.stopPropagation();
     toggleFavorite(script.id, div.querySelector('.card-fav'));
   });
+  const compareCheck = div.querySelector('.card-compare-check input');
+  if (compareCheck) {
+    compareCheck.addEventListener('click', (e) => e.stopPropagation());
+    compareCheck.addEventListener('change', () => {
+      toggleCompare(script.id, div.querySelector('.card-compare-check'));
+    });
+  }
   return div;
 }
 
@@ -458,17 +478,99 @@ document.addEventListener('DOMContentLoaded', () => {
 function initSearch() {
   const input = document.getElementById('search-input');
   const clear = document.getElementById('clear-search');
+  const historyBox = document.getElementById('search-history');
   if (!input) return;
+
   input.addEventListener('input', () => {
     searchQuery = input.value.trim();
     clear.classList.toggle('hidden', !searchQuery);
     renderScripts();
+    renderSearchHistory();
   });
   clear.addEventListener('click', () => {
     input.value = ''; searchQuery = '';
     clear.classList.add('hidden');
     renderScripts(); input.focus();
+    renderSearchHistory();
   });
+
+  input.addEventListener('focus', () => {
+    renderSearchHistory();
+    if (historyBox && historyBox.children.length > 0) historyBox.classList.remove('hidden');
+  });
+  input.addEventListener('blur', () => {
+    if (input.value.trim()) saveSearchHistory(input.value.trim());
+    // Delay agar klik pada chip riwayat sempat terdaftar sebelum box disembunyikan
+    setTimeout(() => historyBox?.classList.add('hidden'), 150);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && input.value.trim()) {
+      saveSearchHistory(input.value.trim());
+      input.blur();
+    }
+  });
+
+  renderSearchHistory();
+}
+
+// ===========================
+// RIWAYAT PENCARIAN (localStorage, tanpa backend)
+// ===========================
+const SEARCH_HISTORY_MAX = 8;
+let searchHistory = JSON.parse(localStorage.getItem('botify_search_history') || '[]');
+
+function saveSearchHistory(query) {
+  const q = query.trim();
+  if (!q) return;
+  searchHistory = searchHistory.filter(item => item.toLowerCase() !== q.toLowerCase());
+  searchHistory.unshift(q);
+  if (searchHistory.length > SEARCH_HISTORY_MAX) searchHistory = searchHistory.slice(0, SEARCH_HISTORY_MAX);
+  localStorage.setItem('botify_search_history', JSON.stringify(searchHistory));
+  renderSearchHistory();
+}
+
+function renderSearchHistory() {
+  const box = document.getElementById('search-history');
+  const input = document.getElementById('search-input');
+  if (!box || !input) return;
+
+  // Sembunyikan kalau user sedang mengetik query aktif (fokus ke hasil pencarian, bukan riwayat)
+  if (input.value.trim() !== '') { box.innerHTML = ''; box.classList.add('hidden'); return; }
+
+  if (searchHistory.length === 0) { box.innerHTML = ''; box.classList.add('hidden'); return; }
+
+  box.innerHTML = `
+    <div class="search-history-header">
+      <span>Pencarian Terakhir</span>
+      <button class="search-history-clear" id="search-history-clear">Hapus</button>
+    </div>
+    <div class="search-history-chips">
+      ${searchHistory.map(q => `<button class="search-chip" data-q="${escHtml(q)}"><i class="fa-solid fa-clock-rotate-left"></i> ${escHtml(q)}</button>`).join('')}
+    </div>
+  `;
+
+  box.querySelectorAll('.search-chip').forEach(chip => {
+    chip.addEventListener('mousedown', (e) => e.preventDefault()); // cegah blur sebelum click terdaftar
+    chip.addEventListener('click', () => {
+      const q = chip.dataset.q;
+      input.value = q;
+      searchQuery = q;
+      document.getElementById('clear-search')?.classList.remove('hidden');
+      renderScripts();
+      saveSearchHistory(q);
+      box.classList.add('hidden');
+    });
+  });
+
+  const clearBtn = document.getElementById('search-history-clear');
+  if (clearBtn) {
+    clearBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    clearBtn.addEventListener('click', () => {
+      searchHistory = [];
+      localStorage.setItem('botify_search_history', JSON.stringify(searchHistory));
+      renderSearchHistory();
+    });
+  }
 }
 
 // ===== BANNER =====
@@ -689,6 +791,22 @@ function showSkeletons(container, count) {
   }
 }
 
+function showLeaderboardSkeletons(container, count) {
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    container.innerHTML += `
+      <div class="leaderboard-item skeleton-card" style="animation-delay:0ms">
+        <span class="sk-line skeleton" style="width:20px;height:20px;border-radius:6px;margin:0"></span>
+        <span class="sk-thumb skeleton" style="width:42px;height:42px;border-radius:10px;flex-shrink:0"></span>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+          <div class="sk-line skeleton" style="height:10px;width:70%;margin:0"></div>
+          <div class="sk-line skeleton short" style="height:8px;margin:0"></div>
+        </div>
+      </div>`;
+  }
+}
+
 // ===== TOAST =====
 function showToast(msg, type = 'info') {
   const icons = { success: 'circle-check', error: 'circle-xmark', info: 'circle-info' };
@@ -705,11 +823,6 @@ function showToast(msg, type = 'info') {
 }
 
 // ===== UTILS =====
-function formatViews(n) {
-  if (!n) return '0';
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-  return n.toString();
-}
 function scrollToScripts() {
   const el = document.getElementById('scripts-anchor');
   if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -2173,8 +2286,8 @@ async function loadNewScriptNotif() {
 const RECENT_MAX = 8;
 
 function trackRecentlyViewed(scriptId) {
-  recentlyViewed = recentlyViewed.filter(id => id !== scriptId);
-  recentlyViewed.unshift(scriptId);
+  recentlyViewed = recentlyViewed.filter(item => item.id !== scriptId);
+  recentlyViewed.unshift({ id: scriptId, ts: Date.now() });
   if (recentlyViewed.length > RECENT_MAX) recentlyViewed = recentlyViewed.slice(0, RECENT_MAX);
   localStorage.setItem('botify_recently_viewed', JSON.stringify(recentlyViewed));
   renderRecentlyViewed();
@@ -2186,13 +2299,48 @@ function renderRecentlyViewed() {
   if (!grid || !header) return;
 
   const items = recentlyViewed
-    .map(id => allScripts.find(s => s.id === id))
+    .map(item => {
+      const s = allScripts.find(sc => sc.id === item.id);
+      return s ? { script: s, ts: item.ts } : null;
+    })
     .filter(Boolean);
 
   grid.innerHTML = '';
   if (items.length === 0) { header.classList.add('hidden'); return; }
   header.classList.remove('hidden');
-  items.forEach((s, i) => grid.appendChild(createCard(s, i)));
+  items.forEach(({ script: s, ts }, i) => {
+    const card = createCard(s, i);
+    const badge = document.createElement('span');
+    badge.className = 'recent-time-badge';
+    badge.textContent = formatRelativeTime(ts);
+    card.querySelector('.card-thumb')?.appendChild(badge);
+    grid.appendChild(card);
+  });
+}
+
+function formatRelativeTime(ts) {
+  if (!ts) return '';
+  const diffMs = Date.now() - ts;
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'Baru saja';
+  if (diffMin < 60) return `${diffMin} menit lalu`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour} jam lalu`;
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 7) return `${diffDay} hari lalu`;
+  return `${Math.floor(diffDay / 7)} minggu lalu`;
+}
+
+function refreshRecentTimeBadges() {
+  const grid = document.getElementById('recent-grid');
+  if (!grid) return;
+  const cards = grid.querySelectorAll('.script-card');
+  cards.forEach((card, i) => {
+    const item = recentlyViewed[i];
+    if (!item) return;
+    const badge = card.querySelector('.recent-time-badge');
+    if (badge) badge.textContent = formatRelativeTime(item.ts);
+  });
 }
 
 function initRecentClearBtn() {
@@ -2233,6 +2381,7 @@ function renderLeaderboard() {
     const row = document.createElement('div');
     row.className = 'leaderboard-item' + (rank <= 3 ? ' top3' : '');
     row.dataset.id = s.id;
+    row.style.animationDelay = `${Math.min(i * 40, 320)}ms`;
     row.innerHTML = `
       <span class="leaderboard-rank">${rankDisplay}</span>
       <img class="leaderboard-thumb" src="${s.thumbnail}" alt="${escHtml(s.nama)}" loading="lazy"
@@ -2257,5 +2406,133 @@ function formatViews(n) {
   if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'jt';
   if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'rb';
   return String(num);
+}
+
+// ===========================
+// COMPARE 2 SCRIPT (client-side, tanpa backend)
+// ===========================
+const COMPARE_MAX = 2;
+
+function toggleCompare(scriptId, labelEl) {
+  const idx = compareList.indexOf(scriptId);
+  if (idx > -1) {
+    compareList.splice(idx, 1);
+  } else {
+    if (compareList.length >= COMPARE_MAX) {
+      showToast(`Maksimal ${COMPARE_MAX} script untuk dibandingkan`, 'info');
+      const input = labelEl?.querySelector('input');
+      if (input) input.checked = false;
+      return;
+    }
+    compareList.push(scriptId);
+  }
+  document.querySelectorAll(`.card-compare-check input[data-id="${scriptId}"]`).forEach(inp => {
+    inp.checked = compareList.includes(scriptId);
+    inp.closest('.card-compare-check')?.classList.toggle('active', compareList.includes(scriptId));
+  });
+  updateCompareBar();
+}
+
+function updateCompareBar() {
+  const bar = document.getElementById('compare-bar');
+  const slots = document.getElementById('compare-bar-slots');
+  const btn = document.getElementById('compare-bar-btn');
+  if (!bar || !slots || !btn) return;
+
+  if (compareList.length === 0) {
+    bar.classList.add('hidden');
+    return;
+  }
+  bar.classList.remove('hidden');
+
+  slots.innerHTML = '';
+  for (let i = 0; i < COMPARE_MAX; i++) {
+    const id = compareList[i];
+    const script = id ? allScripts.find(s => s.id === id) : null;
+    const slot = document.createElement('div');
+    slot.className = 'compare-slot' + (script ? ' filled' : '');
+    if (script) {
+      slot.innerHTML = `
+        <img src="${script.thumbnail}" alt="${escHtml(script.nama)}" onerror="this.src='logo.png'" />
+        <span>${escHtml(script.nama)}</span>
+        <button class="compare-slot-remove" data-id="${script.id}"><i class="fa-solid fa-xmark"></i></button>
+      `;
+      slot.querySelector('.compare-slot-remove').addEventListener('click', () => {
+        toggleCompare(script.id, null);
+      });
+    } else {
+      slot.innerHTML = `<span class="compare-slot-empty">Pilih script ${i + 1}</span>`;
+    }
+    slots.appendChild(slot);
+  }
+
+  btn.disabled = compareList.length < COMPARE_MAX;
+}
+
+function initCompareFeature() {
+  const closeBtn = document.getElementById('compare-bar-close');
+  const compareBtn = document.getElementById('compare-bar-btn');
+  const modalOverlay = document.getElementById('compare-modal-overlay');
+  const modalClose = document.getElementById('compare-modal-close');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      compareList.forEach(id => {
+        document.querySelectorAll(`.card-compare-check input[data-id="${id}"]`).forEach(inp => {
+          inp.checked = false;
+          inp.closest('.card-compare-check')?.classList.remove('active');
+        });
+      });
+      compareList = [];
+      updateCompareBar();
+    });
+  }
+
+  if (compareBtn) {
+    compareBtn.addEventListener('click', () => {
+      if (compareList.length < COMPARE_MAX) return;
+      openCompareModal();
+    });
+  }
+
+  if (modalClose) modalClose.addEventListener('click', closeCompareModal);
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeCompareModal();
+    });
+  }
+}
+
+function openCompareModal() {
+  const overlay = document.getElementById('compare-modal-overlay');
+  const grid = document.getElementById('compare-modal-grid');
+  if (!overlay || !grid) return;
+
+  const scripts = compareList.map(id => allScripts.find(s => s.id === id)).filter(Boolean);
+  if (scripts.length < COMPARE_MAX) return;
+
+  grid.innerHTML = scripts.map(s => `
+    <div class="compare-col">
+      <img class="compare-col-thumb" src="${s.thumbnail}" alt="${escHtml(s.nama)}" onerror="this.src='logo.png'" />
+      <h3 class="compare-col-name">${escHtml(s.nama)}</h3>
+      <span class="compare-col-status ${s.status.toLowerCase()}">${s.status}</span>
+      <div class="compare-row"><span class="compare-label"><i class="fa-solid fa-tag"></i> Kategori</span><span class="compare-value">${escHtml(s.kategori)}</span></div>
+      <div class="compare-row"><span class="compare-label"><i class="fa-solid fa-star"></i> Rating</span><span class="compare-value">${s.rating} ★</span></div>
+      <div class="compare-row"><span class="compare-label"><i class="fa-solid fa-eye"></i> Views</span><span class="compare-value">${formatViews(s.views)}</span></div>
+      <div class="compare-row"><span class="compare-label"><i class="fa-solid fa-fire"></i> Trending</span><span class="compare-value">${s.trending ? 'Ya' : 'Tidak'}</span></div>
+      <div class="compare-row compare-desc-row"><span class="compare-label"><i class="fa-solid fa-align-left"></i> Deskripsi</span><p class="compare-value compare-desc">${escHtml(s.deskripsi)}</p></div>
+      <a href="${s.link || '#'}" target="_blank" class="compare-download-btn"><i class="fa-solid fa-download"></i> Download</a>
+    </div>
+  `).join('');
+
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCompareModal() {
+  const overlay = document.getElementById('compare-modal-overlay');
+  if (!overlay) return;
+  overlay.classList.add('hidden');
+  document.body.style.overflow = '';
 }
 
