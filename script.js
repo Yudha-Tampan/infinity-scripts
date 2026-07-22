@@ -114,6 +114,7 @@ function initApp() {
 
 function initNavigation() {
   document.querySelectorAll('.nav-item').forEach(btn => {
+    if (!btn.dataset.page) return;
     btn.addEventListener('click', () => {
       const page = btn.dataset.page;
       goToPage(page);

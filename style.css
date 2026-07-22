@@ -970,6 +970,7 @@ body::before {
   color: var(--text3); font-family: 'Rajdhani', sans-serif;
   font-size: 0.68rem; font-weight: 600; letter-spacing: 0.3px;
   transition: all var(--transition);
+  text-decoration: none;
 }
 .nav-icon-wrap {
   width: 42px; height: 32px;

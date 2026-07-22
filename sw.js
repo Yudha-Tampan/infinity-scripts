@@ -1,12 +1,12 @@
-// Botify — Service Worker v1
-// Cache static assets untuk offline support
-
-const CACHE_NAME = 'botify-v6';
+const CACHE_NAME = 'botify-v7';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/script.js',
+  '/about.html',
+  '/about.css',
+  '/about.js',
   '/manifest.json',
   '/scripts.json',
   '/event.json',
@@ -20,7 +20,6 @@ const STATIC_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'
 ];
 
-// Install — cache semua static assets
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -32,7 +31,6 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Activate — hapus cache lama
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -44,15 +42,10 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch — strategi:
-// - HTML: network first, fallback cache
-// - JSON data: network first, fallback cache (supaya data tetap fresh)
-// - Static (css/js/img): cache first, fallback network
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET dan request ke AniList API (selalu online)
   if (request.method !== 'GET') return;
   if (url.hostname === 'graphql.anilist.co') return;
   if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
@@ -60,19 +53,16 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // HTML → network first
   if (request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  // JSON data → network first (supaya konten selalu update)
   if (url.pathname.endsWith('.json')) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  // CSS, JS, gambar → cache first
   event.respondWith(cacheFirst(request));
 });
 
