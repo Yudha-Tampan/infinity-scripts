@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Botify — WhatsApp Bot Center</title>
+  <meta name="description" content="Platform terbaik untuk script bot WhatsApp premium dan gratis." />
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#00d4ff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Botify" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="splash">
+  <canvas id="splash-particles"></canvas>
+  <div class="splash-content">
+    <div class="splash-logo">
+      <div class="logo-ring"></div>
+      <div class="logo-ring ring2"></div>
+      <img class="splash-logo-img" src="logo.png" alt="Botify" />
+    </div>
+    <h1 class="splash-title">BOT<span>IFY</span></h1>
+    <p class="splash-sub">WhatsApp Bot Center</p>
+    <div class="splash-bar"><div class="splash-fill"></div></div>
+    <p class="splash-loading">Initializing system...</p>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<div id="pwa-install-banner" class="pwa-banner hidden">
+  <div class="pwa-banner-left">
+    <img src="icons/icon-72x72.png" alt="icon" class="pwa-banner-icon" />
+    <div class="pwa-banner-text">
+      <span>Install Botify</span>
+      <small>Tambah ke homescreen, buka lebih cepat</small>
+    </div>
+  </div>
+  <div class="pwa-banner-actions">
+    <button id="pwa-install-btn" class="pwa-btn-install">Install</button>
+    <button id="pwa-dismiss-btn" class="pwa-btn-dismiss"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+</div>
+
+<div id="announcement-overlay" class="ann-overlay hidden">
+  <div class="ann-box" id="ann-box">
+    <button class="ann-close" id="ann-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="ann-icon" id="ann-icon"><i class="fa-solid fa-bullhorn"></i></div>
+    <h3 id="ann-title"></h3>
+    <p id="ann-message"></p>
+    <div class="ann-actions">
+      <button class="ann-btn-primary" id="ann-btn-action"></button>
+      <button class="ann-btn-dismiss" id="ann-btn-dismiss">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div id="nsn-overlay" class="nsn-overlay hidden">
+  <div class="nsn-box" id="nsn-box">
+    <button class="nsn-close" id="nsn-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="nsn-badge-row">
+      <span class="nsn-badge-new"><i class="fa-solid fa-sparkles"></i> SCRIPT BARU</span>
+      <span class="nsn-badge-status" id="nsn-status-badge">Free</span>
+    </div>
+    <div class="nsn-thumb-wrap">
+      <img class="nsn-thumb-img" id="nsn-thumb-img" src="" alt="" />
+      <div class="nsn-thumb-overlay"></div>
+      <div class="nsn-thumb-placeholder hidden" id="nsn-thumb-ph">
+        <i class="fa-solid fa-code"></i>
+      </div>
+    </div>
+    <div class="nsn-owner-tag"><i class="fa-solid fa-crown"></i> Owner baru saja menambahkan</div>
+    <h3 class="nsn-title" id="nsn-title">Nama Script</h3>
+    <span class="nsn-cat-badge" id="nsn-cat">MD</span>
+    <p class="nsn-desc" id="nsn-desc">Deskripsi script baru.</p>
+    <div class="nsn-actions">
+      <button class="nsn-btn-try" id="nsn-btn-try">Coba Sekarang</button>
+      <button class="nsn-btn-close" id="nsn-btn-close">Nanti Saja</button>
+    </div>
+    <div class="nsn-glow" id="nsn-glow"></div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+
+  <canvas id="bg-particles"></canvas>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <img src="logo.png" alt="logo" class="topbar-logo-img" />
+        <span>Bot<b>ify</b></span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge"><span class="live-dot"></span><span id="visitor-count">0</span> online</div>
+      <button class="icon-btn" id="theme-toggle" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+      <button class="icon-btn" id="fav-btn" title="Favorites"><i class="fa-solid fa-heart"></i><span id="fav-count" class="badge hidden">0</span></button>
+    </div>
+  </header>
+
+  <main id="pages">
+
+    <section id="page-home" class="page active">
+
+      <div class="carousel-wrap">
+        <div class="carousel-track" id="banner-track">
+
+          <div class="carousel-slide img-slide-pure">
+            <img class="slide-bg-img-pure" src="banner1.jpg" alt="Banner 1" loading="eager" />
+          </div>
+
+          <div class="carousel-slide img-slide-pure">
+            <img class="slide-bg-img-pure" src="banner2.jpg" alt="Banner 2" loading="lazy" />
+          </div>
+
+          <div class="carousel-slide img-slide-pure">
+            <img class="slide-bg-img-pure" src="banner3.jpg" alt="Banner 3" loading="lazy" />
+          </div>
+
+        </div>
+        <div class="cs-dots" id="banner-dots"></div>
+        <button class="cs-arrow cs-prev" id="cs-prev"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="cs-arrow cs-next" id="cs-next"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-item"><i class="fa-solid fa-box-archive"></i><div><span id="stat-total">0</span><small>Total Script</small></div></div>
+        <div class="stat-item"><i class="fa-solid fa-fire"></i><div><span>150K+</span><small>Downloads</small></div></div>
+        <div class="stat-item"><i class="fa-solid fa-users"></i><div><span>50K+</span><small>Pengguna</small></div></div>
+        <div class="stat-item"><i class="fa-solid fa-star"></i><div><span>4.9</span><small>Rating</small></div></div>
+      </div>
+
+      <div class="leaderboard-wrap" id="leaderboard-wrap">
+        <div class="leaderboard-header">
+          <h3><i class="fa-solid fa-ranking-star" style="color:var(--gold)"></i> Leaderboard Script Terpopuler</h3>
+          <span class="leaderboard-sub">Top 10 berdasarkan jumlah views</span>
+        </div>
+        <div class="leaderboard-list" id="leaderboard-list"></div>
+      </div>
+
+      <div class="live-update">
+        <span class="live-dot"></span>
+        <i class="fa-solid fa-fire" id="live-icon" style="color:#ff6b35;font-size:0.75rem;flex-shrink:0"></i>
+        <span id="live-text">Loading...</span>
+      </div>
+
+      <div class="search-wrap">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="search-input" placeholder="Cari script bot..." autocomplete="off" />
+          <button class="clear-btn hidden" id="clear-search"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="search-history hidden" id="search-history"></div>
+      </div>
+
+      <div class="section-header">
+        <h3>Kategori</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="categories" id="categories">
+        <button class="cat-btn active" data-cat="all"><i class="fa-solid fa-border-all"></i><span>Semua</span></button>
+        <button class="cat-btn" data-cat="MD"><i class="fa-solid fa-mobile-screen"></i><span>MD</span></button>
+        <button class="cat-btn" data-cat="Bug"><i class="fa-solid fa-bug"></i><span>Bug</span></button>
+        <button class="cat-btn" data-cat="Store"><i class="fa-solid fa-store"></i><span>Store</span></button>
+        <button class="cat-btn" data-cat="Pushkontak"><i class="fa-solid fa-address-book"></i><span>Pushkontak</span></button>
+        <button class="cat-btn" data-cat="JPM"><i class="fa-solid fa-bolt"></i><span>JPM</span></button>
+        <button class="cat-btn" data-cat="Pairing"><i class="fa-solid fa-link"></i><span>Pairing</span></button>
+        <button class="cat-btn" data-cat="Panel"><i class="fa-solid fa-desktop"></i><span>Panel</span></button>
+        <button class="cat-btn" data-cat="Downloader"><i class="fa-solid fa-download"></i><span>Downloader</span></button>
+        <button class="cat-btn" data-cat="Game"><i class="fa-solid fa-gamepad"></i><span>Game</span></button>
+        <button class="cat-btn" data-cat="Tools"><i class="fa-solid fa-wrench"></i><span>Tools</span></button>
+      </div>
+
+      <div class="section-header" id="trending-header">
+        <h3><i class="fa-solid fa-fire" style="color:#ff6b35"></i> Trending</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="cards-grid" id="trending-grid"></div>
+
+      <div class="section-header hidden" id="recent-header">
+        <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--neon2)"></i> Terakhir Dilihat</h3>
+        <span class="section-line"></span>
+        <button class="recent-clear-btn" id="recent-clear-btn" title="Hapus riwayat"><i class="fa-solid fa-trash-can"></i></button>
+      </div>
+      <div class="cards-grid" id="recent-grid"></div>
+
+      <div class="section-header" id="scripts-anchor">
+        <h3>Semua Script</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="sort-bar" id="sort-options">
+        <button class="sort-btn active" data-sort="default"><i class="fa-solid fa-star"></i> Populer</button>
+        <button class="sort-btn" data-sort="az"><i class="fa-solid fa-arrow-down-a-z"></i> A–Z</button>
+        <button class="sort-btn" data-sort="za"><i class="fa-solid fa-arrow-up-z-a"></i> Z–A</button>
+        <button class="sort-btn" data-sort="rating"><i class="fa-solid fa-ranking-star"></i> Rating</button>
+        <button class="sort-btn" data-sort="newest"><i class="fa-solid fa-sparkles"></i> Terbaru</button>
+      </div>
+      <div class="cards-grid" id="scripts-grid"></div>
+      <div class="scripts-by-category" id="scripts-by-category"></div>
+      <div class="empty-state hidden" id="empty-state">
+        <i class="fa-solid fa-ghost"></i>
+        <p>Script tidak ditemukan</p>
+        <small>Coba kata kunci lain</small>
+      </div>
+
+      <div class="section-header" id="changelog-header">
+        <h3><i class="fa-solid fa-clock-rotate-left" style="color:var(--accent)"></i> Update Log</h3>
+        <span class="section-line"></span>
+      </div>
+      <div id="changelog-wrap" class="changelog-wrap">
+        <div class="changelog-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      </div>
+
+    </section>
+
+    <section id="page-event" class="page">
+      <div class="event-page-bg"></div>
+      <div class="event-page-header">
+        <div class="event-header-glow"></div>
+        <div class="event-header-content">
+          <div class="event-header-banner">
+            <img src="event-banner.png" alt="Event & Promosi" class="event-banner-img" />
+          </div>
+          <h2>Event & Promosi</h2>
+          <p>Grup, website, dan penawaran spesial pilihan</p>
+          <div class="event-header-stats">
+            <span><i class="fa-solid fa-calendar-check"></i> <b id="stat-event-total">0</b> Event Aktif</span>
+            <span class="dot-sep">•</span>
+            <span><i class="fa-solid fa-fire"></i> Update Rutin</span>
+          </div>
+        </div>
+      </div>
+      <div class="event-tabs" id="event-tabs">
+        <button class="event-tab active" data-type="all"><i class="fa-solid fa-border-all"></i> Semua</button>
+        <button class="event-tab" data-type="Grup"><i class="fa-brands fa-whatsapp"></i> Grup WA</button>
+        <button class="event-tab" data-type="Saluran"><i class="fa-brands fa-whatsapp"></i> Saluran WA</button>
+        <button class="event-tab" data-type="Website"><i class="fa-solid fa-globe"></i> Website</button>
+        <button class="event-tab" data-type="Channel"><i class="fa-brands fa-telegram"></i> Channel TG</button>
+        <button class="event-tab" data-type="Promo"><i class="fa-solid fa-tag"></i> Promo</button>
+        <button class="event-tab" data-type="Lainnya"><i class="fa-solid fa-ellipsis"></i> Lainnya</button>
+      </div>
+      <div class="search-wrap" style="margin-bottom:12px">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="event-search-input" placeholder="Cari event atau promosi..." autocomplete="off" />
+          <button class="clear-btn hidden" id="event-clear-search"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div id="featured-event-wrap"></div>
+      <div class="section-header">
+        <h3><i class="fa-solid fa-calendar-star" style="color:var(--neon)"></i> Semua Event</h3>
+        <span class="section-line"></span>
+      </div>
+      <div class="event-list" id="event-list"></div>
+      <div class="empty-state hidden" id="event-empty">
+        <i class="fa-solid fa-calendar-xmark"></i>
+        <p>Event tidak ditemukan</p>
+        <small>Coba kata kunci lain</small>
+      </div>
+    </section>
+
+    <section id="page-anime" class="page">
+      <div class="ani-bg"></div>
+      <div class="ani-hero">
+        <div class="ani-hero-glow"></div>
+        <div class="ani-hero-content">
+          <div class="ani-hero-badge">
+            <span class="live-dot"></span>
+            <span>AniList API • Live Data</span>
+          </div>
+          <h2 class="ani-hero-title"><i class="fa-solid fa-tv"></i> Anime Hub</h2>
+          <p class="ani-hero-sub">Jadwal tayang, upcoming, & trending season ini</p>
+          <div class="ani-season-tag" id="anime-season-label">
+            <i class="fa-solid fa-sun"></i> Memuat...
+          </div>
+        </div>
+      </div>
+      <div class="ani-stats-row">
+        <div class="ani-stat-card"><i class="fa-solid fa-tv"></i><div><span id="anime-count-day">0</span><small>Hari ini</small></div></div>
+        <div class="ani-stat-card"><i class="fa-solid fa-calendar-week"></i><div><span id="anime-count-week">0</span><small>Minggu ini</small></div></div>
+        <div class="ani-stat-card"><i class="fa-solid fa-rocket"></i><div><span id="anime-count-upcoming">0</span><small>Upcoming</small></div></div>
+        <div class="ani-stat-card"><i class="fa-solid fa-clock"></i><div><span id="anime-next-time">--:--</span><small>Berikutnya</small></div></div>
+      </div>
+      <div class="ani-today-wrap" id="ani-today-wrap">
+        <div class="ani-section-title">
+          <span class="ani-pill-badge pulse"><span class="live-dot"></span> Tayang Hari Ini</span>
+        </div>
+        <div class="ani-today-scroll" id="ani-today-scroll"></div>
+      </div>
+      <div class="ani-tabs">
+        <button class="ani-tab active" id="ani-tab-jadwal" data-tab="jadwal"><i class="fa-solid fa-calendar-week"></i> Jadwal</button>
+        <button class="ani-tab" id="ani-tab-upcoming" data-tab="upcoming"><i class="fa-solid fa-rocket"></i> Upcoming<span class="ani-badge-count" id="anime-count-upcoming2">0</span></button>
+        <button class="ani-tab" id="ani-tab-trending" data-tab="trending"><i class="fa-solid fa-fire"></i> Trending</button>
+      </div>
+      <div class="ani-day-strip" id="anime-day-tabs">
+        <button class="ani-day-btn" data-day="0">Min</button>
+        <button class="ani-day-btn" data-day="1">Sen</button>
+        <button class="ani-day-btn" data-day="2">Sel</button>
+        <button class="ani-day-btn" data-day="3">Rab</button>
+        <button class="ani-day-btn" data-day="4">Kam</button>
+        <button class="ani-day-btn" data-day="5">Jum</button>
+        <button class="ani-day-btn" data-day="6">Sab</button>
+      </div>
+      <div class="ani-filter-bar">
+        <div class="ani-search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="anime-search-input" placeholder="Cari anime..." autocomplete="off"/>
+          <button class="ani-clear-btn hidden" id="anime-clear-search"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="ani-genre-scroll" id="anime-genre-bar">
+          <button class="ani-genre-pill active" data-genre="all">Semua</button>
+          <button class="ani-genre-pill" data-genre="Action">Action</button>
+          <button class="ani-genre-pill" data-genre="Romance">Romance</button>
+          <button class="ani-genre-pill" data-genre="Comedy">Comedy</button>
+          <button class="ani-genre-pill" data-genre="Fantasy">Fantasy</button>
+          <button class="ani-genre-pill" data-genre="Adventure">Adventure</button>
+          <button class="ani-genre-pill" data-genre="Sci-Fi">Sci-Fi</button>
+          <button class="ani-genre-pill" data-genre="Horror">Horror</button>
+          <button class="ani-genre-pill" data-genre="Sports">Sports</button>
+          <button class="ani-genre-pill" data-genre="Mystery">Mystery</button>
+          <button class="ani-genre-pill" data-genre="Slice of Life">Slice of Life</button>
+          <button class="ani-genre-pill" data-genre="Drama">Drama</button>
+          <button class="ani-genre-pill" data-genre="Supernatural">Supernatural</button>
+          <button class="ani-genre-pill" data-genre="Ecchi">Ecchi</button>
+          <button class="ani-genre-pill" data-genre="Mecha">Mecha</button>
+          <button class="ani-genre-pill" data-genre="Psychological">Psychological</button>
+          <button class="ani-genre-pill" data-genre="Thriller">Thriller</button>
+        </div>
+      </div>
+      <div class="ani-loading hidden" id="anime-loading">
+        <div class="ani-loading-ring"></div>
+        <p>Mengambil data dari AniList...</p>
+        <small>Mohon tunggu sebentar</small>
+      </div>
+      <div class="ani-error hidden" id="anime-error">
+        <div class="ani-error-ico"><i class="fa-solid fa-satellite-dish"></i></div>
+        <p>Gagal memuat data</p>
+        <small>Periksa koneksi internet kamu</small>
+        <button class="ani-retry-btn" id="anime-retry-btn"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button>
+      </div>
+      <div class="ani-content-header hidden" id="anime-section-header">
+        <h3 id="anime-schedule-title"><i class="fa-solid fa-calendar-day"></i> Jadwal</h3>
+        <span id="anime-last-update" class="ani-update-time">--</span>
+      </div>
+      <div class="ani-grid" id="anime-grid"></div>
+      <div class="ani-empty hidden" id="anime-empty">
+        <i class="fa-solid fa-film"></i>
+        <p>Tidak ada anime ditemukan</p>
+        <small>Coba hari lain atau ubah filter</small>
+      </div>
+    </section>
+
+    <div class="modal-overlay hidden" id="anime-modal-overlay">
+      <div class="modal-box ani-modal">
+        <button class="modal-close" id="anime-modal-close"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ani-modal-banner">
+          <img id="am-banner" src="" alt=""/>
+          <div class="ani-modal-banner-overlay"></div>
+          <div class="am-score-badge" id="am-score"></div>
+          <div class="am-modal-countdown" id="am-modal-countdown"></div>
+        </div>
+        <div class="ani-modal-cover-row">
+          <img id="am-cover" src="" alt="" class="ani-modal-cover"/>
+          <div class="ani-modal-title-block">
+            <h2 id="am-title"></h2>
+            <p id="am-title-romaji" class="am-sub-title"></p>
+            <p id="am-title-native" class="am-native-title"></p>
+            <div class="am-genres" id="am-genres"></div>
+          </div>
+        </div>
+        <div class="modal-body" style="padding-top:14px">
+          <div class="am-info-grid">
+            <div class="am-info-item"><i class="fa-solid fa-clock"></i><div><small>Waktu Tayang</small><span id="am-time"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-film"></i><div><small>Episode</small><span id="am-ep"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-tv"></i><div><small>Format</small><span id="am-format"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-star"></i><div><small>Score</small><span id="am-score2"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-users"></i><div><small>Popularity</small><span id="am-pop"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-heart"></i><div><small>Favorit</small><span id="am-fav"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-building"></i><div><small>Studio</small><span id="am-studio"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-book"></i><div><small>Source</small><span id="am-source"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-stopwatch"></i><div><small>Durasi</small><span id="am-duration"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-calendar"></i><div><small>Season</small><span id="am-season-info"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-flag"></i><div><small>Negara</small><span id="am-country"></span></div></div>
+            <div class="am-info-item"><i class="fa-solid fa-signal"></i><div><small>Status</small><span id="am-airstatus"></span></div></div>
+          </div>
+          <div class="am-section-block" id="am-tags-wrap">
+            <div class="am-section-label"><i class="fa-solid fa-tags"></i> Tags</div>
+            <div class="am-tags-list" id="am-tags-list"></div>
+          </div>
+          <div class="am-section-block hidden" id="am-stream-wrap">
+            <div class="am-section-label"><i class="fa-solid fa-play-circle"></i> Tonton di</div>
+            <div class="am-stream-list" id="am-stream-list"></div>
+          </div>
+          <div class="am-section-block">
+            <div class="am-section-label"><i class="fa-solid fa-align-left"></i> Sinopsis</div>
+            <div class="am-desc-wrap">
+              <p id="am-desc"></p>
+              <button class="am-read-more hidden" id="am-read-more">Baca selengkapnya ▼</button>
+            </div>
+          </div>
+          <div class="am-actions-row">
+            <a id="am-anilist-link" href="#" target="_blank" class="am-action-btn am-btn-anilist">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> AniList
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="page-profile" class="page">
+      <div class="profile-bg-effect"></div>
+      <div class="profile-hero">
+        <div class="profile-hero-mesh"></div>
+        <div class="profile-hero-orb orb1"></div>
+        <div class="profile-hero-orb orb2"></div>
+      </div>
+      <div class="profile-wrap">
+        <div class="profile-top-row">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-ring">
+              <div class="profile-avatar">
+                <img src="owner.jpg" alt="Owner" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'av-fallback\'><i class=\'fa-solid fa-user\'></i></div>'" />
+              </div>
+            </div>
+            <div class="profile-status-badge"><i class="fa-solid fa-check"></i></div>
+          </div>
+          <div class="profile-top-actions">
+            <a href="https://wa.me/6288973461209" target="_blank" class="prof-action-btn wa-action"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://t.me/botify" target="_blank" class="prof-action-btn tg-action"><i class="fa-brands fa-telegram"></i></a>
+          </div>
+        </div>
+        <div class="profile-identity">
+          <div class="profile-name-row">
+            <h2 class="profile-name">Botify Owner</h2>
+            <span class="profile-verified"><i class="fa-solid fa-circle-check"></i></span>
+          </div>
+          <div class="profile-role-row">
+            <span class="profile-role-badge"><i class="fa-solid fa-crown"></i> Script Developer</span>
+            <span class="profile-location-tag"><i class="fa-solid fa-location-dot"></i> Indonesia</span>
+          </div>
+          <p class="profile-bio">Developer script WhatsApp bot sejak 2020. Spesialis dalam pembuatan bot otomatis, AI integration, dan sistem store digital.</p>
+        </div>
+        <div class="profile-stats-grid">
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-box-archive"></i></div><span class="p-stat-val">150+</span><small>Script</small></div>
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-users"></i></div><span class="p-stat-val">50K+</span><small>Users</small></div>
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-star"></i></div><span class="p-stat-val">5.0</span><small>Rating</small></div>
+          <div class="p-stat-card"><div class="p-stat-icon"><i class="fa-solid fa-calendar"></i></div><span class="p-stat-val">4+</span><small>Tahun</small></div>
+        </div>
+        <div class="profile-socials">
+          <a href="https://wa.me/6288973461209" target="_blank" class="social-card wa-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-whatsapp"></i></div>
+            <div class="social-info"><span>WhatsApp</span><small>+62 889-7346-1209</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+          <a href="https://t.me/botify" target="_blank" class="social-card tg-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-telegram"></i></div>
+            <div class="social-info"><span>Telegram</span><small>@botify</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+          <a href="https://youtube.com/@botify" target="_blank" class="social-card yt-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-youtube"></i></div>
+            <div class="social-info"><span>YouTube</span><small>@botify</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+          <a href="https://github.com/botify" target="_blank" class="social-card gh-card">
+            <div class="social-icon-wrap"><i class="fa-brands fa-github"></i></div>
+            <div class="social-info"><span>GitHub</span><small>botify</small></div>
+            <i class="fa-solid fa-chevron-right social-arrow"></i>
+          </a>
+        </div>
+        <div class="profile-info-card">
+          <div class="pic-header"><i class="fa-solid fa-address-card"></i> Informasi Kontak</div>
+          <div class="pic-row"><div class="pic-icon"><i class="fa-solid fa-envelope"></i></div><div class="pic-content"><small>Email</small><span>hello@botify.id</span></div></div>
+          <div class="pic-row"><div class="pic-icon"><i class="fa-solid fa-globe"></i></div><div class="pic-content"><small>Website</small><span>botify.id</span></div></div>
+          <div class="pic-row pic-row-last"><div class="pic-icon"><i class="fa-solid fa-clock"></i></div><div class="pic-content"><small>Respon</small><span>Dalam 1x24 jam</span></div></div>
+        </div>
+        <div class="profile-skills-card">
+          <div class="pic-header"><i class="fa-solid fa-code"></i> Keahlian</div>
+          <div class="skill-list">
+            <div class="skill-item"><div class="skill-label-row"><span>JavaScript</span><span class="skill-pct">95%</span></div><div class="skill-track"><div class="skill-fill" data-w="95"></div></div></div>
+            <div class="skill-item"><div class="skill-label-row"><span>Node.js</span><span class="skill-pct">90%</span></div><div class="skill-track"><div class="skill-fill" data-w="90"></div></div></div>
+            <div class="skill-item"><div class="skill-label-row"><span>WhatsApp API</span><span class="skill-pct">98%</span></div><div class="skill-track"><div class="skill-fill" data-w="98"></div></div></div>
+            <div class="skill-item"><div class="skill-label-row"><span>Bot Development</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill" data-w="85"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="music-player" id="music-player">
+    <div class="music-info">
+      <div class="music-disc" id="music-disc"><i class="fa-solid fa-music"></i></div>
+      <div class="music-text">
+        <span id="music-title">Everything u are</span>
+        <small id="music-artist">Hindia</small>
+      </div>
+    </div>
+    <div class="music-controls">
+      <button class="music-btn" id="music-toggle"><i class="fa-solid fa-play"></i></button>
+    </div>
+    <div class="music-wave" id="music-wave">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="music-progress-bar"><div class="music-progress-fill" id="music-progress"></div></div>
+  </div>
+
+  <button class="fab" id="fab" title="Scroll to top"><i class="fa-solid fa-chevron-up"></i></button>
+
+  <div class="compare-bar hidden" id="compare-bar">
+    <div class="compare-bar-slots" id="compare-bar-slots"></div>
+    <button class="compare-bar-btn" id="compare-bar-btn" disabled>
+      <i class="fa-solid fa-code-compare"></i> Bandingkan
+    </button>
+    <button class="compare-bar-close" id="compare-bar-close" title="Batal"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="home">
+      <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
+      <span>Home</span>
+    </button>
+    <button class="nav-item nav-event-center" data-page="event">
+      <div class="nav-icon-wrap nav-event-icon">
+        <i class="fa-solid fa-bolt"></i>
+        <span class="event-nav-badge hidden" id="event-nav-badge"></span>
+      </div>
+      <span>Event</span>
+    </button>
+    <a class="nav-item" href="about.html">
+      <div class="nav-icon-wrap"><i class="fa-solid fa-bars"></i></div>
+      <span>Menu</span>
+    </a>
+    <button class="nav-item" data-page="anime">
+      <div class="nav-icon-wrap"><i class="fa-solid fa-tv"></i></div>
+      <span>Anime</span>
+    </button>
+    <button class="nav-item" data-page="profile">
+      <div class="nav-icon-wrap"><i class="fa-solid fa-user"></i></div>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+</div>
+
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-img-wrap">
+      <img id="modal-img" src="" alt="" />
+      <div class="modal-badges">
+        <span id="modal-status-badge" class="status-badge"></span>
+        <span id="modal-new-badge" class="new-badge hidden">NEW</span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modal-cat"></div>
+      <h2 id="modal-name"></h2>
+      <p id="modal-desc"></p>
+      <div class="modal-meta">
+        <div class="meta-item"><i class="fa-solid fa-star"></i><span id="modal-rating"></span></div>
+        <div class="meta-item"><i class="fa-solid fa-eye"></i><span id="modal-views"></span></div>
+        <div class="meta-item"><i class="fa-solid fa-fire" id="modal-trend-icon"></i><span id="modal-trend"></span></div>
+      </div>
+      <div class="modal-actions">
+        <a id="modal-link" href="#" target="_blank" class="btn-download"><i class="fa-solid fa-download"></i> Download / Open</a>
+        <button class="btn-fav-modal" id="modal-fav-btn"><i class="fa-solid fa-heart"></i></button>
+      </div>
+      <div class="modal-share-row" id="modal-share-row">
+        <button class="share-btn copy-btn" id="modal-copy-btn" title="Salin Link"><i class="fa-solid fa-copy"></i> Salin Link</button>
+        <button class="share-btn wa-share-btn" id="modal-wa-share-btn" title="Share ke WhatsApp"><i class="fa-brands fa-whatsapp"></i> Share WA</button>
+      </div>
+      <div class="script-extra-btns" id="script-extra-btns">
+        <a id="modal-yt-btn" href="#" target="_blank" class="ev-extra-btn ev-yt-btn hidden"><i class="fa-brands fa-youtube"></i> Sumber Script</a>
+        <a id="modal-ch-btn" href="#" target="_blank" class="ev-extra-btn ev-ch-btn hidden"><i class="fa-brands fa-whatsapp"></i> Saluran WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="event-modal-overlay">
+  <div class="modal-box event-modal-box" id="event-modal-box">
+    <button class="modal-close" id="event-modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="event-modal-header">
+      <div class="event-modal-thumb" id="ev-modal-thumb-wrap">
+        <img id="ev-modal-img" src="" alt="" />
+        <div class="event-modal-thumb-overlay"></div>
+      </div>
+      <div id="ev-modal-yt-wrap" class="hidden" style="width:100%;aspect-ratio:16/9;background:#000;border-radius:12px 12px 0 0;overflow:hidden;">
+        <iframe id="ev-modal-yt-iframe" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media" style="width:100%;height:100%;display:block;"></iframe>
+      </div>
+      <div class="event-modal-type-badge" id="ev-modal-type"></div>
+      <div class="event-modal-featured-badge hidden" id="ev-modal-featured-badge"><i class="fa-solid fa-star"></i> Featured</div>
+    </div>
+    <div class="modal-body">
+      <h2 id="ev-modal-name"></h2>
+      <p id="ev-modal-desc"></p>
+      <div class="ev-modal-info">
+        <div class="ev-info-row"><i class="fa-solid fa-globe"></i><span id="ev-modal-link-text"></span></div>
+        <div class="ev-info-row" id="ev-modal-penyelenggara-row"><i class="fa-solid fa-user-tie"></i><span id="ev-modal-penyelenggara"></span></div>
+        <div class="ev-info-row" id="ev-modal-anggota-row"><i class="fa-solid fa-users"></i><span id="ev-modal-anggota"></span></div>
+      </div>
+      <div class="modal-actions" style="margin-top:20px">
+        <a id="ev-modal-link" href="#" target="_blank" class="btn-download ev-btn-join">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> <span id="ev-btn-label">Gabung Sekarang</span>
+        </a>
+      </div>
+      <div class="modal-share-row" id="ev-modal-share-row">
+        <button class="share-btn copy-btn" id="ev-copy-btn"><i class="fa-solid fa-copy"></i> Salin Link</button>
+        <button class="share-btn wa-share-btn" id="ev-wa-share-btn"><i class="fa-brands fa-whatsapp"></i> Share WA</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="compare-modal-overlay">
+  <div class="compare-modal-box" id="compare-modal-box">
+    <button class="modal-close" id="compare-modal-close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="compare-modal-header">
+      <i class="fa-solid fa-code-compare"></i>
+      <h2>Bandingkan Script</h2>
+    </div>
+    <div class="compare-modal-grid" id="compare-modal-grid"></div>
+  </div>
+</div>
+
+<script src="botify-db.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

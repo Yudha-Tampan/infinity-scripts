@@ -2,7 +2,7 @@
   "name": "Botify",
   "short_name": "Botify",
   "description": "Platform terbaik untuk script bot WhatsApp premium dan gratis.",
-  "start_url": "/",
+  "start_url": "/app.html",
   "display": "standalone",
   "background_color": "#03040f",
   "theme_color": "#00d4ff",

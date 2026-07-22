@@ -20,13 +20,13 @@
 
 <header class="topbar">
   <div class="topbar-left">
-    <a href="index.html" class="topbar-logo">
+    <a href="app.html" class="topbar-logo">
       <img src="logo.png" alt="logo" class="topbar-logo-img" />
       <span>Bot<b>ify</b></span>
     </a>
   </div>
   <div class="topbar-right">
-    <a class="icon-btn" href="index.html" title="Kembali"><i class="fa-solid fa-house"></i></a>
+    <a class="icon-btn" href="app.html" title="Kembali"><i class="fa-solid fa-house"></i></a>
   </div>
 </header>
 
@@ -37,6 +37,23 @@
     <img src="logo.png" alt="Botify" class="about-hero-logo" />
     <h1>Tentang <span>Botify</span></h1>
     <p>Botify adalah pusat script bot WhatsApp terbesar untuk komunitas Indonesia. Kami menghadirkan ratusan script MD, tools bug, panel, downloader, hingga script store dalam satu platform yang rapi, cepat, dan mudah dipakai baik untuk pemula maupun developer berpengalaman.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:12px;padding:0 4px;margin-top:18px;">
+    <a href="addscript.html" style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,136,255,.1));border:1px solid rgba(0,212,255,.35);border-radius:14px;text-decoration:none;color:#e6f2ff;">
+      <i class="fa-solid fa-plus-circle" style="font-size:24px;color:#00d4ff;"></i>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:15px;">Tambah Script</div>
+        <div style="font-size:12px;color:#93a4bd;">Kontribusi script bot ke Botify</div>
+      </div>
+      <i class="fa-solid fa-chevron-right" style="color:#93a4bd;"></i>
+    </a>
+    <div id="auth-row" style="display:flex;gap:10px;">
+      <a href="login.html" id="btn-login" style="flex:1;padding:12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:12px;text-align:center;text-decoration:none;color:#00d4ff;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;">Login</a>
+      <a href="register.html" id="btn-register" style="flex:1;padding:12px;background:linear-gradient(135deg,#00d4ff,#0088ff);border-radius:12px;text-align:center;text-decoration:none;color:#001827;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;">Daftar</a>
+      <button id="btn-logout" style="display:none;flex:1;padding:12px;background:rgba(255,80,100,.12);border:1px solid rgba(255,80,100,.3);border-radius:12px;color:#ff8090;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:inherit;">Logout</button>
+    </div>
+    <div id="auth-status" style="text-align:center;font-size:12px;color:#93a4bd;"></div>
   </section>
 
   <section class="about-story">
@@ -158,6 +175,27 @@
   <p>&copy; 2026 Botify. Dibuat untuk komunitas developer WhatsApp bot Indonesia.</p>
 </footer>
 
+<script src="botify-db.js"></script>
 <script src="about.js"></script>
+<script>
+  (function(){
+    function ready(fn){if(window.botifyDB)fn();else window.addEventListener('botifyDBReady',fn,{once:true});}
+    ready(async ()=>{
+      const user = await window.botifyDB.getUser();
+      const login=document.getElementById('btn-login');
+      const reg=document.getElementById('btn-register');
+      const out=document.getElementById('btn-logout');
+      const status=document.getElementById('auth-status');
+      if(user){
+        login.style.display='none'; reg.style.display='none'; out.style.display='block';
+        status.textContent='Login sebagai '+(user.email||user.id);
+      }
+      out.addEventListener('click', async ()=>{
+        await window.botifyDB.signOut();
+        location.reload();
+      });
+    });
+  })();
+</script>
 </body>
 </html>

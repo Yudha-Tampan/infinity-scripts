@@ -134,6 +134,11 @@ function goToPage(page) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+async function waitForBotifyDB(){
+  if (window.botifyDB) return window.botifyDB;
+  return new Promise(res => window.addEventListener('botifyDBReady', () => res(window.botifyDB), { once: true }));
+}
+
 async function loadScripts() {
   const scriptsGrid = document.getElementById('scripts-grid');
   const trendingGrid = document.getElementById('trending-grid');
@@ -142,12 +147,12 @@ async function loadScripts() {
   showSkeletons(trendingGrid, 3);
   showLeaderboardSkeletons(leaderboardList, 5);
   try {
-    const res = await fetch('scripts.json?v=' + Date.now());
-    if (!res.ok) throw new Error('fail');
-    allScripts = await res.json();
+    const db = await waitForBotifyDB();
+    allScripts = await db.listScripts();
   } catch(e) {
+    console.error(e);
     allScripts = [];
-    showToast('Gagal memuat scripts.json', 'error');
+    showToast('Gagal memuat script dari database', 'error');
   }
   const statTotal = document.getElementById('stat-total');
   if (statTotal) statTotal.textContent = allScripts.length;

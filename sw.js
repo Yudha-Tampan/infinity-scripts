@@ -1,7 +1,7 @@
 const CACHE_NAME = 'botify-v7';
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
+  '/app.html',
   '/style.css',
   '/script.js',
   '/about.html',
